@@ -1,0 +1,95 @@
+# =======================================================
+# Archivos de Dart y Flutter
+# =======================================================
+
+# Directorio de herramientas de Dart (reemplaza a .packages)
+.dart_tool/
+
+# Archivos de paquetes (obsoleto, pero bueno tenerlo)
+.packages
+
+# Directorio principal de salida de builds de Flutter
+build/
+
+# Registros de Flutter
+flutter_*.log
+*.log
+
+# Archivos generados por Flutter (plugins)
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Script de entorno generado
+flutter_export_environment.sh
+
+# =======================================================
+# Archivos de IDE (Android Studio / IntelliJ / VS Code)
+# =======================================================
+
+# Directorio de configuración de IntelliJ/Android Studio
+.idea/
+
+# Archivos de módulo de IntelliJ
+*.iml
+*.ipr
+*.iws
+
+# Archivos de configuración de VS Code (opcional, pero recomendado)
+.vscode/
+
+# =======================================================
+# Archivos específicos de Android (dentro de /android)
+# =======================================================
+
+# Archivos generados por Gradle
+android/.gradle/
+android/build/
+
+# Archivo de propiedades locales (¡MUY IMPORTANTE!)
+# Contiene rutas del SDK específicas de tu máquina.
+android/local.properties
+
+# Archivos de claves (Keystores) - ¡NUNCA subas tus claves!
+android/app/*.jks
+android/app/*.keystore
+android/*.jks
+android/*.keystore
+
+# Archivos de configuración específicos del IDE dentro de Android
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+
+# =======================================================
+# Archivos específicos de iOS (dentro de /ios)
+# =======================================================
+
+# Directorio de builds de Xcode
+ios/build/
+
+# Archivos de configuración de usuario de Xcode
+ios/Runner.xcworkspace/xcuserdata/
+ios/.symlinks/
+
+# Dependencias de CocoaPods
+ios/Pods/
+
+# Archivos generados por Flutter en iOS
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
+ios/Flutter/Flutter.podspec
+ios/Flutter/GeneratedPluginRegistrant.*
+
+# =======================================================
+# Archivos del Sistema Operativo
+# =======================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+desktop.ini
