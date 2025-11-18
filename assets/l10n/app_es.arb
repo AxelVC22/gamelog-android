@@ -1,0 +1,100 @@
+{
+"@@_GLOBAL": "=== TEXTOS GLOBALES ===",
+  "appName": "Gamelog",
+  "appTitle": "Gamelog",
+  "ok": "Aceptar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "close": "Cerrar",
+  "confirm": "Confirmar",
+  "loading": "Cargando...",
+  "error": "Error",
+  "success": "Éxito",
+  "yes": "Sí",
+  "no": "No",
+  "description": "Descripción",
+  "search": "Buscar",
+  "follow": "Seguir",
+  "friends": "Amigos",
+
+  "welcomeMessage": "¡Bienvenido, {username}!",
+  "@welcomeMessage": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+
+
+  "email": "Correo",
+  "user": "Usuario",
+  "password": "Contraseña",
+  "name": "Nombre",
+  "fathersSurname": "Primer apellido",
+  "mothersSurname": "Segundo apellido",
+  "userName": "Nombre de usuario",
+
+
+  "@@Titles": "=== TITULOS DE MODULOS ===",
+  "recoverPasswordTitle": "Recuperación de contraseña",
+  "createAccountTitle": "Creación de cuenta",
+  "searchProfileTitle": "Buscar perfil",
+  "profileTitle": "Perfil de usuario",
+  "editProfileTitle": "Editar perfil",
+  "favoriteGames": "Videojuegos favoritos",
+  "searchGameTitle": "Buscar juego",
+  "reviewGameTitle": "Reseñar juego",
+  "reviewHistoryTitle": "Historial de reseñas",
+  "gameTitle": "Juego",
+  "myReviewTitle": "Mi reseña",
+  "notificationsTitle": "Notificaciones",
+  "socialTitle": "Social",
+
+
+
+
+
+  "@@Auth": "=== Autenticación ===",
+
+  "login": "Iniciar sesiôn",
+  "createAccount": "Crear cuenta",
+  "recoverPassword": "Recuperar contraseña",
+  "verificationCode": "Código de verificación",
+  "verify": "Verificar",
+  "register": "Registrar",
+  "changePicture": "Cambiar foto",
+  "blackList": "Lista negra",
+
+
+
+
+  "@@ReviewManagement": "=== Gestion de resenas ===",
+
+  "gameName": "Nombre de juego",
+  "globalRating": "Calificación global",
+  "myRating": "Mi calificación",
+  "reviewGame": "Reseñar",
+  "showReviews": "Ver reseñas",
+  "rating": "Calificación",
+  "writeOpinion": "Escribe tu opinion",
+  "addToPendings": "Añadir a pendientes",
+  "allReviews": "Todos",
+
+  "@@Notifications": "=== Notificaciones ===",
+
+  "newFollowerNotification": "¡{username} ha comenzado a seguirte!",
+  "@newFollowerNotification": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@@Social": "=== Social ===",
+
+  "followers": "Seguidores",
+  "followedPlayers": "Seguidos"
+}

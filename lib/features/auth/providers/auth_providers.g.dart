@@ -90,5 +90,22 @@ final loginControllerProvider =
     );
 
 typedef _$LoginController = AutoDisposeAsyncNotifier<void>;
+String _$recoverPasswordControllerHash() =>
+    r'099b2b77be690beadceb248b44be66a77f9de33e';
+
+/// See also [RecoverPasswordController].
+@ProviderFor(RecoverPasswordController)
+final recoverPasswordControllerProvider =
+    AutoDisposeNotifierProvider<RecoverPasswordController, int>.internal(
+      RecoverPasswordController.new,
+      name: r'recoverPasswordControllerProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$recoverPasswordControllerHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$RecoverPasswordController = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
