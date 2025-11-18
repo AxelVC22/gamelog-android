@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,6 +8,8 @@ import '../../../../core/domain/use_cases/login_use_case.dart';
 import '../../../../core/domain/entities/user.dart';
 
 part 'auth_providers.g.dart';
+
+final currentUserProvider = StateProvider<User?>((ref) => null);
 
 @Riverpod(keepAlive: true)
 FlutterSecureStorage secureStorage(SecureStorageRef ref) {
@@ -59,5 +62,25 @@ class LoginController extends AutoDisposeAsyncNotifier<void> {
         state = const AsyncValue.data(null);
       },
     );
+  }
+}
+
+@riverpod
+class RecoverPasswordController extends _$RecoverPasswordController {
+  @override
+  int build() {
+    return 1;
+  }
+
+  void next() {
+    state = state + 1;
+  }
+
+  void previous() {
+    if (state > 1) state = state - 1;
+  }
+
+  void goTo(int paso) {
+    state = paso;
   }
 }

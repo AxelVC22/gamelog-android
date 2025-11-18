@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/auth/views/create_account_screen.dart';
+import 'package:gamelog/features/auth/views/recover_password_screen.dart';
+import 'package:gamelog/features/home/views/home_screen.dart';
+import 'package:gamelog/features/user_management/views/search_profile_screen.dart';
+import '../../../core/domain/entities/user.dart';
+import '../../../widgets/app_button.dart';
+import '../../../widgets/app_link_text.dart';
+import '../../../widgets/app_module_title.dart';
+import '../../../widgets/app_password_field.dart';
+import '../../../widgets/app_text_field.dart';
 import '../providers/auth_providers.dart';
+import 'package:gamelog/l10n/app_localizations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -12,8 +23,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
-  final List<String> _userTypes = ['Jugador', 'Administrador']; // <-- AJUSTA SI ES NECESARIO
+
+  final List<String> _userTypes = ['Jugador', 'Administrador'];
   String? _selectedUserType;
 
   @override
@@ -24,109 +35,103 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _performLogin() {
-    if (_selectedUserType == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, selecciona un tipo de usuario')),
+
+    //todo: agregar logica
+
+      ref.read(currentUserProvider.notifier).state = new User (username: "nombre de usuario", description: '', accessType: '');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HomeScreen(),
+        ),
       );
       return;
-    }
 
-    ref.read(loginControllerProvider.notifier).login(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-          _selectedUserType!,
-        );
+
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(loginControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
-    ref.listen<AsyncValue<void>>(
-      loginControllerProvider,
-      (previous, next) {
-        if (next is AsyncError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(next.error.toString())),
-          );
-        }
-        if (next is AsyncData) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('¡Login exitoso!')),
-          );
-        }
-      },
-    );
+    ref.listen<AsyncValue<void>>(loginControllerProvider, (previous, next) {
+      if (next is AsyncError) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.error.toString())));
+      }
+      if (next is AsyncData) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('¡Login exitoso!')));
+      }
+    });
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                
-                Image.asset(
-                  'assets/images/isotipo.png',
-                  height: 150.0,
-                ),
-                const SizedBox(height: 48.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Image.asset('assets/images/isotipo.png', height: 150.0),
+              const SizedBox(height: 48.0),
+              Center(child: AppModuleTitle(title: l10n.appName)),
 
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Correo',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
+              AppTextField(
+                label: l10n.email,
+                icon: Icons.email,
+                controller: _emailController,
+              ),
+              const SizedBox(height: 20.0),
 
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Contraseña',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
+              AppPasswordField(
+                label: l10n.password,
+                hint: l10n.password,
+                controller: _passwordController,
+              ),
+              const SizedBox(height: 16.0),
 
-                DropdownButtonFormField<String>(
-                  value: _selectedUserType,
-                  hint: const Text('Tipo de Usuario'),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                  ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedUserType = newValue;
-                    });
-                  },
-                  items: _userTypes.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
+              Center(
+                child: AppLinkText(
+                  text: l10n.recoverPassword,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RecoverPasswordScreen(),
+                      ),
                     );
-                  }).toList(),
+                  },
                 ),
-                const SizedBox(height: 24.0),
+              ),
 
-                ElevatedButton(
-                  onPressed: state.isLoading ? null : _performLogin,
-                  child: state.isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Ingresar'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                  ),
-                ),
-              ],
-            ),
+              const SizedBox(height: 24.0),
+              AppButton(
+                text: l10n.login,
+                isLoading: state.isLoading,
+                onPressed: () {
+                 _performLogin();
+                },
+                type: AppButtonType.primary,
+              ),
+              const SizedBox(height: 8.0),
+              AppButton(
+                text: l10n.createAccount,
+
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CreateAccountScreen(),
+                    ),
+                  );
+                },
+                type: AppButtonType.secondary,
+              ),
+            ],
           ),
         ),
       ),
