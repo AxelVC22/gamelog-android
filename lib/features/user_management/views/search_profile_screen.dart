@@ -23,9 +23,9 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
   final _searchingStringController = TextEditingController();
 
   List<User> allProfiles = [
-    new User (username: 'Carlos', accessType: '', description: 'god del gaming mexicano xddddd'),
-    new User (username: 'Ana', accessType: '', description: 'experto en resenas'),
-    new User (username: 'Pedro', accessType: '', description: 'jugador casual')
+    // new User (name: 'Carlos', accessType: '', description: 'god del gaming mexicano xddddd'),
+    // new User (name: 'Ana', accessType: '', description: 'experto en resenas'),
+    // new User (name: 'Pedro', accessType: '', description: 'jugador casual')
   ];
 
   List<User> results = [];
@@ -39,7 +39,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
 
     setState(() {
       results = allProfiles
-          .where((user) => user.username.toLowerCase().contains(query.toLowerCase()))
+          .where((user) => user.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
 
       isLoading = false;
@@ -91,7 +91,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
                     itemCount: results.length,
                     itemBuilder: (_, i) {
                       return AppProfileCard(
-                        name: results[i].username,
+                        name: results[i].name,
                         imageUrl: "",
                         onTap: () { Navigator.push(
                           context,

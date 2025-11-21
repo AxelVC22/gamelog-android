@@ -36,22 +36,11 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(loginControllerProvider);
+
     final l10n = AppLocalizations.of(context)!;
     final step = ref.watch(recoverPasswordControllerProvider);
 
-    ref.listen<AsyncValue<void>>(loginControllerProvider, (previous, next) {
-      if (next is AsyncError) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error.toString())));
-      }
-      if (next is AsyncData) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('¡Login exitoso!')));
-      }
-    });
+
 
     return Scaffold(
       backgroundColor: Colors.white,

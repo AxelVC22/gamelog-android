@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       localizationsDelegates: [
         AppLocalizations.delegate,
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
       ],
       locale: Locale('es'),
 
-      title: 'Gamelog',
+      title: 'GameLog',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
