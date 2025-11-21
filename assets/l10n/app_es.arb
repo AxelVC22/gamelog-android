@@ -96,5 +96,19 @@
   "@@Social": "=== Social ===",
 
   "followers": "Seguidores",
-  "followedPlayers": "Seguidos"
+  "followedPlayers": "Seguidos",
+
+  "@@Errors": "=== Errores ===",
+
+  "unexpectedError": "Error inesperado",
+
+  "@@ValidationMessages": "=== Mensajes de validacion ===",
+  "requiredField" : "El campo es obligatorio",
+  "invalidName": "El nombre es inválido",
+  "invalidFathersSurname": "El primer apellido es invalido",
+  "invalidMotherSurname": "El segundo apellido es invalido",
+  "invalidUsername": "El nombre de usuario es invalido",
+  "invalidPassword": "La contrasena no es segura",
+  "invalidEmail": "El correo es invalido",
+  "invalidDescription": "La descripcion es invalida"
 }

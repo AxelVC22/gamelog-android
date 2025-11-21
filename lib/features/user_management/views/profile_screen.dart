@@ -50,7 +50,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Expanded(
                     child: Column(
                       children: <Widget>[
-                        AppModuleTitle(title: widget.user.username),
+                        AppModuleTitle(title: widget.user.name),
                         AppButton(
                           text: l10n.follow,
 

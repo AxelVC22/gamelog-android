@@ -9,7 +9,7 @@ enum AppButtonType {
 
 class AppButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final void Function()? onPressed;
   final AppButtonType type;
   final IconData? icon;
   final bool isLoading;

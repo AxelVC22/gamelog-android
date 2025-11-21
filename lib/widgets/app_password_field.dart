@@ -6,12 +6,15 @@ class AppPasswordField extends StatefulWidget {
   final String? hint;
   final bool enabled;
 
+  final String? Function(String?)? validator;
+
   const AppPasswordField({
     super.key,
     required this.label,
     required this.controller,
     this.hint,
     this.enabled = true,
+    this.validator,
   });
 
   @override
@@ -20,6 +23,16 @@ class AppPasswordField extends StatefulWidget {
 
 class _AppPasswordFieldState extends State<AppPasswordField> {
   bool _obscure = true;
+
+  String? _errorText;
+
+  void _validate(String? value) {
+    if (widget.validator != null) {
+      setState(() {
+        _errorText = widget.validator!(value);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +43,10 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
           controller: widget.controller,
           enabled: widget.enabled,
           obscureText: _obscure,
+          onChanged: _validate,
           decoration: InputDecoration(
             hintText: widget.hint,
+            errorText: _errorText,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
             ),

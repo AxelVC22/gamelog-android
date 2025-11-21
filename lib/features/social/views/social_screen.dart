@@ -24,9 +24,9 @@ class SocialScreen extends ConsumerStatefulWidget {
 
 class _SocialScreenState extends ConsumerState<SocialScreen> {
   List<User> allProfiles = [
-    new User (username: 'Carlos', accessType: '', description: 'god del gaming mexicano xddddd'),
-    new User (username: 'Ana', accessType: '', description: 'experto en resenas'),
-    new User (username: 'Pedro', accessType: '', description: 'jugador casual')
+    // new User (name: 'Carlos', accessType: '', description: 'god del gaming mexicano xddddd'),
+    // new User (name: 'Ana', accessType: '', description: 'experto en resenas'),
+    // new User (name: 'Pedro', accessType: '', description: 'jugador casual')
   ];
 
   @override
@@ -46,7 +46,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
 
     setState(() {
       results = allProfiles
-          .where((user) => user.username.toLowerCase().contains(query.toLowerCase()))
+          .where((user) => user.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
 
       isLoading = false;
@@ -98,7 +98,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                     itemCount: results.length,
                     itemBuilder: (_, i) {
                       return AppFollowerCard(
-                        name: results[i].username,
+                        name: results[i].name,
                         imageUrl: "",
                         onTap: () { Navigator.push(
                           context,
