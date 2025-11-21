@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/auth/models/login_request.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
 import 'package:gamelog/features/home/views/home_screen.dart';
@@ -10,8 +11,11 @@ import '../../../widgets/app_link_text.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
+import '../models/login_response.dart';
 import '../providers/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
+
+import '../providers/login_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -35,37 +39,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _performLogin() {
-
     //todo: agregar logica
 
-      ref.read(currentUserProvider.notifier).state = new User (username: "nombre de usuario", description: '', accessType: '');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HomeScreen(),
-        ),
-      );
-      return;
-
-
+    ref.read(currentUserProvider.notifier).state = new User(
+      name: "nombre de usuario",
+      description: '',
+      email: '',
+      status: '',
+      fathersSurname: '',
+      username: '',
+      userType: '',
+    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(loginControllerProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    ref.listen<AsyncValue<void>>(loginControllerProvider, (previous, next) {
-      if (next is AsyncError) {
-        ScaffoldMessenger.of(
+    ref.listen<AsyncValue<LoginResponse?>>(loginControllerProvider, (
+      previous,
+      next,
+    ) {
+      next.when(
+        data: (loginResponse) {
+          if (loginResponse != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(loginResponse.message)));
+          }
+        },
+        loading: () => print('Login en progreso...'),
+        error: (err, stack) => ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(next.error.toString())));
-      }
-      if (next is AsyncData) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('¡Login exitoso!')));
-      }
+        ).showSnackBar(SnackBar(content: Text(err.toString()))),
+      );
     });
 
     return Scaffold(
@@ -110,26 +119,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
               const SizedBox(height: 24.0),
               AppButton(
-                text: l10n.login,
-                isLoading: state.isLoading,
-                onPressed: () {
-                 _performLogin();
-                },
-                type: AppButtonType.primary,
-              ),
-              const SizedBox(height: 8.0),
-              AppButton(
                 text: l10n.createAccount,
 
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => CreateAccountScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => CreateAccountScreen()),
                   );
                 },
                 type: AppButtonType.secondary,
+              ),
+              const SizedBox(height: 8.0),
+              AppButton(
+                text: l10n.login,
+
+                onPressed: () async {
+                  final request = LoginRequest(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    userType: 'Jugador',
+                  );
+
+                  await ref
+                      .read(loginControllerProvider.notifier)
+                      .login(request);
+
+
+                },
               ),
             ],
           ),

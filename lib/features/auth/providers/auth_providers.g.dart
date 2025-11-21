@@ -23,7 +23,7 @@ final secureStorageProvider = Provider<FlutterSecureStorage>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SecureStorageRef = ProviderRef<FlutterSecureStorage>;
-String _$dioHash() => r'749cdeb129ae9a6661f9e3ec22f492ffc3a535dd';
+String _$dioHash() => r'f0a6b4a200c804c5701c6b79a33146642af43491';
 
 /// See also [dio].
 @ProviderFor(dio)
@@ -74,22 +74,6 @@ final loginUseCaseProvider = Provider<LoginUseCase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LoginUseCaseRef = ProviderRef<LoginUseCase>;
-String _$loginControllerHash() => r'81f509f238a89312a92c39b2fe333a35038d60fd';
-
-/// See also [LoginController].
-@ProviderFor(LoginController)
-final loginControllerProvider =
-    AutoDisposeAsyncNotifierProvider<LoginController, void>.internal(
-      LoginController.new,
-      name: r'loginControllerProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$loginControllerHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$LoginController = AutoDisposeAsyncNotifier<void>;
 String _$recoverPasswordControllerHash() =>
     r'099b2b77be690beadceb248b44be66a77f9de33e';
 

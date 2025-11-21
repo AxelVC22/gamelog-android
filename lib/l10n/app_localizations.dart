@@ -447,6 +447,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Seguidos'**
   String get followedPlayers;
+
+  /// No description provided for @unexpectedError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error inesperado'**
+  String get unexpectedError;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In es, this message translates to:
+  /// **'El campo es obligatorio'**
+  String get requiredField;
+
+  /// No description provided for @invalidName.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre es inválido'**
+  String get invalidName;
+
+  /// No description provided for @invalidFathersSurname.
+  ///
+  /// In es, this message translates to:
+  /// **'El primer apellido es invalido'**
+  String get invalidFathersSurname;
+
+  /// No description provided for @invalidMotherSurname.
+  ///
+  /// In es, this message translates to:
+  /// **'El segundo apellido es invalido'**
+  String get invalidMotherSurname;
+
+  /// No description provided for @invalidUsername.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre de usuario es invalido'**
+  String get invalidUsername;
+
+  /// No description provided for @invalidPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'La contrasena no es segura'**
+  String get invalidPassword;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'El correo es invalido'**
+  String get invalidEmail;
+
+  /// No description provided for @invalidDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'La descripcion es invalida'**
+  String get invalidDescription;
 }
 
 class _AppLocalizationsDelegate

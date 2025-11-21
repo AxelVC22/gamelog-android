@@ -188,4 +188,31 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get followedPlayers => 'Seguidos';
+
+  @override
+  String get unexpectedError => 'Error inesperado';
+
+  @override
+  String get requiredField => 'El campo es obligatorio';
+
+  @override
+  String get invalidName => 'El nombre es inválido';
+
+  @override
+  String get invalidFathersSurname => 'El primer apellido es invalido';
+
+  @override
+  String get invalidMotherSurname => 'El segundo apellido es invalido';
+
+  @override
+  String get invalidUsername => 'El nombre de usuario es invalido';
+
+  @override
+  String get invalidPassword => 'La contrasena no es segura';
+
+  @override
+  String get invalidEmail => 'El correo es invalido';
+
+  @override
+  String get invalidDescription => 'La descripcion es invalida';
 }
