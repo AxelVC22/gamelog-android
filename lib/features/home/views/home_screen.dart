@@ -2,13 +2,19 @@ import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/auth/models/logout_response.dart';
+import 'package:gamelog/features/auth/providers/logout_controller.dart';
+import 'package:gamelog/features/auth/views/login_screen.dart';
 import 'package:gamelog/features/notifications/views/notifications_screen.dart';
 import 'package:gamelog/features/review_management/views/review_history_screen.dart';
 import 'package:gamelog/features/social/views/social_screen.dart';
 import 'package:gamelog/features/user_management/views/my_profile_screen.dart';
 import 'package:gamelog/features/user_management/views/search_profile_screen.dart';
+import 'package:gamelog/l10n/app_localizations_extension.dart';
 
+import '../../../core/domain/failures/failure.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_button.dart';
 import '../../../widgets/app_module_title.dart';
@@ -23,9 +29,54 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreen extends ConsumerState<HomeScreen> {
+
+  Future<void> performLogout() async {
+    final email = ref.read(currentUserProvider)?.email;
+
+    await ref.read(logoutControllerProvider.notifier).logout(email!);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    ref.listen<AsyncValue<LogoutResponse?>>(logoutControllerProvider, (
+        previous,
+        next,
+        ) {
+      next.when(
+        loading: () {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        },
+        data: (response) {
+          ref.read(globalLoadingProvider.notifier).state = false;
+          if (response == null) return;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("Adios")));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => LoginScreen()),
+            );
+          });
+        },
+        error: (error, stack) {
+          ref.read(globalLoadingProvider.notifier).state = false;
+
+          final msg = error is Failure
+              ? (error.serverMessage ?? l10n.byKey(error.code))
+              : error.toString();
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(msg)));
+          });
+        },
+      );
+    });
 
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
@@ -61,7 +112,7 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
         elevation: 0,
         leading: AppIconButton(
           icon: Icons.logout,
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => performLogout(),
         ),
         actions: [
           IconButton(

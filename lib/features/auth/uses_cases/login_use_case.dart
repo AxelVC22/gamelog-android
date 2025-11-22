@@ -11,10 +11,10 @@ class LoginUseCase {
   LoginUseCase(this.repository);
 
   Future<Either<Failure, LoginResponse>> call(LoginRequest request) async {
-    //
-    // if (request.password.trim().isEmpty || request.password.length < 3 || request.password.length > 50) {
-    //   return left(Failure(ErrorCodes.invalidPassword));
-    // }
+
+    if (request.password.trim().isEmpty || request.password.length < 3 || request.password.length > 50) {
+      return left(Failure(ErrorCodes.invalidPassword));
+    }
 
     if (request.email.isEmpty || !request.email.contains("@") || request.email.length > 50) {
       return left(Failure(ErrorCodes.invalidEmail));

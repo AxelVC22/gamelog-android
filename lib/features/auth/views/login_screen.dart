@@ -178,7 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               AppButton(
                 text: l10n.login,
 
-                onPressed: isValid ? () async => await performLogin() : null,
+                onPressed: isValid ? () => performLogin() : null,
               ),
 
               const SizedBox(height: 8.0),
