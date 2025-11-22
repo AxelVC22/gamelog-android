@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/domain/entities/user.dart';
 import 'package:gamelog/features/auth/models/login_request.dart';
+import 'package:gamelog/features/auth/providers/auth_providers.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
 import 'package:gamelog/features/home/views/home_screen.dart';
@@ -67,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       passwordErrorProvider.select((f) => f.isValid),
     );
 
-    final isValid = isEmailValid; //&& isPasswordValid;
+    final isValid = isEmailValid && isPasswordValid;
 
     ref.listen<AsyncValue<LoginResponse?>>(loginControllerProvider, (
       previous,
@@ -79,14 +80,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         },
         data: (response) {
           ref.read(globalLoadingProvider.notifier).state = false;
-
           if (response == null) return;
+
+          ref.read(currentUserProvider.notifier).state = response.accounts.first;
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(response.message)));
-
+            ).showSnackBar(SnackBar(content: Text("Bienvenido")));
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => HomeScreen()),
@@ -146,7 +147,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 controller: _passwordController,
                 errorText: passwordError.error,
                 onChanged: (value) {
-
                   final notifier = ref.read(passwordErrorProvider.notifier);
 
                   String? error;
