@@ -196,7 +196,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get requiredField => 'El campo es obligatorio';
 
   @override
-  String get invalidName => 'El nombre es inválido';
+  String get invalidName =>
+      'El nombre es invalido (3-50 caracteres solo letras)';
 
   @override
   String get invalidFathersSurname => 'El primer apellido es invalido';
@@ -208,11 +209,39 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invalidUsername => 'El nombre de usuario es invalido';
 
   @override
-  String get invalidPassword => 'La contrasena no es segura';
+  String get invalidPassword =>
+      'La contrasena no es segura: procura usar mas de 8 caracteres \n Menos de 50 letras simbolos etc';
 
   @override
   String get invalidEmail => 'El correo es invalido';
 
   @override
   String get invalidDescription => 'La descripcion es invalida';
+
+  @override
+  String get nameFormat =>
+      'El nombre debe ser entre 3-50 caracteres y solo debe contener letras';
+
+  @override
+  String get fathersSurnameFormat =>
+      'El primer apellido debe ser entre 3-50 caracteres y solo debe contener letras';
+
+  @override
+  String get mothersSurnameFormat =>
+      'El segundo apellido debe ser entre 3-50 caracteres y solo debe contener letras';
+
+  @override
+  String get usernameFormat =>
+      'El nombre de usuario ser entre 3-50 caracteres y solo debe contener letras';
+
+  @override
+  String get emailFormat =>
+      'El correo ser entre 3-50 caracteres y debe contener @ y .';
+
+  @override
+  String get descriptionFormat =>
+      'La descripcion ser entre 3-100 caracteres y solo debe contener letras';
+
+  @override
+  String get unknownError => 'Ha ocurrido un error desconocido';
 }

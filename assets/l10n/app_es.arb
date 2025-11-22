@@ -102,13 +102,33 @@
 
   "unexpectedError": "Error inesperado",
 
-  "@@ValidationMessages": "=== Mensajes de validacion ===",
+  "@@ValidationMessages": "=== Mensajes de validacion UI===",
   "requiredField" : "El campo es obligatorio",
-  "invalidName": "El nombre es inválido",
+  "invalidName": "El nombre es invalido (3-50 caracteres solo letras)",
   "invalidFathersSurname": "El primer apellido es invalido",
   "invalidMotherSurname": "El segundo apellido es invalido",
   "invalidUsername": "El nombre de usuario es invalido",
-  "invalidPassword": "La contrasena no es segura",
+  "invalidPassword": "La contrasena no es segura: procura usar mas de 8 caracteres \n Menos de 50 letras simbolos etc",
   "invalidEmail": "El correo es invalido",
-  "invalidDescription": "La descripcion es invalida"
+  "invalidDescription": "La descripcion es invalida",
+
+  "@@FormatFields": "=== Formato de campos ===",
+
+  "nameFormat": "El nombre debe ser entre 3-50 caracteres y solo debe contener letras",
+  "fathersSurnameFormat": "El primer apellido debe ser entre 3-50 caracteres y solo debe contener letras",
+  "mothersSurnameFormat": "El segundo apellido debe ser entre 3-50 caracteres y solo debe contener letras",
+  "usernameFormat": "El nombre de usuario ser entre 3-50 caracteres y solo debe contener letras",
+  "emailFormat" : "El correo ser entre 3-50 caracteres y debe contener @ y .",
+  "descriptionFormat" : "La descripcion ser entre 3-100 caracteres y solo debe contener letras",
+
+
+
+
+  "@@Validation": "=== Validaciion de CU ===",
+
+  "unknownError": "Ha ocurrido un error desconocido",
+  "@unknownError": {
+    "description": "Mensaje de error genérico"
+  }
+
 }

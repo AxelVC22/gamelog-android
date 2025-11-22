@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/constants/api_constants.dart';
+import 'package:gamelog/core/messages/error_codes.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/register_user_reponse.dart';
@@ -30,13 +31,13 @@ class AuthRepositoryImpl implements AuthRepository {
         if (token != null) {
           await storage.write(key: 'token', value: token);
         }
-        return Right(LoginResponse.fromJson(response.data));
+        final res = LoginResponse.fromJson(response.data);
+        return Right(LoginResponse(message: res.message, error: false));
       } else {
-        final message = response.data['mensaje'] ?? 'unexpected_error';
-        return Left(Failure(message));
+        return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure('unexpected_error'));
+      return Left(Failure(ErrorCodes.unexpectedError));
     }
   }
 
@@ -50,14 +51,14 @@ class AuthRepositoryImpl implements AuthRepository {
         Failure(e.response?.data['mensaje'] ?? 'Error al cerrar sesión'),
       );
     } catch (e) {
-      return Left(Failure("unexpected_error"));
+      return Left(Failure(ErrorCodes.unexpectedError));
     } finally {
       await storage.delete(key: 'token');
     }
   }
 
   @override
-  Future<Either<Failure, String>> registerUser(
+  Future<Either<Failure, RegisterUserResponse>> registerUser(
     RegisterUserRequest request,
   ) async {
     try {
@@ -69,13 +70,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final res = RegisterUserResponse.fromJson(response.data);
-        return Right(res.message);
+        return Right(RegisterUserResponse(message: res.message, error: false));
       } else {
-        final res = RegisterUserResponse.fromJson(response.data);
-        return Left(Failure(res.message));
+        return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure("unexpected_error"));
+      return Left(Failure(ErrorCodes.unexpectedError));
     }
   }
 }

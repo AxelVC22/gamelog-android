@@ -463,7 +463,7 @@ abstract class AppLocalizations {
   /// No description provided for @invalidName.
   ///
   /// In es, this message translates to:
-  /// **'El nombre es inválido'**
+  /// **'El nombre es invalido (3-50 caracteres solo letras)'**
   String get invalidName;
 
   /// No description provided for @invalidFathersSurname.
@@ -487,7 +487,7 @@ abstract class AppLocalizations {
   /// No description provided for @invalidPassword.
   ///
   /// In es, this message translates to:
-  /// **'La contrasena no es segura'**
+  /// **'La contrasena no es segura: procura usar mas de 8 caracteres \n Menos de 50 letras simbolos etc'**
   String get invalidPassword;
 
   /// No description provided for @invalidEmail.
@@ -501,6 +501,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'La descripcion es invalida'**
   String get invalidDescription;
+
+  /// No description provided for @nameFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre debe ser entre 3-50 caracteres y solo debe contener letras'**
+  String get nameFormat;
+
+  /// No description provided for @fathersSurnameFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'El primer apellido debe ser entre 3-50 caracteres y solo debe contener letras'**
+  String get fathersSurnameFormat;
+
+  /// No description provided for @mothersSurnameFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'El segundo apellido debe ser entre 3-50 caracteres y solo debe contener letras'**
+  String get mothersSurnameFormat;
+
+  /// No description provided for @usernameFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre de usuario ser entre 3-50 caracteres y solo debe contener letras'**
+  String get usernameFormat;
+
+  /// No description provided for @emailFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'El correo ser entre 3-50 caracteres y debe contener @ y .'**
+  String get emailFormat;
+
+  /// No description provided for @descriptionFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'La descripcion ser entre 3-100 caracteres y solo debe contener letras'**
+  String get descriptionFormat;
+
+  /// Mensaje de error genérico
+  ///
+  /// In es, this message translates to:
+  /// **'Ha ocurrido un error desconocido'**
+  String get unknownError;
 }
 
 class _AppLocalizationsDelegate

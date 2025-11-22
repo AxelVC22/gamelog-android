@@ -1,29 +1,33 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/models/login_request.dart';
+import 'package:gamelog/features/auth/providers/auth_providers.dart';
+import 'package:gamelog/features/auth/uses_cases/login_use_case.dart';
 
 import '../models/login_response.dart';
-import '../repositories/auth_repository.dart';
-import 'auth_providers.dart';
 
 final loginControllerProvider =
-    StateNotifierProvider<LoginController, AsyncValue<LoginResponse?>>(
-      (ref) => LoginController(ref.watch(authRepositoryProvider)),
+    NotifierProvider<LoginController, AsyncValue<LoginResponse?>>(
+      LoginController.new,
     );
 
-class LoginController extends StateNotifier<AsyncValue<LoginResponse?>> {
-  final AuthRepository repository;
+class LoginController extends Notifier<AsyncValue<LoginResponse?>> {
+  late final LoginUseCase _loginUseCase;
 
-  LoginController(this.repository) : super(const AsyncValue.data(null));
+  @override
+  AsyncValue<LoginResponse?> build() {
+    final repo = ref.read(authRepositoryProvider);
+    _loginUseCase = LoginUseCase(repo);
+    return const AsyncData(null);
+  }
 
-  Future<void> login(LoginRequest request) async {
-    state = const AsyncValue.loading();
+  Future<void> login(LoginRequest req) async {
+    state = const AsyncLoading();
 
-    final result = await repository.login(request);
+    final result = await _loginUseCase(req);
 
-    result.fold(
-      (failure) =>
-          state = AsyncValue.error(failure.message, StackTrace.current),
-      (loginResponse) => state = AsyncValue.data(loginResponse),
+    state = result.fold(
+      (f) => AsyncError(f, StackTrace.current),
+      (r) => AsyncData(r),
     );
   }
 }
