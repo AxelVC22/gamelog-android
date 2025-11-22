@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/messages/error_codes.dart';
+import 'package:gamelog/features/auth/models/logout_response.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/register_user_reponse.dart';
@@ -42,18 +43,22 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> logout(String email) async {
+  Future<Either<Failure, LogoutResponse>> logout(String email) async {
     try {
-      await dio.delete('/gamelog/login/$email');
-      return Right(null);
-    } on DioException catch (e) {
-      return Left(
-        Failure(e.response?.data['mensaje'] ?? 'Error al cerrar sesión'),
+      final response = await dio.delete(
+        '${ApiConstants.logout}/$email',
+        options: Options(validateStatus: (status) => status! < 600),
       );
+
+      if (response.statusCode == 200) {
+        await storage.delete(key: 'token');
+        final res = LogoutResponse.fromJson(response.data);
+        return Right(LogoutResponse(message: res.message, error: false));
+      } else {
+        return Left(Failure.server(response.data['mensaje']));
+      }
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));
-    } finally {
-      await storage.delete(key: 'token');
     }
   }
 
