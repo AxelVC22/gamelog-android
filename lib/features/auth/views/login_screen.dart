@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/domain/entities/user.dart';
 import 'package:gamelog/features/auth/models/login_request.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
 import 'package:gamelog/features/home/views/home_screen.dart';
-import 'package:gamelog/features/user_management/views/search_profile_screen.dart';
-import '../../../core/domain/entities/user.dart';
+import 'package:gamelog/l10n/app_localizations_extension.dart';
+import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/field_state.dart';
+import '../../../core/helpers/field_validator.dart';
 import '../../../widgets/app_button.dart';
+import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_link_text.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
 import '../models/login_response.dart';
-import '../providers/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../providers/login_controller.dart';
@@ -28,8 +31,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  final List<String> _userTypes = ['Jugador', 'Administrador'];
-  String? _selectedUserType;
+  final emailErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final passwordErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
 
   @override
   void dispose() {
@@ -38,42 +45,67 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _performLogin() {
-    //todo: agregar logica
-
-    ref.read(currentUserProvider.notifier).state = new User(
-      name: "nombre de usuario",
-      description: '',
-      email: '',
-      status: '',
-      fathersSurname: '',
-      username: '',
-      userType: '',
+  Future<void> performLogin() async {
+    final request = LoginRequest(
+      email: _emailController.text,
+      password: _passwordController.text,
+      userType: UserType.Jugador.name,
     );
-    Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
-    return;
+
+    await ref.read(loginControllerProvider.notifier).login(request);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final emailError = ref.watch(emailErrorProvider);
+    final passwordError = ref.watch(passwordErrorProvider);
+
+    final isEmailValid = ref.watch(emailErrorProvider.select((f) => f.isValid));
+    final isPasswordValid = ref.watch(
+      passwordErrorProvider.select((f) => f.isValid),
+    );
+
+    final isValid = isEmailValid; //&& isPasswordValid;
+
     ref.listen<AsyncValue<LoginResponse?>>(loginControllerProvider, (
       previous,
       next,
     ) {
       next.when(
-        data: (loginResponse) {
-          if (loginResponse != null) {
+        loading: () {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        },
+        data: (response) {
+          ref.read(globalLoadingProvider.notifier).state = false;
+
+          if (response == null) return;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(loginResponse.message)));
-          }
+            ).showSnackBar(SnackBar(content: Text(response.message)));
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => HomeScreen()),
+            );
+          });
         },
-        loading: () => print('Login en progreso...'),
-        error: (err, stack) => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(err.toString()))),
+        error: (error, stack) {
+          ref.read(globalLoadingProvider.notifier).state = false;
+
+          final msg = error is Failure
+              ? (error.serverMessage ?? l10n.byKey(error.code))
+              : error.toString();
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(msg)));
+          });
+        },
       );
     });
 
@@ -93,6 +125,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 label: l10n.email,
                 icon: Icons.email,
                 controller: _emailController,
+                errorText: emailError.error,
+                onChanged: (value) {
+                  final notifier = ref.read(emailErrorProvider.notifier);
+
+                  String? error;
+                  if (value.isEmpty) {
+                    error = l10n.requiredField;
+                  } else if (!FieldValidator.isEmail(value)) {
+                    error = l10n.invalidEmail;
+                  }
+                  notifier.state = FieldState(error: error, touched: true);
+                },
               ),
               const SizedBox(height: 20.0),
 
@@ -100,6 +144,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 label: l10n.password,
                 hint: l10n.password,
                 controller: _passwordController,
+                errorText: passwordError.error,
+                onChanged: (value) {
+
+                  final notifier = ref.read(passwordErrorProvider.notifier);
+
+                  String? error;
+                  if (value.isEmpty) {
+                    error = l10n.requiredField;
+                  } else if (!FieldValidator.isStrongPassword(value)) {
+                    error = l10n.invalidPassword;
+                  }
+                  notifier.state = FieldState(error: error, touched: true);
+                },
               ),
               const SizedBox(height: 16.0),
 
@@ -119,6 +176,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
               const SizedBox(height: 24.0),
               AppButton(
+                text: l10n.login,
+
+                onPressed: isValid ? () async => await performLogin() : null,
+              ),
+
+              const SizedBox(height: 8.0),
+              AppButton(
                 text: l10n.createAccount,
 
                 onPressed: () {
@@ -128,24 +192,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   );
                 },
                 type: AppButtonType.secondary,
-              ),
-              const SizedBox(height: 8.0),
-              AppButton(
-                text: l10n.login,
-
-                onPressed: () async {
-                  final request = LoginRequest(
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                    userType: 'Jugador',
-                  );
-
-                  await ref
-                      .read(loginControllerProvider.notifier)
-                      .login(request);
-
-
-                },
               ),
             ],
           ),

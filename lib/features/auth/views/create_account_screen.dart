@@ -1,17 +1,18 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/helpers/field_validator.dart';
-import 'package:gamelog/features/auth/views/recover_password_screen.dart';
+import 'package:gamelog/l10n/app_localizations_extension.dart';
 import '../../../core/domain/entities/user.dart';
+import '../../../core/domain/failures/failure.dart';
 import '../../../core/helpers/field_state.dart';
 import '../../../widgets/app_button.dart';
-import '../../../widgets/app_link_text.dart';
+import '../../../widgets/app_global_loader.dart';
+
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
+import '../models/register_user_reponse.dart';
 import '../models/register_user_request.dart';
-import '../providers/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 import '../providers/register_controller.dart';
 
@@ -33,14 +34,26 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   final _passwordController = TextEditingController();
 
   final nameErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final fathersSurnameErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final mothersSurnameErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final usernameErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final descriptionErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final emailErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
+  final passwordErrorProvider = StateProvider<FieldState>(
         (ref) => const FieldState(),
   );
-  final fathersSurnameErrorProvider = StateProvider<String?>((ref) => null);
-  final mothersSurnameErrorProvider = StateProvider<String?>((ref) => null);
-  final usernameErrorProvider = StateProvider<String?>((ref) => null);
-  final descriptionErrorProvider = StateProvider<String?>((ref) => null);
-  final emailErrorProvider = StateProvider<String?>((ref) => null);
-  final passwordErrorProvider = StateProvider<String?>((ref) => null);
 
   @override
   void dispose() {
@@ -50,15 +63,11 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final request = RegisterUserRequest( email: _emailController.text, password: _passwordController.text, status: 'Desbaneado', name: _nameController.text, fathersSurname: _fathersSurnameController.text, mothersSurname: _mothersSurnameController.text.isEmpty ? null : _mothersSurnameController.text, username: _userNameController.text, description: _descriptionController.text, picture: 'foto.jpg', userType: 'Jugador', ); await ref.read(registerControllerProvider.notifier).register(request);
-  }
-
   Future<void> performCreateAccount() async {
     final request = RegisterUserRequest(
       email: _emailController.text,
       password: _passwordController.text,
-      status: UserStatus.Desbaneado.toString(),
+      status: UserStatus.Desbaneado.name,
       name: _nameController.text,
       fathersSurname: _fathersSurnameController.text,
       mothersSurname: _mothersSurnameController.text.isEmpty
@@ -66,8 +75,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
           : _mothersSurnameController.text,
       username: _userNameController.text,
       description: _descriptionController.text,
-      picture: '',
-      userType: UserType.Jugador.toString(),
+      picture: 'foto.jpg',
+      userType: UserType.Jugador.name,
     );
 
     await ref.read(registerControllerProvider.notifier).register(request);
@@ -75,9 +84,7 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final l10n = AppLocalizations.of(context)!;
-
 
     final nameError = ref.watch(nameErrorProvider);
     final fathersSurnameError = ref.watch(fathersSurnameErrorProvider);
@@ -85,37 +92,59 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     final usernameError = ref.watch(usernameErrorProvider);
     final emailError = ref.watch(emailErrorProvider);
     final descriptionError = ref.watch(descriptionErrorProvider);
+    final passwordError = ref.watch(passwordErrorProvider);
 
-    final isValid = ref.watch(nameErrorProvider.select((field) => field.isValid));
+    final isNameValid = ref.watch(nameErrorProvider.select((f) => f.isValid));
+    final isFatherValid = ref.watch(fathersSurnameErrorProvider.select((f) => f.isValid));
+    final isMotherValid = ref.watch(mothersSurnameErrorProvider.select((f) => f.isValid));
+    final isUsernameValid = ref.watch(usernameErrorProvider.select((f) => f.isValid));
+    final isEmailValid = ref.watch(emailErrorProvider.select((f) => f.isValid));
+    final isDescriptionValid = ref.watch(descriptionErrorProvider.select((f) => f.isValid));
+    final isPasswordValid = ref.watch(passwordErrorProvider.select((f) => f.isValid));
+
+    final isValid = isNameValid &&
+        isFatherValid &&
+        isMotherValid &&
+        isUsernameValid &&
+        isEmailValid &&
+        isDescriptionValid  &&
+        isPasswordValid;
 
 
-    ref.listen<AsyncValue<String?>>(registerControllerProvider, (
+    ref.listen<AsyncValue<RegisterUserResponse?>>(registerControllerProvider, (
       previous,
       next,
     ) {
       next.when(
-        data: (mensaje) {
-          if (mensaje != null) {
+        loading: () {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        },
+        data: (response) {
+          ref.read(globalLoadingProvider.notifier).state = false;
+
+          if (response == null) return;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(mensaje)));
-
-            print('Mensaje backend: $mensaje');
+            ).showSnackBar(SnackBar(content: Text(response.message)));
 
             Navigator.pop(context);
-          }
+          });
         },
-        loading: () {
-          print('Registro en progreso...');
-        },
-        error: (err, stack) {
-          final mensajeError = err is String ? err : err.toString();
-          print('Error en registro: $mensajeError');
-          print('StackTrace: $stack');
+        error: (error, stack) {
+          ref.read(globalLoadingProvider.notifier).state = false;
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: $mensajeError')));
+          final msg = error is Failure
+              ? (error.serverMessage ?? l10n.byKey(error.code))
+              : error.toString();
+
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(msg)));
+          });
         },
       );
     });
@@ -145,53 +174,48 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     error = l10n.invalidName;
                   }
 
-                  notifier.state = FieldState(
-                    error: error,
-                    touched: true,
-                  );
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
-
-
 
               const SizedBox(height: 16.0),
 
               AppTextField(
                 label: l10n.fathersSurname,
                 controller: _fathersSurnameController,
-                errorText: fathersSurnameError,
+                errorText: fathersSurnameError.error,
                 onChanged: (value) {
                   final notifier = ref.read(
                     fathersSurnameErrorProvider.notifier,
                   );
+                  String? error;
 
                   if (value.isEmpty) {
-                    notifier.state = l10n.requiredField;
+                    error = l10n.requiredField;
                   } else if (!FieldValidator.isName(value)) {
-                    notifier.state = l10n.invalidFathersSurname;
-                  } else {
-                    notifier.state = null;
+                    error = l10n.invalidFathersSurname;
                   }
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
               const SizedBox(height: 16.0),
               AppTextField(
                 label: l10n.mothersSurname,
                 controller: _mothersSurnameController,
-                errorText: mothersSurnameError,
+                errorText: mothersSurnameError.error,
 
                 onChanged: (value) {
                   final notifier = ref.read(
                     mothersSurnameErrorProvider.notifier,
                   );
 
+                  String? error;
                   if (value.isEmpty) {
-                    notifier.state = l10n.requiredField;
+                    error = l10n.requiredField;
                   } else if (!FieldValidator.isName(value)) {
-                    notifier.state = l10n.invalidMotherSurname;
-                  } else {
-                    notifier.state = null;
+                    error = l10n.invalidMotherSurname;
                   }
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
               const SizedBox(height: 16.0),
@@ -199,19 +223,17 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               AppTextField(
                 label: l10n.userName,
                 controller: _userNameController,
-                errorText: usernameError,
+                errorText: usernameError.error,
                 onChanged: (value) {
-                  final notifier = ref.read(
-                    usernameErrorProvider.notifier,
-                  );
+                  final notifier = ref.read(usernameErrorProvider.notifier);
 
+                  String? error;
                   if (value.isEmpty) {
-                    notifier.state = l10n.requiredField;
+                    error = l10n.requiredField;
                   } else if (!FieldValidator.isUsername(value)) {
-                    notifier.state = l10n.invalidUsername;
-                  } else {
-                    notifier.state = null;
+                    error = l10n.invalidUsername;
                   }
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
               const SizedBox(height: 16.0),
@@ -219,15 +241,17 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               AppPasswordField(
                 label: l10n.password,
                 hint: l10n.password,
-                controller: _passwordController,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.requiredField;
+                controller: _passwordController, errorText: passwordError.error,  // ← Agregar
+                onChanged: (value) {              // ← Cambiar de validator a onChanged
+                  final notifier = ref.read(passwordErrorProvider.notifier);
+
+                  String? error;
+                  if (value.isEmpty) {
+                    error = l10n.requiredField;
+                  } else if (!FieldValidator.isStrongPassword(value)) {
+                    error = l10n.invalidPassword;
                   }
-                  if (!FieldValidator.isStrongPassword(value)) {
-                    return l10n.invalidPassword;
-                  }
-                  return null; // Sin errores
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
               const SizedBox(height: 16.0),
@@ -235,19 +259,17 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               AppTextField(
                 label: l10n.email,
                 controller: _emailController,
-                errorText: emailError,
+                errorText: emailError.error,
                 onChanged: (value) {
-                  final notifier = ref.read(
-                    emailErrorProvider.notifier,
-                  );
+                  final notifier = ref.read(emailErrorProvider.notifier);
 
+                  String? error;
                   if (value.isEmpty) {
-                    notifier.state = l10n.requiredField;
+                    error = l10n.requiredField;
                   } else if (!FieldValidator.isEmail(value)) {
-                    notifier.state = l10n.invalidEmail;
-                  } else {
-                    notifier.state = null;
+                    error = l10n.invalidEmail;
                   }
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
               const SizedBox(height: 16.0),
@@ -255,23 +277,20 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               AppTextField(
                 label: l10n.description,
                 controller: _descriptionController,
-                errorText: descriptionError,
+                errorText: descriptionError.error,
                 onChanged: (value) {
-                  final notifier = ref.read(
-                    descriptionErrorProvider.notifier,
-                  );
+                  final notifier = ref.read(descriptionErrorProvider.notifier);
 
+                  String? error;
                   if (value.isEmpty) {
-                    notifier.state = l10n.requiredField;
+                    error = l10n.requiredField;
                   } else if (!FieldValidator.areLettersOnly(value)) {
-                    notifier.state = l10n.invalidDescription;
-                  } else {
-                    notifier.state = null;
+                    error = l10n.invalidDescription;
                   }
+                  notifier.state = FieldState(error: error, touched: true);
                 },
               ),
               const SizedBox(height: 16.0),
-
 
               Row(
                 children: [
@@ -279,7 +298,9 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                     child: AppButton(
                       text: l10n.register,
                       type: AppButtonType.success,
-                      onPressed: isValid ? () async => await _submit() : null,
+                      onPressed: isValid
+                          ? () async => await performCreateAccount()
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 16),

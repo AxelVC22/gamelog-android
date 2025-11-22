@@ -5,8 +5,9 @@ class AppPasswordField extends StatefulWidget {
   final TextEditingController controller;
   final String? hint;
   final bool enabled;
-
   final String? Function(String?)? validator;
+  final void Function(String)? onChanged;     // ← AGREGAR
+  final String? errorText;                     // ← AGREGAR
 
   const AppPasswordField({
     super.key,
@@ -15,6 +16,8 @@ class AppPasswordField extends StatefulWidget {
     this.hint,
     this.enabled = true,
     this.validator,
+    this.onChanged,      // ← AGREGAR
+    this.errorText,      // ← AGREGAR
   });
 
   @override
@@ -23,7 +26,6 @@ class AppPasswordField extends StatefulWidget {
 
 class _AppPasswordFieldState extends State<AppPasswordField> {
   bool _obscure = true;
-
   String? _errorText;
 
   void _validate(String? value) {
@@ -31,6 +33,18 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
       setState(() {
         _errorText = widget.validator!(value);
       });
+    }
+  }
+
+  void _handleChange(String value) {
+    // ✅ Llama a validator si existe
+    if (widget.validator != null) {
+      _validate(value);
+    }
+
+    // ✅ Llama a onChanged si existe
+    if (widget.onChanged != null) {
+      widget.onChanged!(value);
     }
   }
 
@@ -43,10 +57,11 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
           controller: widget.controller,
           enabled: widget.enabled,
           obscureText: _obscure,
-          onChanged: _validate,
+          onChanged: _handleChange,  // ← CAMBIAR
           decoration: InputDecoration(
             hintText: widget.hint,
-            errorText: _errorText,
+            // ✅ Prioriza errorText externo sobre el interno
+            errorText: widget.errorText ?? _errorText,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
             ),
