@@ -20,14 +20,21 @@ class LoginController extends Notifier<AsyncValue<LoginResponse?>> {
     return const AsyncData(null);
   }
 
-  Future<void> login(LoginRequest req) async {
+  Future<LoginResponse?> login(LoginRequest req) async {
     state = const AsyncLoading();
 
     final result = await _loginUseCase(req);
 
-    state = result.fold(
-      (f) => AsyncError(f, StackTrace.current),
-      (r) => AsyncData(r),
+    return result.fold(
+          (f) {
+        state = AsyncError(f, StackTrace.current);
+        return null;
+      },
+          (r) {
+        state = AsyncData(r);
+        return r;
+      },
     );
   }
+
 }
