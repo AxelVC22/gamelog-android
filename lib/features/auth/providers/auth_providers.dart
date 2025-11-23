@@ -36,14 +36,8 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
   );
 }
 
-@Riverpod(keepAlive: true)
-LoginUseCase loginUseCase(LoginUseCaseRef ref) {
-  return LoginUseCase(ref.watch(authRepositoryProvider));
-}
-
-
 @riverpod
-class RecoverPasswordController extends _$RecoverPasswordController {
+class RecoverPasswordStepController extends _$RecoverPasswordStepController {
   @override
   int build() {
     return 1;

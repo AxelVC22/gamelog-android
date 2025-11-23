@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/domain/entities/user.dart';
+import 'package:gamelog/features/auth/models/recover_password_request.dart';
+import 'package:gamelog/features/auth/views/login_screen.dart';
+import 'package:gamelog/l10n/app_localizations_extension.dart';
 import 'package:gamelog/widgets/app_module_title.dart';
+import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/field_state.dart';
+import '../../../core/helpers/field_validator.dart';
 import '../../../widgets/app_button.dart';
+import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
+import '../models/recover_password_response.dart';
 import '../providers/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
+
+import '../providers/recover_password_controller.dart';
 
 class RecoverPasswordScreen extends ConsumerStatefulWidget {
   const RecoverPasswordScreen({super.key});
@@ -19,6 +30,11 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
   final _emailController = TextEditingController();
   final _verificationCodeController = TextEditingController();
   final _newPasswordController = TextEditingController();
+  late final int idAccessSaved;
+
+  final emailErrorProvider = StateProvider<FieldState>(
+    (ref) => const FieldState(),
+  );
 
   @override
   void dispose() {
@@ -26,21 +42,111 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
     super.dispose();
   }
 
-  void _performRecover() {
-    // ref
-    //     .read(loginControllerProvider.notifier)
-    //     .login(
-    //   _emailController.text.trim(),
-    // );
+  Future<void> performSendEmail() async {
+    final request = RecoverPasswordRequest(
+      email: _emailController.text,
+      userType: UserType.Jugador.name,
+    );
+    await ref
+        .read(recoverPasswordControllerProvider.notifier)
+        .sendEmail(request);
+  }
+
+  Future<void> performVerifyCode() async {
+    final request = RecoverPasswordRequest(
+      email: _emailController.text,
+      userType: UserType.Jugador.name,
+      code: int.parse(_verificationCodeController.text),
+    );
+    await ref
+        .read(recoverPasswordControllerProvider.notifier)
+        .verifyCode(request);
+  }
+
+  Future<void> performChangePassword() async {
+    final request = RecoverPasswordRequest(
+      email: _emailController.text,
+      userType: UserType.Jugador.name,
+      code: int.parse(_verificationCodeController.text),
+      idAccess: idAccessSaved,
+      password: _newPasswordController.text
+    );
+    await ref
+        .read(recoverPasswordControllerProvider.notifier)
+        .changePassword(request);
   }
 
   @override
   Widget build(BuildContext context) {
-
     final l10n = AppLocalizations.of(context)!;
-    final step = ref.watch(recoverPasswordControllerProvider);
+    final step = ref.watch(recoverPasswordStepControllerProvider);
+
+    final emailError = ref.watch(emailErrorProvider);
+
+    final isEmailValid = ref.watch(emailErrorProvider.select((f) => f.isValid));
+
+    ref.listen<AsyncValue<RecoverPasswordResponse?>>(
+      recoverPasswordControllerProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+              if (response == null) return;
 
 
+              if (response.step! < 3) {
+
+                final id = response.idAccess;
+                if (id != null && id > 0) {
+                  idAccessSaved = id;
+                }
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(response.message)));
+
+                  ref
+                      .read(recoverPasswordStepControllerProvider.notifier)
+                      .next();
+                });
+              }
+
+              if (response.step! == 3) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(response.message)));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  );
+                });
+              }
+            },
+            error: (error, stack) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              final msg = error is Failure
+                  ? (error.serverMessage ?? l10n.byKey(error.code))
+                  : error.toString();
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
+              });
+            },
+          );
+        }
+
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -53,7 +159,7 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -61,7 +167,8 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
                 SingleChildScrollView(
                   child: RecoverStepOne(
                     emailController: _emailController,
-                    onRecover: _performRecover,
+                    emailError: emailError,
+                    notifier: ref.read(emailErrorProvider.notifier),
                   ),
                 ),
 
@@ -69,7 +176,7 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
                 SingleChildScrollView(
                   child: RecoverStepTwo(
                     verificationCodeController: _verificationCodeController,
-                    onRecover: _performRecover,
+                    onRecover: performSendEmail,
                   ),
                 ),
 
@@ -77,25 +184,34 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
                 SingleChildScrollView(
                   child: RecoverStepThree(
                     newPasswordController: _newPasswordController,
-                    onRecover: _performRecover,
+                    onRecover: performSendEmail,
                   ),
                 ),
 
               Row(
                 children: [
                   Expanded(
-                    child: AppButton(
-                      text: step != 2 ? l10n.ok : l10n.verify,
-                      type: step == 2
-                          ? AppButtonType.success
-                          : AppButtonType.primary,
-                      onPressed: () {
-                        if (step < 3) {
-                          ref
-                            .read(recoverPasswordControllerProvider.notifier)
-                            .next();
-                        } else {
-                          //todo
+                    child: Builder(
+                      builder: (_) {
+                        switch (step) {
+                          case 1:
+                            return AppButton(
+                              text: l10n.ok,
+                              onPressed: isEmailValid ? performSendEmail : null,
+                            );
+                          case 2:
+                            return AppButton(
+                              text: l10n.verify,
+                              type: AppButtonType.success,
+                              onPressed: performVerifyCode,
+                            );
+                          case 3:
+                            return AppButton(
+                              text: l10n.ok,
+                              onPressed: performChangePassword,
+                            );
+                          default:
+                            return const SizedBox.shrink();
                         }
                       },
                     ),
@@ -109,7 +225,7 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
                         if (step > 1) {
                           ref
                               .read(
-                                recoverPasswordControllerProvider.notifier,
+                                recoverPasswordStepControllerProvider.notifier,
                               )
                               .previous();
                         } else {
@@ -130,12 +246,14 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
 
 class RecoverStepOne extends StatelessWidget {
   final TextEditingController emailController;
-  final VoidCallback onRecover;
+  final FieldState emailError;
+  final StateController<FieldState> notifier;
 
   const RecoverStepOne({
     super.key,
     required this.emailController,
-    required this.onRecover,
+    required this.emailError,
+    required this.notifier,
   });
 
   @override
@@ -149,6 +267,16 @@ class RecoverStepOne extends StatelessWidget {
           label: l10n.email,
           icon: Icons.email,
           controller: emailController,
+          errorText: emailError.error,
+          onChanged: (value) {
+            String? error;
+            if (value.isEmpty) {
+              error = l10n.requiredField;
+            } else if (!FieldValidator.isEmail(value)) {
+              error = l10n.invalidEmail;
+            }
+            notifier.state = FieldState(error: error, touched: true);
+          },
         ),
         const SizedBox(height: 16.0),
       ],

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/models/login_request.dart';
 import 'package:gamelog/features/auth/providers/auth_providers.dart';
-import 'package:gamelog/features/auth/uses_cases/login_use_case.dart';
 
 import '../models/login_response.dart';
+import '../use_cases/login_use_case.dart';
 
 final loginControllerProvider =
     NotifierProvider<LoginController, AsyncValue<LoginResponse?>>(

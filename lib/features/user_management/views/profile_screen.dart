@@ -3,21 +3,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 
+import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/entities/user.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
+import '../../auth/providers/auth_providers.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
-  final User user;
+  final Account account;
 
-  const ProfileScreen({super.key, required this.user});
+  const ProfileScreen({super.key, required this.account});
 
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+
+  late final bool isCurrentUser = ref.read(currentUserProvider.notifier).state?.username == widget.account.username;
+  late final bool isAdmin = ref.read(currentUserProvider.notifier).state?.accessType == UserType.Administrador.name;
+  Future<void> performFollow() async {}
+
+  Future<void> performAddBlackList() async {}
+
+
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -42,6 +53,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Row(
                 children: [
                   Expanded(
+                    //todo: cambiar por foto de perfil
                     child: Image.asset(
                       'assets/images/isotipo.png',
                       height: 100.0,
@@ -50,13 +62,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Expanded(
                     child: Column(
                       children: <Widget>[
-                        AppModuleTitle(title: widget.user.name),
+                        AppModuleTitle(title: widget.account.username),
                         AppButton(
                           text: l10n.follow,
 
-                          onPressed: () {
-
-                          },
+                          onPressed: isCurrentUser ? null : performFollow,
                         ),
 
                         const SizedBox(height: 8.0),
@@ -65,9 +75,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           text: l10n.blackList,
                           type: AppButtonType.danger,
 
-                          onPressed: () {
-
-                          },
+                          onPressed: isAdmin ? performAddBlackList : null
                         ),
 
                       ],
@@ -81,7 +89,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 16.0),
 
               Text(
-                widget.user.description,
+                widget.account.description,
                 style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

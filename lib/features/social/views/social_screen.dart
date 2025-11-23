@@ -6,6 +6,7 @@ import 'package:gamelog/core/domain/entities/game.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_follower_card.dart';
 
+import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/entities/player.dart';
 import '../../../core/domain/entities/review.dart';
 import '../../../core/domain/entities/user.dart';
@@ -23,7 +24,7 @@ class SocialScreen extends ConsumerStatefulWidget {
 }
 
 class _SocialScreenState extends ConsumerState<SocialScreen> {
-  List<User> allProfiles = [
+  List<Account> allProfiles = [
     // new User (name: 'Carlos', accessType: '', description: 'god del gaming mexicano xddddd'),
     // new User (name: 'Ana', accessType: '', description: 'experto en resenas'),
     // new User (name: 'Pedro', accessType: '', description: 'jugador casual')
@@ -34,7 +35,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     super.initState();
     _search('c');
   }
-  List<User> results = [];
+  List<Account> results = [];
   bool isLoading = false;
 
 
@@ -103,7 +104,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                         onTap: () { Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>  ProfileScreen(user: results[i]),
+                            builder: (_) =>  ProfileScreen(account: results[i]),
                           ),
                         );},
                       );

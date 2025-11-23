@@ -5,7 +5,8 @@ enum UserStatus {
 }
 
 enum UserType {
-  Jugador
+  Jugador,
+  Administrador
 }
 
 @immutable

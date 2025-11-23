@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/models/logout_response.dart';
 import 'package:gamelog/features/auth/providers/auth_providers.dart';
-import 'package:gamelog/features/auth/uses_cases/logout_use_case.dart';
+
+import '../use_cases/logout_use_case.dart';
 
 final logoutControllerProvider =
     NotifierProvider<LogoutController, AsyncValue<LogoutResponse?>>(

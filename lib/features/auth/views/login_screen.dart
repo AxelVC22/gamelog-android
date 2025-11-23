@@ -74,12 +74,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       previous,
       next,
     ) {
-      // ✅ Solo actúa si hubo un cambio real de estado
       if (previous?.isLoading == true && next.isLoading == false) {
-        // Terminó de cargar (ya sea éxito o error)
 
         next.when(
-          loading: () {}, // No hace nada, ya procesamos arriba
+          loading: () {},
           data: (response) {
             ref.read(globalLoadingProvider.notifier).state = false;
             if (response == null) return;
@@ -113,7 +111,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
       }
 
-      // Muestra loading cuando empieza
       if (next.isLoading) {
         ref.read(globalLoadingProvider.notifier).state = true;
       }

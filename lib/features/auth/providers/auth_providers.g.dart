@@ -23,7 +23,7 @@ final secureStorageProvider = Provider<FlutterSecureStorage>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SecureStorageRef = ProviderRef<FlutterSecureStorage>;
-String _$dioHash() => r'f0a6b4a200c804c5701c6b79a33146642af43491';
+String _$dioHash() => r'ec3208917309c246f4ab168b16a725d10caae58f';
 
 /// See also [dio].
 @ProviderFor(dio)
@@ -57,39 +57,22 @@ final authRepositoryProvider = Provider<AuthRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthRepositoryRef = ProviderRef<AuthRepository>;
-String _$loginUseCaseHash() => r'c19591da812e8b7ab7dd1235ae74be1fb38cb6ae';
+String _$recoverPasswordStepControllerHash() =>
+    r'1a39fd71617b4d8d9755fdc1a55bc48c4fb4d63d';
 
-/// See also [loginUseCase].
-@ProviderFor(loginUseCase)
-final loginUseCaseProvider = Provider<LoginUseCase>.internal(
-  loginUseCase,
-  name: r'loginUseCaseProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$loginUseCaseHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef LoginUseCaseRef = ProviderRef<LoginUseCase>;
-String _$recoverPasswordControllerHash() =>
-    r'099b2b77be690beadceb248b44be66a77f9de33e';
-
-/// See also [RecoverPasswordController].
-@ProviderFor(RecoverPasswordController)
-final recoverPasswordControllerProvider =
-    AutoDisposeNotifierProvider<RecoverPasswordController, int>.internal(
-      RecoverPasswordController.new,
-      name: r'recoverPasswordControllerProvider',
+/// See also [RecoverPasswordStepController].
+@ProviderFor(RecoverPasswordStepController)
+final recoverPasswordStepControllerProvider =
+    AutoDisposeNotifierProvider<RecoverPasswordStepController, int>.internal(
+      RecoverPasswordStepController.new,
+      name: r'recoverPasswordStepControllerProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$recoverPasswordControllerHash,
+          : _$recoverPasswordStepControllerHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$RecoverPasswordController = AutoDisposeNotifier<int>;
+typedef _$RecoverPasswordStepController = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

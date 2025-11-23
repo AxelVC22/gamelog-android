@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/models/register_user_reponse.dart';
 import '../models/register_user_request.dart';
-import '../uses_cases/register_user_use_case.dart';
+import '../use_cases/register_user_use_case.dart';
 import 'auth_providers.dart';
 
 final registerControllerProvider =
