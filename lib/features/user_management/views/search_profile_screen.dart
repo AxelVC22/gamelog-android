@@ -9,7 +9,6 @@ import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 
 import '../../../core/domain/entities/account.dart';
-import '../../../core/domain/entities/user.dart';
 import '../../../core/domain/failures/failure.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';

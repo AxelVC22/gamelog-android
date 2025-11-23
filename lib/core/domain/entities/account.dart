@@ -13,6 +13,7 @@ class Account {
   final String username;
   final String description;
   final String picture;
+  final int? idAccess;
 
   const Account({
     required this.idAccount,
@@ -26,6 +27,7 @@ class Account {
     required this.username,
     required this.description,
     required this.picture,
+    this.idAccess
   });
 
   factory Account.fromJson(Map<String, dynamic> json) {

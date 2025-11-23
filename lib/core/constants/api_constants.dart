@@ -17,4 +17,6 @@ class ApiConstants {
   //username_management
 
   static const String searchUser = '/gamelog/jugador';
+
+  static const String editProfile = '/gamelog/jugador';
 }

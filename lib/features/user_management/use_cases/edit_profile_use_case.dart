@@ -15,7 +15,6 @@ class SearchUserUseCase {
       return left(Failure(ErrorCodes.invalidUsername));
     }
 
-
     final result = await repository.searchUser(username);
 
     return result;
