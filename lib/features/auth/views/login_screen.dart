@@ -74,40 +74,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       previous,
       next,
     ) {
-      next.when(
-        loading: () {
-          ref.read(globalLoadingProvider.notifier).state = true;
-        },
-        data: (response) {
-          ref.read(globalLoadingProvider.notifier).state = false;
-          if (response == null) return;
+      // ✅ Solo actúa si hubo un cambio real de estado
+      if (previous?.isLoading == true && next.isLoading == false) {
+        // Terminó de cargar (ya sea éxito o error)
 
-          ref.read(currentUserProvider.notifier).state = response.accounts.first;
+        next.when(
+          loading: () {}, // No hace nada, ya procesamos arriba
+          data: (response) {
+            ref.read(globalLoadingProvider.notifier).state = false;
+            if (response == null) return;
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text("Bienvenido")));
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => HomeScreen()),
-            );
-          });
-        },
-        error: (error, stack) {
-          ref.read(globalLoadingProvider.notifier).state = false;
+            ref.read(currentUserProvider.notifier).state =
+                response.accounts.first;
 
-          final msg = error is Failure
-              ? (error.serverMessage ?? l10n.byKey(error.code))
-              : error.toString();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("Bienvenido")));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+            });
+          },
+          error: (error, stack) {
+            ref.read(globalLoadingProvider.notifier).state = false;
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(msg)));
-          });
-        },
-      );
+            final msg = error is Failure
+                ? (error.serverMessage ?? l10n.byKey(error.code))
+                : error.toString();
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(msg)));
+            });
+          },
+        );
+      }
+
+      // Muestra loading cuando empieza
+      if (next.isLoading) {
+        ref.read(globalLoadingProvider.notifier).state = true;
+      }
     });
 
     return Scaffold(
