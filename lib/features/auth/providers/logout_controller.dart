@@ -34,4 +34,5 @@ class LogoutController extends Notifier<AsyncValue<LogoutResponse?>> {
         }
     );
   }
+
 }

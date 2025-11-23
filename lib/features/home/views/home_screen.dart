@@ -29,7 +29,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreen extends ConsumerState<HomeScreen> {
-
   Future<void> performLogout() async {
     final email = ref.read(currentUserProvider)?.email;
 
@@ -41,41 +40,45 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     ref.listen<AsyncValue<LogoutResponse?>>(logoutControllerProvider, (
-        previous,
-        next,
-        ) {
-      next.when(
-        loading: () {
-          ref.read(globalLoadingProvider.notifier).state = true;
-        },
-        data: (response) {
-          ref.read(globalLoadingProvider.notifier).state = false;
-          if (response == null) return;
+      previous,
+      next,
+    ) {
+      if (previous?.isLoading == true && next.isLoading == false) {
+        next.when(
+          loading: () {},
+          data: (response) {
+            ref.read(globalLoadingProvider.notifier).state = false;
+            if (response == null) return;
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text("Adios")));
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => LoginScreen()),
-            );
-          });
-        },
-        error: (error, stack) {
-          ref.read(globalLoadingProvider.notifier).state = false;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("Adios")));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            });
+          },
+          error: (error, stack) {
+            ref.read(globalLoadingProvider.notifier).state = false;
 
-          final msg = error is Failure
-              ? (error.serverMessage ?? l10n.byKey(error.code))
-              : error.toString();
+            final msg = error is Failure
+                ? (error.serverMessage ?? l10n.byKey(error.code))
+                : error.toString();
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(msg)));
-          });
-        },
-      );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(msg)));
+            });
+          },
+        );
+      }
+
+      if (next.isLoading) {
+        ref.read(globalLoadingProvider.notifier).state = true;
+      }
     });
 
     return Scaffold(
@@ -86,18 +89,12 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
             child: Icon(Icons.home_outlined),
             label: 'Home',
           ),
-          CurvedNavigationBarItem(
-            child: Icon(Icons.search),
-            label: 'Search',
-          ),
+          CurvedNavigationBarItem(child: Icon(Icons.search), label: 'Search'),
           CurvedNavigationBarItem(
             child: Icon(Icons.chat_bubble_outline),
             label: 'Chat',
           ),
-          CurvedNavigationBarItem(
-            child: Icon(Icons.newspaper),
-            label: 'Feed',
-          ),
+          CurvedNavigationBarItem(child: Icon(Icons.newspaper), label: 'Feed'),
           CurvedNavigationBarItem(
             child: Icon(Icons.perm_identity),
             label: 'Personal',
