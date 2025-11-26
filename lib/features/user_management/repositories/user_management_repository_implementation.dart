@@ -10,6 +10,7 @@ import 'package:gamelog/features/user_management/repositories/user_management_re
 import '../../../core/constants/api_constants.dart';
 import '../../../core/domain/failures/failure.dart';
 import '../../../core/messages/error_codes.dart';
+import '../models/get_id_access_response.dart';
 
 class UserManagementRepositoryImpl implements UserManagementRepository {
   final Dio dio;
@@ -43,40 +44,18 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
     }
   }
 
-  @override
-  Future<Either<List<Failure>, List<EditProfileResponse>>> editProfile(
-    EditProfileRequest request,
-  ) async {
-    final failures = <Failure>[];
-    final successes = <EditProfileResponse>[];
-
-    if (request.changeUserDate) {
-      final r1 = await changeUserData(request);
-
-      r1.fold((err) => failures.add(err), (ok) => successes.add(ok));
-    }
-
-    if (request.changePasswordOrEmail) {
-      final r2 = await changePasswordOrEmail(request);
-
-      r2.fold((err) => failures.add(err), (ok) => successes.add(ok));
-    }
-
-    if (failures.isNotEmpty) {
-      return left(failures);
-    }
-
-    return right(successes);
-  }
-
-  Future<Either<Failure, EditProfileResponse>> changeUserData(
+  Future<Either<Failure, EditProfileResponse>> editProfile(
     EditProfileRequest request,
   ) async {
     try {
+      final token = await storage.read(key: 'access_token');
       final response = await dio.put(
         '${ApiConstants.editProfile}/${request.idPlayer}',
         data: request.toJson(),
-        options: Options(validateStatus: (status) => status! < 600),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -90,22 +69,48 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
     }
   }
 
-  Future<Either<Failure, EditProfileResponse>> changePasswordOrEmail(
-    EditProfileRequest request,
+  Future<Either<Failure, int>> getIdAccess(
+    String email,
+    String userType,
   ) async {
     try {
-      final response = await dio.put(
-        '${ApiConstants.recoverPasswordChangePassword}/${request.idAccess}',
-        data: request.toJson(),
+      final response = await dio.get(
+        '${ApiConstants.getIdAccess}/$email',
+        queryParameters: {'tipoDeUsuario': userType},
         options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
-        final res = EditProfileResponse.fromJson(response.data);
-        return Right(EditProfileResponse(message: res.message, error: false));
+        final res = GetIdAccessResponse.fromJson(response.data);
+        return Right(res.idAccess);
       } else {
         return Left(Failure.server(response.data['mensaje']));
       }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+  Future<Either<Failure, EditProfileResponse>> changePasswordOrEmail(
+    EditProfileRequest request,
+  ) async {
+    try {
+      final idAccess = await getIdAccess(request.oldEmail!, request.userType);
+
+      return idAccess.fold((failure) => Left(failure), (idAccess) async {
+        final response = await dio.put(
+          '${ApiConstants.recoverPasswordChangePassword}/$idAccess',
+          data: request.toJson(),
+          options: Options(validateStatus: (status) => status! < 600),
+        );
+
+        if (response.statusCode == 200) {
+          final res = EditProfileResponse.fromJson(response.data);
+          return Right(EditProfileResponse(message: res.message, error: false));
+        } else {
+          return Left(Failure.server(response.data['mensaje']));
+        }
+      });
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));
     }

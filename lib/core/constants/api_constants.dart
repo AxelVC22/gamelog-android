@@ -19,4 +19,6 @@ class ApiConstants {
   static const String searchUser = '/gamelog/jugador';
 
   static const String editProfile = '/gamelog/jugador';
+
+  static const String getIdAccess = '/gamelog/acceso';
 }

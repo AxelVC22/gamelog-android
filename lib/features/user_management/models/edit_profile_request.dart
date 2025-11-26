@@ -3,8 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 @immutable
 class EditProfileRequest {
-  final String email;
-  final String password;
+  final String? oldEmail;
   final String name;
   final String fathersSurname;
   final String? mothersSurname;
@@ -13,12 +12,10 @@ class EditProfileRequest {
   final String? picture;
   final int? idAccess;
   final int? idPlayer;
-  final bool changePasswordOrEmail;
-  final bool changeUserDate;
+  final String userType;
 
   const EditProfileRequest({
-    required this.email,
-    required this.password,
+
     required this.name,
     required this.fathersSurname,
     this.mothersSurname,
@@ -27,18 +24,18 @@ class EditProfileRequest {
     this.picture,
     this.idAccess,
     this.idPlayer,
-    required this.changePasswordOrEmail,
-    required this.changeUserDate
+    this.oldEmail,
+    required this.userType
   });
 
   Map<String, dynamic> toJson() => {
-    'correo': email,
-    'contrasenia': password,
+
     'nombre': name,
     'primerApellido': fathersSurname,
     if (mothersSurname != null) 'segundoApellido': mothersSurname,
     'nombreDeUsuario': username,
     'descripcion': description,
     if (picture != null) 'foto': picture,
+    'tipoDeUsuario' : userType
   };
 }

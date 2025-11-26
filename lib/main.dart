@@ -29,14 +29,14 @@ class MyApp extends ConsumerWidget {
       locale: const Locale('es'),
 
       title: 'GameLog',
-      theme: ThemeData(primarySwatch: Colors.blue),
 
-      // <-- Aquí insertamos el loader *dentro* del árbol de MaterialApp
+      theme: ThemeData(primarySwatch: Colors.red),
+
       builder: (context, child) {
         return Stack(
           children: [
             if (child != null) child,
-            const GlobalLoader(), // ya tiene Directionality/Scaffold disponible
+            const GlobalLoader(),
           ],
         );
       },

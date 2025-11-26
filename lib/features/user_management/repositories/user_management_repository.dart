@@ -9,6 +9,6 @@ abstract class UserManagementRepository {
 
   Future<Either<Failure, SearchUserResponse>> searchUser(String username);
 
-  Future<Either<List<Failure>, List<EditProfileResponse>>> editProfile(EditProfileRequest request);
+  Future<Either<Failure, EditProfileResponse>> editProfile(EditProfileRequest request);
 
 }

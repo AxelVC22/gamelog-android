@@ -1,21 +1,19 @@
 import 'package:dartz/dartz.dart';
+import 'package:gamelog/features/user_management/models/edit_profile_request.dart';
+import 'package:gamelog/features/user_management/models/edit_profile_response.dart';
 import 'package:gamelog/features/user_management/models/search_user_response.dart';
 import 'package:gamelog/features/user_management/repositories/user_management_repository.dart';
 import '../../../core/messages/error_codes.dart';
 import '../../../core/domain/failures/failure.dart';
 
-class SearchUserUseCase {
+class EditProfileUseCase {
   final UserManagementRepository repository;
 
-  SearchUserUseCase(this.repository);
+  EditProfileUseCase(this.repository);
 
-  Future<Either<Failure, SearchUserResponse>> call(String username) async {
+  Future<Either<Failure, EditProfileResponse>>call(EditProfileRequest request) async {
 
-    if (username.trim().isEmpty || username.length > 50) {
-      return left(Failure(ErrorCodes.invalidUsername));
-    }
-
-    final result = await repository.searchUser(username);
+    final result = await repository.editProfile(request);
 
     return result;
   }

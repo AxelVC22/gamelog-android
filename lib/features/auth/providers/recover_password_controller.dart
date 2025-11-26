@@ -5,14 +5,17 @@ import 'package:gamelog/features/auth/providers/auth_providers.dart';
 
 import '../use_cases/recover_password_use_case.dart';
 
-final recoverPasswordControllerProvider = NotifierProvider<RecoverPasswordController,
-    AsyncValue<RecoverPasswordResponse?>> (RecoverPasswordController.new);
+final recoverPasswordControllerProvider =
+    NotifierProvider<
+      RecoverPasswordController,
+      AsyncValue<RecoverPasswordResponse?>
+    >(RecoverPasswordController.new);
 
-class RecoverPasswordController extends Notifier<AsyncValue<RecoverPasswordResponse?>> {
+class RecoverPasswordController
+    extends Notifier<AsyncValue<RecoverPasswordResponse?>> {
   late final RecoverPasswordSendEmailUseCase _recoverPasswordUseCase;
   late final RecoverPasswordVerifyCodeUseCase _verifyCode;
   late final RecoverPasswordChangePasswordUseCase _changePassword;
-
 
   @override
   AsyncValue<RecoverPasswordResponse?> build() {
@@ -31,14 +34,14 @@ class RecoverPasswordController extends Notifier<AsyncValue<RecoverPasswordRespo
     final result = await _recoverPasswordUseCase(req);
 
     return result.fold(
-        (f) {
-          state = AsyncError(f, StackTrace.current);
-          return null;
-        },
-        (r) {
-          state = AsyncData(r);
-          return r;
-        }
+      (f) {
+        state = AsyncError(f, StackTrace.current);
+        return null;
+      },
+      (r) {
+        state = AsyncData(r);
+        return r;
+      },
     );
   }
 
@@ -46,8 +49,8 @@ class RecoverPasswordController extends Notifier<AsyncValue<RecoverPasswordRespo
     state = const AsyncLoading();
     final result = await _verifyCode(req);
     state = result.fold(
-          (f) => AsyncError(f, StackTrace.current),
-          (r) => AsyncData(r),
+      (f) => AsyncError(f, StackTrace.current),
+      (r) => AsyncData(r),
     );
   }
 
@@ -55,10 +58,8 @@ class RecoverPasswordController extends Notifier<AsyncValue<RecoverPasswordRespo
     state = const AsyncLoading();
     final result = await _changePassword(req);
     state = result.fold(
-          (f) => AsyncError(f, StackTrace.current),
-          (r) => AsyncData(r),
+      (f) => AsyncError(f, StackTrace.current),
+      (r) => AsyncData(r),
     );
   }
-
-
 }
