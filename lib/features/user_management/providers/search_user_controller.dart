@@ -1,7 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/features/auth/models/login_request.dart';
-import 'package:gamelog/features/auth/providers/auth_providers.dart';
-import 'package:gamelog/features/auth/uses_cases/login_use_case.dart';
 import 'package:gamelog/features/user_management/models/search_user_response.dart';
 import 'package:gamelog/features/user_management/providers/user_management_providers.dart';
 import 'package:gamelog/features/user_management/use_cases/search_user_use_case.dart';

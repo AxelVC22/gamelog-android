@@ -110,7 +110,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
         isDescriptionValid  &&
         isPasswordValid;
 
-
     ref.listen<AsyncValue<RegisterUserResponse?>>(registerControllerProvider, (
       previous,
       next,
