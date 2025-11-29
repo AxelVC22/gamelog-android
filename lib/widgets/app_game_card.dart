@@ -10,7 +10,6 @@ class AppGameCard extends StatelessWidget {
     required this.name,
     required this.imageUrl,
     this.onTap,
-
   });
 
   @override
@@ -22,35 +21,30 @@ class AppGameCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: imageUrl.isNotEmpty
-                      ? Image.network(
-                    imageUrl,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  )
-                      : Container(
-                    width: 60,
-                    height: 60,
-                    color: Colors.grey.shade300,
-                    child: const Icon(Icons.videogame_asset, size: 32),
-                  ),
-                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: imageUrl.isNotEmpty
+                    ? Image.network(imageUrl, height: 150, fit: BoxFit.cover)
+                    : Container(
+                        height: 150,
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.videogame_asset, size: 48),
+                      ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(height: 8),
               Text(
                 name,
+                textAlign: TextAlign.left,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
-              )
+              ),
             ],
           ),
         ),

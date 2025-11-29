@@ -29,7 +29,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
       id: 0,
       rating: 4,
       opinion: 'Buen juego',
-      game: Game(name: 'Zelda', description: "", id: 0, rating: 3.5),
+     // game: Game(name: 'Zelda', description: "", id: 0, rating: 3.5),
       date: DateTime.now(),
       player: Player(username: 'Meka')
     ),
@@ -37,7 +37,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
       id: 0,
       rating: 3,
       opinion: 'Mal juego',
-      game: Game(name: 'Fortinaitiz', description: "", id: 0, rating: 1.5),
+   //   game: Game(name: 'Fortinaitiz', description: "", id: 0, rating: 1.5),
       date: DateTime.now(),
         player: Player(username: 'Cachetes')
 
@@ -59,16 +59,16 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
     // Simula un delay de API
     await Future.delayed(const Duration(milliseconds: 600));
 
-    setState(() {
-      results = allGames
-          .where(
-            (review) =>
-                review.game.name.toLowerCase().contains(query.toLowerCase()),
-          )
-          .toList();
-
-      isLoading = false;
-    });
+    // setState(() {
+    //   results = allGames
+    //       .where(
+    //         (review) =>
+    //             review.game.name.toLowerCase().contains(query.toLowerCase()),
+    //       )
+    //       .toList();
+    //
+    //   isLoading = false;
+    // });
   }
 
   @override

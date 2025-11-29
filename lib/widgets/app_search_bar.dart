@@ -8,7 +8,7 @@ class AppSearchBar extends StatefulWidget {
   const AppSearchBar({
     Key? key,
     required this.onSearch,
-    this.hint = "Buscar...",
+    required this.hint,
   }) : super(key: key);
 
   @override
@@ -19,11 +19,9 @@ class _AppSearchBarState extends State<AppSearchBar> {
   Timer? _debounce;
 
   void _onChanged(String value) {
-    // Cancela el anterior delay
     _debounce?.cancel();
 
-    // Espera 400ms para ver si el usuario deja de escribir
-    _debounce = Timer(const Duration(milliseconds: 400), () {
+    _debounce = Timer(const Duration(milliseconds: 1000), () {
       widget.onSearch(value);
     });
   }
@@ -36,12 +34,14 @@ class _AppSearchBarState extends State<AppSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      onChanged: _onChanged,
-      decoration: InputDecoration(
-        labelText: widget.hint,
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    return Padding(padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        onChanged: _onChanged,
+        decoration: InputDecoration(
+          labelText: widget.hint,
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       ),
     );
   }

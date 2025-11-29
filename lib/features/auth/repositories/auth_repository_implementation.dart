@@ -35,7 +35,7 @@ class AuthRepositoryImpl implements AuthRepository {
           await storage.write(key: 'access_token', value: token);
         }
         final res = LoginResponse.fromJson(response.data);
-        return Right(LoginResponse(error: false, accounts: res.accounts));
+        return Right(res);
       } else {
         return Left(Failure.server(response.data['mensaje']));
       }

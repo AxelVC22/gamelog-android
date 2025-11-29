@@ -6,8 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../core/domain/entities/account.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/auth_repository_implementation.dart';
-import '../uses_cases/login_use_case.dart';
-import '../../../../core/domain/entities/user.dart';
+
 
 part 'auth_providers.g.dart';
 

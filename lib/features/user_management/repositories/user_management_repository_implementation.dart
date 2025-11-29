@@ -60,7 +60,7 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
 
       if (response.statusCode == 200) {
         final res = EditProfileResponse.fromJson(response.data);
-        return Right(EditProfileResponse(message: res.message, error: false));
+        return Right(res);
       } else {
         return Left(Failure.server(response.data['mensaje']));
       }
@@ -106,7 +106,7 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
 
         if (response.statusCode == 200) {
           final res = EditProfileResponse.fromJson(response.data);
-          return Right(EditProfileResponse(message: res.message, error: false));
+          return Right(res);
         } else {
           return Left(Failure.server(response.data['mensaje']));
         }
