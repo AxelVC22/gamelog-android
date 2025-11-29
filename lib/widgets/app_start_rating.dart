@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppStarRating extends StatelessWidget {
-  final double rating; // 0.0 a 5.0
+  final double rating;
   final Function(double?)? onRatingChanged;
   final double size;
 
@@ -21,11 +21,11 @@ class AppStarRating extends StatelessWidget {
         IconData icon;
 
         if (rating >= starValue) {
-          icon = Icons.star;               // estrella llena
+          icon = Icons.star;
         } else if (rating >= starValue - 0.5) {
-          icon = Icons.star_half;          // media estrella
+          icon = Icons.star_half;
         } else {
-          icon = Icons.star_border;        // vacía
+          icon = Icons.star_border;
         }
 
         return GestureDetector(
@@ -34,8 +34,6 @@ class AppStarRating extends StatelessWidget {
 
             double localX = details.localPosition.dx;
 
-            // Presiona en la mitad izquierda → media estrella
-            // Presiona en la mitad derecha → estrella completa
             if (localX < size / 2) {
               onRatingChanged!(starValue - 0.5);
             } else {

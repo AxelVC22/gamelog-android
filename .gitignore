@@ -93,3 +93,5 @@ ios/Flutter/GeneratedPluginRegistrant.*
 # Windows
 Thumbs.db
 desktop.ini
+
+.env

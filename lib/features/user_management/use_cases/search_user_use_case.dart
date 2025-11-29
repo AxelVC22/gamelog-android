@@ -12,7 +12,7 @@ class SearchUserUseCase {
   Future<Either<Failure, SearchUserResponse>> call(String username) async {
 
     if (username.trim().isEmpty || username.length > 50) {
-      return left(Failure(ErrorCodes.invalidUsername));
+      return left(Failure.local(ErrorCodes.invalidUsername));
     }
 
 

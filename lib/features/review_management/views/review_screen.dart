@@ -56,7 +56,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   Expanded(
                     child: Column(
                       children: <Widget>[
-                        AppModuleTitle(title: widget.review.game.name),
+                        AppModuleTitle(title: 'd')//widget.review.game.name),
                       ],
                     ),
                   ),
@@ -65,7 +65,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               const SizedBox(height: 16.0),
 
               Text(
-                widget.review.game.description,
+                'd',//widget.review.game.description,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -76,7 +76,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               Text(l10n.myRating),
 
               AppStarRating(
-                rating: widget.review.game.rating,
+                rating: 4,//widget.review.game.rating,
                 onRatingChanged: (_) {},
               ),
 
