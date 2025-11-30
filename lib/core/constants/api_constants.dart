@@ -25,4 +25,6 @@ class ApiConstants {
 
   //reviews
   static const String searchGame = '/games';
+
+  static const String reviewGame = '/gamelog/resena';
 }

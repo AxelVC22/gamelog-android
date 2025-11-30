@@ -1,9 +1,7 @@
-
 import 'package:flutter/cupertino.dart';
 
 @immutable
 class ReviewGameRequest {
-
   final int idGame;
   final int idPlayer;
   final double rating;
@@ -13,14 +11,13 @@ class ReviewGameRequest {
     required this.idGame,
     required this.idPlayer,
     required this.rating,
-    required this.opinion
+    required this.opinion,
   });
 
   Map<String, dynamic> toJson() => {
-
     'idJuego': idGame,
     'idJugador': idPlayer,
     'calificacion': rating,
-    'comentario': opinion,
+    'opinion': opinion,
   };
 }

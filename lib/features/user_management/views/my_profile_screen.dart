@@ -106,7 +106,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     ref.read(currentUserProvider.notifier).state = newCurrentAccount;
   }
 
-  void performAccept() async {
+  void _performAccept() async {
     final request = EditProfileRequest(
       name: _nameController.text,
       fathersSurname: _fathersSurnameController.text,
@@ -365,7 +365,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
                       child: AppButton(
                         text: l10n.save,
                         type: AppButtonType.success,
-                        onPressed: isValid ? performAccept : null,
+                        onPressed: isValid ? _performAccept : null,
                       ),
                     ),
                     SizedBox(width: 16),
