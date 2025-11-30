@@ -79,7 +79,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ],
               ),
 
-              Padding( padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4.0,
+                  vertical: 8.0,
+                ),
                 child: Column(
                   children: [
                     Align(

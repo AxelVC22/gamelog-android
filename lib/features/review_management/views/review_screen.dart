@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/domain/entities/review.dart';
-import 'package:gamelog/features/review_management/views/review_game_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 
-import '../../../widgets/app_button.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_start_rating.dart';

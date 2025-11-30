@@ -11,4 +11,6 @@ abstract class UserManagementRepository {
 
   Future<Either<Failure, EditProfileResponse>> editProfile(EditProfileRequest request);
 
+
+
 }

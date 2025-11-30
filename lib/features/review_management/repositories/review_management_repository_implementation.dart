@@ -1,7 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
+import 'package:gamelog/features/review_management/models/review_game_request.dart';
+import 'package:gamelog/features/review_management/models/review_game_response.dart';
 import 'package:gamelog/features/review_management/providers/review_management_providers.dart';
 import 'package:gamelog/features/review_management/repositories/review_management_repository.dart';
 
@@ -9,44 +12,66 @@ import '../../../core/domain/entities/game.dart';
 import '../../../core/messages/error_codes.dart';
 
 class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
-  final Dio dio;
+  final Dio dioRawg;
   final String apiKey;
+  final FlutterSecureStorage storage;
+  final Dio dio;
 
-  ReviewManagementRepositoryImpl(this.dio, this.apiKey);
+
+
+  ReviewManagementRepositoryImpl(this.dioRawg, this.apiKey, this.storage, this.dio);
 
   @override
-  Future<Either<Failure, Game>> searchGame(
-    String gameName,
-  ) async {
-      try {
+  Future<Either<Failure, Game>> searchGame(String gameName) async {
+    try {
+      final response = await dioRawg.get(
+        '${ApiConstants.searchGame}/$gameName',
+        queryParameters: {'key': apiKey},
+      );
 
-        final response = await dio.get(
-          '${ApiConstants.searchGame}/$gameName',
-          queryParameters: {
-            'key': apiKey,
-          },
-        );
+      if (response.statusCode == 200) {
+        final res = Game.fromJson(response.data);
+        return Right(res);
+      } else {
+        final data = response.data;
 
+        final message =
+            data['error'] ??
+            data['detail'] ??
+            data['message'] ??
+            'Unknown server error';
 
-
-        if (response.statusCode == 200 ) {
-          final res = Game.fromJson(response.data);
-          return Right(res);
-        } else {
-          final data = response.data;
-
-          final message =
-              data['error'] ??
-                  data['detail'] ??
-                  data['message'] ??
-                  'Unknown server error';
-
-          return Left(Failure.server(message));
-
-        }
-      } catch (e) {
-        return Left(Failure(ErrorCodes.unexpectedError));
+        return Left(Failure.server(message));
       }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
     }
+  }
 
+  @override
+  Future<Either<Failure, ReviewGameResponse>> reviewGame(
+    ReviewGameRequest request,
+  ) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.post(
+        ApiConstants.reviewGame,
+        data: request.toJson(),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final res = ReviewGameResponse.fromJson(response.data);
+        return Right(res);
+      } else {
+        return Left(Failure.server(response.data['mensaje']));
+      }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
 }

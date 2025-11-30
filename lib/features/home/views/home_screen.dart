@@ -139,7 +139,7 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
               );
             },
           ),
-          SizedBox(width: 8), // Espaciado al borde
+          SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
