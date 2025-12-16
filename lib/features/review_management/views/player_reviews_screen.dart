@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/core/domain/entities/game.dart';
+import 'package:gamelog/features/auth/providers/auth_providers.dart';
+import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
+import 'package:gamelog/features/review_management/providers/retrieve_player_reviews_controller.dart';
 import 'package:gamelog/features/review_management/views/review_screen.dart';
+import 'package:gamelog/features/user_management/views/profile_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
+import 'package:gamelog/l10n/app_localizations_extension.dart';
 
-import '../../../core/domain/entities/player.dart';
+import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/review.dart';
+import '../../../core/domain/failures/failure.dart';
 import '../../../widgets/app_filter_tab.dart';
+import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
-import '../../../widgets/app_my_review_card.dart';
 import '../../../widgets/app_review_card.dart';
-import '../../../widgets/app_search_bar.dart';
+
+final retrieveResultsProvider = StateProvider<List<Review>>((ref) => []);
 
 class PlayerReviewsScreen extends ConsumerStatefulWidget {
-  const PlayerReviewsScreen({super.key});
+  final Game game;
+  const PlayerReviewsScreen({super.key, required this.game});
 
   @override
   ConsumerState<PlayerReviewsScreen> createState() =>
@@ -24,51 +31,30 @@ class PlayerReviewsScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
-  List<Review> allGames = [
-    Review(
-      id: 0,
-      rating: 4,
-      opinion: 'Buen juego',
-     // game: Game(name: 'Zelda', description: "", id: 0, rating: 3.5),
-      date: DateTime.now(),
-      player: Player(username: 'Meka')
-    ),
-    Review(
-      id: 0,
-      rating: 3,
-      opinion: 'Mal juego',
-   //   game: Game(name: 'Fortinaitiz', description: "", id: 0, rating: 1.5),
-      date: DateTime.now(),
-        player: Player(username: 'Cachetes')
-
-    ),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _search('z');
-  }
+  List<Review> allGames = [];
 
   List<Review> results = [];
   bool isLoading = false;
 
-  Future<void> _search(String query) async {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() => _search());
+  }
+
+  Future<void> _search() async {
+    if (!mounted) return;
+
     setState(() => isLoading = true);
 
-    // Simula un delay de API
-    await Future.delayed(const Duration(milliseconds: 600));
+    int idPlayer = ref.read(currentUserProvider.notifier).state!.idPlayer;
 
-    // setState(() {
-    //   results = allGames
-    //       .where(
-    //         (review) =>
-    //             review.game.name.toLowerCase().contains(query.toLowerCase()),
-    //       )
-    //       .toList();
-    //
-    //   isLoading = false;
-    // });
+    await ref
+        .read(retrievePlayerReviewsControllerProvider.notifier)
+        .retrievePlayerReviews(widget.game.id, idPlayer);
+
+    if (mounted) setState(() => isLoading = false);
   }
 
   @override
@@ -79,6 +65,43 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final results = ref.watch(retrieveResultsProvider);
+
+    ref.listen<AsyncValue<RetrievePlayerReviewsResponse?>>(
+      retrievePlayerReviewsControllerProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              if (response == null) return;
+
+              ref.read(retrieveResultsProvider.notifier).state =
+                  response.reviews;
+            },
+            error: (error, stack) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              final msg = error is Failure
+                  ? (error.serverMessage ?? l10n.byKey(error.code))
+                  : error.toString();
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
+              });
+            },
+          );
+        }
+
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -99,11 +122,9 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
             children: <Widget>[
               AppFilterTab(
                 options: [l10n.allReviews, l10n.friends],
-                onChanged: (index) {
-                },
+                onChanged: (index) {},
               ),
               const SizedBox(height: 16.0),
-
 
               if (isLoading)
                 const Expanded(
@@ -116,18 +137,19 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                     itemBuilder: (_, i) {
                       return AppReviewCard(
                         date: DateTime.now(),
-                        username: results[i].player.username,
+                        username: results[i].username,
                         imageUrl: "",
                         rating: results[i].rating,
                         opinion: results[i].opinion,
                         onDelete: () {},
+                        isLiked: results[i].isLiked,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ReviewScreen(review: results[i]),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (_) => ProfileScreen(),
+                          //   ),
+                          // );
                         },
                       );
                     },

@@ -13,6 +13,7 @@ class AppReviewCard extends StatelessWidget {
   final double rating;
   final String opinion;
   final VoidCallback? onDelete;
+  final bool isLiked;
 
   const AppReviewCard({
     super.key,
@@ -22,7 +23,8 @@ class AppReviewCard extends StatelessWidget {
     required this.date,
     required this.rating,
     required this.opinion,
-    required this.onDelete
+    required this.onDelete,
+    required this.isLiked
   });
 
   @override
@@ -76,7 +78,7 @@ class AppReviewCard extends StatelessWidget {
                 ],
               ),
               AppLikeButton(
-                initialValue: true,
+                initialValue: isLiked,
                 onChanged: (value) {
                 },
               ),

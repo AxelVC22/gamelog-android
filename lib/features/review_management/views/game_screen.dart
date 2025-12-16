@@ -139,7 +139,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => PlayerReviewsScreen(),
+                            builder: (_) => PlayerReviewsScreen(game: widget.game),
                           ),
                         );
                       },

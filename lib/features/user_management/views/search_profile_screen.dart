@@ -36,7 +36,6 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
 
     await ref.read(searchUserControllerProvider.notifier).searchUser(query);
 
-    setState(() => isLoading = false);
   }
 
   @override
@@ -85,6 +84,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
         ref.read(globalLoadingProvider.notifier).state = true;
       }
     });
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.0.31:1234'; //10.0.2.2
+  static const String baseUrl = 'http://192.168.0.24:1234'; //10.0.2.2
   static const String baseRawgUrl = 'https://api.rawg.io/api';
 
   //Auth
@@ -27,4 +27,10 @@ class ApiConstants {
   static const String searchGame = '/games';
 
   static const String reviewGame = '/gamelog/resena';
+
+  static const String retrievePlayerReviews = '/gamelog/resena/juego';
+
+  //games
+
+  static const String registerGame = '/gamelog/juego';
 }
