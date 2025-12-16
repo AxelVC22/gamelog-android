@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/review_management/models/add_to_pendings_request.dart';
+import 'package:gamelog/features/review_management/models/add_to_pendings_response.dart';
+import 'package:gamelog/features/review_management/providers/add_game_to_pendings_controller.dart';
 import 'package:gamelog/features/review_management/views/player_reviews_screen.dart';
 import 'package:gamelog/features/review_management/views/review_game_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
+import 'package:gamelog/l10n/app_localizations_extension.dart';
 
 import '../../../core/domain/entities/game.dart';
+import '../../../core/domain/failures/failure.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_expandable_html_text.dart';
+import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_start_rating.dart';
 
 import 'package:flutter_html/flutter_html.dart';
+
+import '../../auth/providers/auth_providers.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final Game game;
@@ -27,6 +35,52 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    void _performAddGameToPendings() async {
+      final request = AddToPendingsRequest(
+        idGame: widget.game.id,
+        idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+      );
+
+      await ref
+          .read(addGameToPendingsControllerProvider.notifier)
+          .addGameToPendings(request);
+    }
+
+    ref.listen<AsyncValue<AddToPendingsResponse?>>(
+      addGameToPendingsControllerProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(response!.message)));
+              });
+            },
+            error: (error, stack) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              final msg = error is Failure
+                  ? (error.serverMessage ?? l10n.byKey(error.code))
+                  : error.toString();
+
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(msg)));
+            },
+          );
+        }
+
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -139,7 +193,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => PlayerReviewsScreen(game: widget.game),
+                            builder: (_) =>
+                                PlayerReviewsScreen(game: widget.game),
                           ),
                         );
                       },
@@ -153,7 +208,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               AppButton(
                 text: l10n.addToPendings,
                 onPressed: () {
-                  //todo
+                  _performAddGameToPendings();
                 },
               ),
               const SizedBox(height: 12),

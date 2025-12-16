@@ -1,5 +1,4 @@
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/review_management/providers/review_management_providers.dart';
 import 'package:gamelog/features/review_management/use_cases/search_game_use_case.dart';

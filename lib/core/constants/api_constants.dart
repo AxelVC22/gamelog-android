@@ -33,4 +33,6 @@ class ApiConstants {
   //games
 
   static const String registerGame = '/gamelog/juego';
+
+  static const String addGameToPendings = '/gamelog/juego/pendiente';
 }
