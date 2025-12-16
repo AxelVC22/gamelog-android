@@ -37,6 +37,8 @@ class _ReviewGameScreenState extends ConsumerState<ReviewGameScreen> {
       idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
       rating: currentRating,
       opinion: _opinionController.text,
+      name: widget.game.name,
+      released: widget.game.released!
     );
 
     await ref.read(reviewGameControllerProvider.notifier).reviewGame(request);

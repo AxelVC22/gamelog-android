@@ -48,7 +48,7 @@ class _AppFilterTabState extends State<AppFilterTab> {
                 ),
                 decoration: BoxDecoration(
                   color: isActive ? Colors.blue : Colors.grey[200],
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   widget.options[index],

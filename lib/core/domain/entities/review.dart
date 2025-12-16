@@ -1,43 +1,46 @@
 import 'package:flutter/foundation.dart';
-import 'player.dart';
-import 'game.dart';
 
 @immutable
 class Review {
-  final int id;
-  final double rating;
+  final int idReview;
+  final int idPlayer;
+  final String username;
+  final String? picture;
+  final int idGame;
+  final String name;
+  final String date;
   final String opinion;
- // final Game game;
-  final Player player;
-  final DateTime date;
+  final double rating;
+  final int likesTotal;
+  final bool isLiked;
 
   const Review({
-    required this.id,
-    required this.rating,
-    required this.opinion,
-   // required this.game,
+    required this.idReview,
+    required this.idPlayer,
+    required this.username,
+    this.picture,
+    required this.idGame,
+    required this.name,
     required this.date,
-    required this.player
+    required this.opinion,
+    required this.rating,
+    required this.likesTotal,
+    required this.isLiked,
   });
-
   factory Review.fromJson(Map<String, dynamic> json) {
     return Review(
-      id: json['id'] as int,
-      rating: (json['rating'] as num).toDouble(),
-      opinion: json['comentario'] as String,
-   //   game: Game.fromJson(json['game']),
-      date: DateTime.parse(json['fecha']),
-      player: Player.fromJson(json['jugador'])
+      idReview: json['idResenia'] as int,
+      idPlayer: json['idJugador'] as int,
+      username: json['nombreDeUsuario'] as String,
+      picture: json['foto'] as String?,
+      idGame: json['idJuego'] as int,
+      name: json['nombre'] as String,
+      date: json['fecha'] as String,
+      opinion: json['opinion'] as String,
+      rating: (json['calificacion'] as num).toDouble(),
+      likesTotal: json['totalDeMeGusta'] as int,
+      isLiked: (json['existeMeGusta'] as bool),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'rating': rating,
-      'comentario': opinion,
-     // 'game': game.toJson(),
-      'fecha': date.toIso8601String(),
-    };
-  }
 }

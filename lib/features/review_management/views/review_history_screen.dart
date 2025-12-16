@@ -23,22 +23,7 @@ class ReviewHistoryScreen extends ConsumerStatefulWidget {
 
 class _ReviewHistoryScreenState extends ConsumerState<ReviewHistoryScreen> {
   List<Review> allGames = [
-    Review(
-      id: 0,
-      rating: 4,
-      opinion: 'Buen juego',
-     // game: Game(name: 'Zelda', description: "", id: 0, rating: 3.5),
-      date: DateTime.now(),
-      player: Player(username: 'Meka'),
-    ),
-    Review(
-      id: 0,
-      rating: 3,
-      opinion: 'Mal juego',
-     // game: Game(name: 'Fortinaiti', description: "", id: 0, rating: 1.5),
-      date: DateTime.now(),
-      player: Player(username: 'Cachetes hdp'),
-    ),
+
   ];
 
   List<Review> results = [];

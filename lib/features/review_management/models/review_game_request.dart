@@ -7,11 +7,17 @@ class ReviewGameRequest {
   final double rating;
   final String opinion;
 
+  final String name;
+  final String released;
+
+
   const ReviewGameRequest({
     required this.idGame,
     required this.idPlayer,
     required this.rating,
     required this.opinion,
+    required this.name,
+    required this.released
   });
 
   Map<String, dynamic> toJson() => {

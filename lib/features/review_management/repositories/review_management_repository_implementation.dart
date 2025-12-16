@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
+import 'package:gamelog/features/review_management/models/register_game_request.dart';
+import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
 import 'package:gamelog/features/review_management/models/review_game_request.dart';
 import 'package:gamelog/features/review_management/models/review_game_response.dart';
 import 'package:gamelog/features/review_management/providers/review_management_providers.dart';
@@ -10,6 +12,7 @@ import 'package:gamelog/features/review_management/repositories/review_managemen
 
 import '../../../core/domain/entities/game.dart';
 import '../../../core/messages/error_codes.dart';
+import '../models/register_game_response.dart';
 
 class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
   final Dio dioRawg;
@@ -17,9 +20,12 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
   final FlutterSecureStorage storage;
   final Dio dio;
 
-
-
-  ReviewManagementRepositoryImpl(this.dioRawg, this.apiKey, this.storage, this.dio);
+  ReviewManagementRepositoryImpl(
+    this.dioRawg,
+    this.apiKey,
+    this.storage,
+    this.dio,
+  );
 
   @override
   Future<Either<Failure, Game>> searchGame(String gameName) async {
@@ -48,6 +54,27 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
     }
   }
 
+  Future<Either<Failure, RegisterGameResponse>> _registerGame(
+    RegisterGameRequest request,
+  ) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.post(
+        ApiConstants.registerGame,
+        data: request.toJson(),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+      final res = RegisterGameResponse.fromJson(response.data);
+      return Right(res);
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
   @override
   Future<Either<Failure, ReviewGameResponse>> reviewGame(
     ReviewGameRequest request,
@@ -55,9 +82,45 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
     try {
       final token = await storage.read(key: 'access_token');
 
-      final response = await dio.post(
-        ApiConstants.reviewGame,
-        data: request.toJson(),
+      final registerGameRequest = RegisterGameRequest(
+        idGame: request.idGame,
+        name: request.name,
+        releaseDate: request.released,
+      );
+
+      final gameRegistration = await _registerGame(registerGameRequest);
+
+      return gameRegistration.fold((failure) => Left(failure), (response) async {
+        final response = await dio.post(
+          ApiConstants.reviewGame,
+          data: request.toJson(),
+          options: Options(
+            headers: {"Authorization": "Bearer $token"},
+            validateStatus: (status) => status! < 600,
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          final res = ReviewGameResponse.fromJson(response.data);
+          return Right(res);
+        } else {
+          return Left(Failure.server(response.data['mensaje']));
+        }
+      });
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+  @override
+  Future<Either<Failure, RetrievePlayerReviewsResponse>>
+  retrievePlayerReviewsResponse(int idGame, int idPlayer) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.get(
+        '${ApiConstants.retrievePlayerReviews}/$idGame',
+        queryParameters: {'idJugadorBuscador': idPlayer},
         options: Options(
           headers: {"Authorization": "Bearer $token"},
           validateStatus: (status) => status! < 600,
@@ -65,7 +128,7 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
       );
 
       if (response.statusCode == 200) {
-        final res = ReviewGameResponse.fromJson(response.data);
+        final res = RetrievePlayerReviewsResponse.fromJson(response.data);
         return Right(res);
       } else {
         return Left(Failure.server(response.data['mensaje']));
