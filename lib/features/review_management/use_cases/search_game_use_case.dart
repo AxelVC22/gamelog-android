@@ -16,8 +16,18 @@ class SearchGameUseCase {
     if (gameName.trim().isEmpty || gameName.length > 50) {
       return left(Failure.local(ErrorCodes.invalidUsername));
     }
-    final result = await repository.searchGame(gameName.replaceAll(' ', '-'));
+    final normalizedName = _normalizeGameName(gameName);
+
+    final result = await repository.searchGame(normalizedName);
 
     return result;
   }
+
+  String _normalizeGameName(String input) {
+    return input
+        .replaceAll(RegExp(r'\s*\(itch\)\s*', caseSensitive: false), '')
+        .trim()
+        .replaceAll(RegExp(r'\s+'), '-');
+  }
+
 }

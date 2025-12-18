@@ -6,6 +6,7 @@ import 'package:gamelog/core/domain/failures/failure.dart';
 import 'package:gamelog/features/review_management/models/add_to_pendings_response.dart';
 import 'package:gamelog/features/review_management/models/register_game_request.dart';
 import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
+import 'package:gamelog/features/review_management/models/retrieve_review_history_response.dart';
 import 'package:gamelog/features/review_management/models/review_game_request.dart';
 import 'package:gamelog/features/review_management/models/review_game_response.dart';
 import 'package:gamelog/features/review_management/providers/review_management_providers.dart';
@@ -165,6 +166,36 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
         return Right(res);
       } else {
         return left(Failure.server(response.data['mensaje']));
+      }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+  @override
+  Future<Either<Failure, RetrieveReviewHistoryResponse>> retrieveReviewHistory(
+    int idPlayerToSearch,
+    int idPlayer,
+  ) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.get(
+        '${ApiConstants.retriveReviewHistory}/$idPlayerToSearch',
+        queryParameters: {'idJugadorBuscador': idPlayer},
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final res = RetrieveReviewHistoryResponse.fromJson(response.data);
+        return Right(res);
+      } else if (response.statusCode == 404) {
+        return Right(RetrieveReviewHistoryResponse(reviews: [], error: false));
+      } else {
+        return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));

@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 class Review {
   final int idReview;
   final int idPlayer;
-  final String username;
+  final String? username;
   final String? picture;
   final int idGame;
   final String name;
@@ -17,7 +17,7 @@ class Review {
   const Review({
     required this.idReview,
     required this.idPlayer,
-    required this.username,
+    this.username,
     this.picture,
     required this.idGame,
     required this.name,
@@ -31,7 +31,7 @@ class Review {
     return Review(
       idReview: json['idResenia'] as int,
       idPlayer: json['idJugador'] as int,
-      username: json['nombreDeUsuario'] as String,
+      username: json['nombreDeUsuario'] as String?,
       picture: json['foto'] as String?,
       idGame: json['idJuego'] as int,
       name: json['nombre'] as String,
@@ -39,8 +39,9 @@ class Review {
       opinion: json['opinion'] as String,
       rating: (json['calificacion'] as num).toDouble(),
       likesTotal: json['totalDeMeGusta'] as int,
-      isLiked: (json['existeMeGusta'] as bool),
+      isLiked:
+          (json['existeMeGusta'] as bool? ?? false) ||
+          (json['existeLike'] as bool? ?? false),
     );
   }
-
 }

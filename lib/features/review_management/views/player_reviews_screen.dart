@@ -31,7 +31,6 @@ class PlayerReviewsScreen extends ConsumerStatefulWidget {
 
 class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
-  List<Review> results = [];
   bool isLoading = false;
 
   @override
@@ -57,7 +56,6 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
   @override
   void dispose() {
-    results.clear();
     super.dispose();
   }
 
@@ -135,8 +133,8 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                     itemCount: results.length,
                     itemBuilder: (_, i) {
                       return AppReviewCard(
-                        date: DateTime.now(),
-                        username: results[i].username,
+                        date: DateTime.parse(results[i].date),
+                        username: results[i].username!,
                         imageUrl: "",
                         rating: results[i].rating,
                         opinion: results[i].opinion,

@@ -193,7 +193,7 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => ReviewHistoryScreen()),
+                    MaterialPageRoute(builder: (_) => ReviewHistoryScreen(idPlayerToSearch: ref.read(currentUserProvider.notifier).state!.idPlayer)),
                   );
                 },
                 color: Colors.brown,

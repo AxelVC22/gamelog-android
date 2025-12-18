@@ -25,8 +25,6 @@ class SearchGameScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
-
-
   bool isLoading = false;
 
   Future<void> _search(String query) async {
@@ -47,9 +45,9 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     ref.listen<AsyncValue<Game?>>(searchGameControllerProvider, (
-        previous,
-        next,
-        ) {
+      previous,
+      next,
+    ) {
       if (previous?.isLoading == true && next.isLoading == false) {
         next.when(
           loading: () {},
@@ -102,24 +100,31 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
 
               const SizedBox(height: 12),
 
-              if (isLoading)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else
-                if (ref.read(searchResultProvider.notifier).state != null)
+              if (ref.read(searchResultProvider.notifier).state != null)
                 Expanded(
                   child: ListView.builder(
                     itemCount: 1,
                     itemBuilder: (_, i) {
                       return AppGameCard(
-                        name: ref.read(searchResultProvider.notifier).state!.name,
-                        imageUrl: ref.read(searchResultProvider.notifier).state!.backgroundImage ?? 'https://picsum.photos/800/450',
+                        name: ref
+                            .read(searchResultProvider.notifier)
+                            .state!
+                            .name, //TODO: cambiar por mejor imagen
+                        imageUrl:
+                            ref
+                                .read(searchResultProvider.notifier)
+                                .state!
+                                .backgroundImage ??
+                            'https://picsum.photos/800/450',
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => GameScreen(game: ref.read(searchResultProvider.notifier).state!),
+                              builder: (_) => GameScreen(
+                                game: ref
+                                    .read(searchResultProvider.notifier)
+                                    .state!,
+                              ),
                             ),
                           );
                         },

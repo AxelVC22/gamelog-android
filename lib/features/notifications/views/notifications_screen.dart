@@ -12,7 +12,7 @@ import '../../../core/domain/entities/review.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
-import '../../../widgets/app_my_review_card.dart';
+import '../../../widgets/app_poster_review_card.dart';
 import '../../../widgets/app_notification_card.dart';
 import '../../../widgets/app_review_card.dart';
 import '../../../widgets/app_search_bar.dart';

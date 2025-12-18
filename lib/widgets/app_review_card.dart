@@ -24,7 +24,7 @@ class AppReviewCard extends StatelessWidget {
     required this.rating,
     required this.opinion,
     required this.onDelete,
-    required this.isLiked
+    required this.isLiked,
   });
 
   @override
@@ -77,19 +77,10 @@ class AppReviewCard extends StatelessWidget {
                   ),
                 ],
               ),
-              AppLikeButton(
-                initialValue: isLiked,
-                onChanged: (value) {
-                },
-              ),
-              AppIconButton(
-                icon: Icons.delete,
-                onPressed: onDelete,
-              )
+              AppLikeButton(initialValue: isLiked, onChanged: (value) {}),
+              AppIconButton(icon: Icons.delete, onPressed: onDelete),
             ],
           ),
-
-
         ),
       ),
     );
