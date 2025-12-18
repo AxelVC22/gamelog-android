@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/providers/auth_providers.dart';
+import 'package:gamelog/features/review_management/models/delete_review_response.dart';
 import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
+import 'package:gamelog/features/review_management/providers/delete_review_controller.dart';
 import 'package:gamelog/features/review_management/providers/retrieve_player_reviews_controller.dart';
-
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
@@ -30,7 +31,6 @@ class PlayerReviewsScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
-
   bool isLoading = false;
 
   @override
@@ -52,6 +52,12 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
         .retrievePlayerReviews(widget.game.id, idPlayer);
 
     if (mounted) setState(() => isLoading = false);
+  }
+
+  Future<void> _performDeleteReview(int idReview) async {
+    await ref
+        .read(deleteReviewControllerProvider.notifier)
+        .deleteReview(widget.game.id, idReview);
   }
 
   @override
@@ -77,6 +83,51 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
               ref.read(retrieveResultsProvider.notifier).state =
                   response.reviews;
+            },
+            error: (error, stack) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              final msg = error is Failure
+                  ? (error.serverMessage ?? l10n.byKey(error.code))
+                  : error.toString();
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
+              });
+            },
+          );
+        }
+
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
+
+    ref.listen<AsyncValue<DeleteReviewResponse?>>(
+      deleteReviewControllerProvider,
+          (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              if (response == null) return;
+
+              final notifier = ref.read(retrieveResultsProvider.notifier);
+
+              notifier.state = notifier.state
+                  .where((item) => item.idReview != response.idReview)
+                  .toList();
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(response!.message)));
+              });
             },
             error: (error, stack) {
               ref.read(globalLoadingProvider.notifier).state = false;
@@ -133,21 +184,21 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                     itemCount: results.length,
                     itemBuilder: (_, i) {
                       return AppReviewCard(
+                        likes: results[i].likesTotal,
+                        userType: ref
+                            .read(currentUserProvider.notifier)
+                            .state!
+                            .accessType,
                         date: DateTime.parse(results[i].date),
                         username: results[i].username!,
                         imageUrl: "",
                         rating: results[i].rating,
                         opinion: results[i].opinion,
-                        onDelete: () {},
-                        isLiked: results[i].isLiked,
-                        onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) => ProfileScreen(),
-                          //   ),
-                          // );
+                        onDelete: () {
+                          _performDeleteReview(results[i].idReview);
                         },
+                        isLiked: results[i].isLiked,
+                        onTap: () {},
                       );
                     },
                   ),

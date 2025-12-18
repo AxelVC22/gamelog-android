@@ -1,17 +1,17 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
 import 'package:gamelog/features/review_management/models/add_to_pendings_response.dart';
+import 'package:gamelog/features/review_management/models/delete_review_response.dart';
 import 'package:gamelog/features/review_management/models/register_game_request.dart';
 import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
 import 'package:gamelog/features/review_management/models/retrieve_review_history_response.dart';
 import 'package:gamelog/features/review_management/models/review_game_request.dart';
 import 'package:gamelog/features/review_management/models/review_game_response.dart';
-import 'package:gamelog/features/review_management/providers/review_management_providers.dart';
 import 'package:gamelog/features/review_management/repositories/review_management_repository.dart';
 
+import '../../../core/constants/api_constants.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/messages/error_codes.dart';
 import '../models/add_to_pendings_request.dart';
@@ -200,5 +200,49 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));
     }
+  }
+
+  @override
+  Future<Either<Failure, DeleteReviewResponse>> deleteReview(int idGame, int idReview) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.delete(
+        '${ApiConstants.deleteReview}/$idGame/$idReview',
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final base = DeleteReviewResponse.fromJson(response.data);
+
+        final res = base.copyWith(idReview: idReview);
+        return Right(res);
+      } else {
+        final message = response.data['mensaje'];
+        return Left(Failure.server(_parseMessages(message)));
+      }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+
+  static String _parseMessages(dynamic message) {
+    if (message == null) return '';
+
+    if (message is String) {
+      return message;
+    }
+
+    if (message is List) {
+      String concatString = '';
+      message.map((e) => concatString = concatString + e.toString());
+      return concatString;
+    }
+
+    return ErrorCodes.unexpectedError;
   }
 }
