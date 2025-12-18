@@ -36,7 +36,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    void _performAddGameToPendings() async {
+    Future<void> _performAddGameToPendings() async {
       final request = AddToPendingsRequest(
         idGame: widget.game.id,
         idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,

@@ -14,6 +14,8 @@ class AppReviewCard extends StatelessWidget {
   final String opinion;
   final VoidCallback? onDelete;
   final bool isLiked;
+  final String userType;
+  final int likes;
 
   const AppReviewCard({
     super.key,
@@ -25,6 +27,8 @@ class AppReviewCard extends StatelessWidget {
     required this.opinion,
     required this.onDelete,
     required this.isLiked,
+    required this.userType,
+    required this.likes,
   });
 
   @override
@@ -37,48 +41,91 @@ class AppReviewCard extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundImage: imageUrl.isNotEmpty
-                    ? NetworkImage(imageUrl)
-                    : null,
-                child: imageUrl.isEmpty
-                    ? const Icon(Icons.person, size: 32)
-                    : null,
-              ),
-              const SizedBox(width: 16),
-
-              Column(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppStarRating(rating: rating, onRatingChanged: (_) {}),
-                  Text(
-                    username,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: imageUrl.isNotEmpty
+                            ? NetworkImage(imageUrl)
+                            : null,
+                        child: imageUrl.isEmpty
+                            ? const Icon(Icons.person, size: 16)
+                            : null,
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        username,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
+                  Row(
+                    children: [
+                      if (userType == 'Administrador')
+                        AppIconButton(
+                          icon: Icons.delete,
+                          onPressed: onDelete,
+                          color: Colors.grey,
+                        ),
+                      AppLikeButton(
+                        initialValue: isLiked,
+                        onChanged: (value) {},
+                      ),
+                      Text(
+                        likes.toString(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+                  Row(
+                    children: [
+                      AppStarRating(rating: rating, onRatingChanged: (_) {}),
+                      Text(
+                        rating.toString(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+
                   Text(
                     DateFormat('dd/MM/yyyy').format(date),
                     style: const TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.w300,
                     ),
                   ),
 
                   Text(
                     opinion,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
                 ],
               ),
-              AppLikeButton(initialValue: isLiked, onChanged: (value) {}),
-              AppIconButton(icon: Icons.delete, onPressed: onDelete),
             ],
           ),
         ),

@@ -32,6 +32,8 @@ class ApiConstants {
 
   static const String retriveReviewHistory = '/gamelog/resena/jugador';
 
+  static const String deleteReview = '/gamelog/resena';
+
   //games
 
   static const String registerGame = '/gamelog/juego';
