@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:gamelog/features/user_management/models/add_to_black_list_request.dart';
+import 'package:gamelog/features/user_management/models/add_to_black_list_response.dart';
 import 'package:gamelog/features/user_management/models/edit_profile_request.dart';
 import 'package:gamelog/features/user_management/models/edit_profile_response.dart';
 
@@ -35,7 +37,7 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
 
       if (response.statusCode == 200) {
         final res = SearchUserResponse.fromJson(response.data);
-        return Right(SearchUserResponse(error: false, accounts: res.accounts));
+        return Right(res);
       } else {
         return Left(Failure.server(response.data['mensaje']));
       }
@@ -114,5 +116,55 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));
     }
+  }
+
+  @override
+  Future<Either<Failure, AddToBlackListResponse>> addToBlackList(AddToBlackListRequest request) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final idResult = await getIdAccess(request.email, request.userType);
+
+      return idResult.fold(
+            (failure) => Left(failure),
+            (idAccess) async {
+          final response = await dio.patch(
+            '${ApiConstants.addToBlackList}/$idAccess',
+            data: request.toJson(),
+            options: Options(
+              headers: {"Authorization": "Bearer $token"},
+              validateStatus: (status) => status! < 600,
+            ),
+          );
+
+          if (response.statusCode == 200) {
+            final res = AddToBlackListResponse.fromJson(response.data);
+            return Right(res);
+          } else {
+            final String message = response.data['mensaje'];
+            return Left(Failure.server(_parseMessages(message)));
+          }
+        },
+      );
+
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+  static String _parseMessages(dynamic message) {
+    if (message == null) return '';
+
+    if (message is String) {
+      return message;
+    }
+
+    if (message is List) {
+      String concatString = '';
+      message.map((e) => concatString = concatString + e.toString());
+      return concatString;
+    }
+
+    return ErrorCodes.unexpectedError;
   }
 }

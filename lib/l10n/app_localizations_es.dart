@@ -193,6 +193,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unexpectedError => 'Error inesperado';
 
   @override
+  String get notFoundUser => 'Usuario no encontrado';
+
+  @override
   String get requiredField => 'El campo es obligatorio';
 
   @override

@@ -36,6 +36,7 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
       final response = await dioRawg.get(
         '${ApiConstants.searchGame}/$gameName',
         queryParameters: {'key': apiKey},
+        options: Options(validateStatus: (status) => status! < 600,)
       );
 
       if (response.statusCode == 200) {

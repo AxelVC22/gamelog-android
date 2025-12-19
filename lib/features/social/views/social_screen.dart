@@ -104,7 +104,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                         onTap: () { Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>  ProfileScreen(account: results[i]),
+                            builder: (_) =>  ProfileScreen(username: results[i].username),
                           ),
                         );},
                       );

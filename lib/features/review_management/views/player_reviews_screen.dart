@@ -6,6 +6,7 @@ import 'package:gamelog/features/review_management/models/delete_review_response
 import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
 import 'package:gamelog/features/review_management/providers/delete_review_controller.dart';
 import 'package:gamelog/features/review_management/providers/retrieve_player_reviews_controller.dart';
+import 'package:gamelog/features/user_management/views/profile_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
@@ -198,7 +199,9 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                           _performDeleteReview(results[i].idReview);
                         },
                         isLiked: results[i].isLiked,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder:(_) => ProfileScreen(username: results[i].username!)));
+                        },
                       );
                     },
                   ),

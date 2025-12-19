@@ -240,8 +240,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
               AppPasswordField(
                 label: l10n.password,
                 hint: l10n.password,
-                controller: _passwordController, errorText: passwordError.error,  // ← Agregar
-                onChanged: (value) {              // ← Cambiar de validator a onChanged
+                controller: _passwordController, errorText: passwordError.error,
+                onChanged: (value) {
                   final notifier = ref.read(passwordErrorProvider.notifier);
 
                   String? error;

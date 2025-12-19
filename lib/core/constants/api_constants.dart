@@ -21,6 +21,8 @@ class ApiConstants {
 
   static const String editProfile = '/gamelog/jugador';
 
+  static const String addToBlackList = '/gamelog/acceso';
+
   static const String getIdAccess = '/gamelog/acceso';
 
   //reviews

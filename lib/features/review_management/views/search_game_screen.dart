@@ -95,7 +95,7 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            children: <Widget>[
+            children: [
               AppSearchBar(hint: l10n.search, onSearch: _search),
 
               const SizedBox(height: 12),
