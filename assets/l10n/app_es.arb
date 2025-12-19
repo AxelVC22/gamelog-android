@@ -101,6 +101,7 @@
   "@@Errors": "=== Errores ===",
 
   "unexpectedError": "Error inesperado",
+  "notFoundUser": "Usuario no encontrado",
 
   "@@ValidationMessages": "=== Mensajes de validacion UI===",
   "requiredField" : "El campo es obligatorio",

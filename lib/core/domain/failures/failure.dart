@@ -11,4 +11,6 @@ class Failure {
   const Failure.server(String message)
       : code = ErrorCodes.serverError,
         serverMessage = message;
+
+  const Failure.unexpected() : code = ErrorCodes.unexpectedError, serverMessage='';
 }

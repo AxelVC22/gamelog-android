@@ -454,6 +454,12 @@ abstract class AppLocalizations {
   /// **'Error inesperado'**
   String get unexpectedError;
 
+  /// No description provided for @notFoundUser.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario no encontrado'**
+  String get notFoundUser;
+
   /// No description provided for @requiredField.
   ///
   /// In es, this message translates to:

@@ -29,13 +29,10 @@ class SearchProfileScreen extends ConsumerStatefulWidget {
 class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
   final _searchingStringController = TextEditingController();
 
-  bool isLoading = false;
 
   Future<void> _search(String query) async {
-    setState(() => isLoading = true);
 
     await ref.read(searchUserControllerProvider.notifier).searchUser(query);
-
   }
 
   @override
@@ -43,7 +40,6 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
     _searchingStringController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +102,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
 
               const SizedBox(height: 12),
 
-              if (isLoading)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else
+
                 Expanded(
                   child: ListView.builder(
                     itemCount: results.length,
@@ -123,7 +115,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  ProfileScreen(account: results[i]),
+                                  ProfileScreen(username: results[i].username),
                             ),
                           );
                         },

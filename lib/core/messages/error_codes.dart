@@ -19,4 +19,5 @@ class ErrorCodes {
 
   static const networkError = 'networkError';
   static const serverError = 'serverError';
+
 }
