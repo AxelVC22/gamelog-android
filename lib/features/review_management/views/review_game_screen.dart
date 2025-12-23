@@ -104,12 +104,12 @@ class _ReviewGameScreenState extends ConsumerState<ReviewGameScreen> {
 
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(widget.game.name),
+                child: AppModuleTitle(title: widget.game.name),
               ),
 
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text("${l10n.rating}:"),
+                child: Text("${l10n.rating}:",),
               ),
 
               Row(

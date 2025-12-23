@@ -81,10 +81,6 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: AppIconButton(
-          icon: Icons.arrow_back,
-          onPressed: () => Navigator.pop(context),
-        ),
         title: AppModuleTitle(title: l10n.searchGameTitle),
         centerTitle: true,
         elevation: 0,
