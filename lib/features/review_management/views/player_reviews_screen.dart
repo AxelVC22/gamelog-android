@@ -153,7 +153,6 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -162,7 +161,6 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
         title: AppModuleTitle(title: l10n.reviewHistoryTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(

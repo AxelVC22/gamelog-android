@@ -41,7 +41,7 @@ final dioRawgProvider = Provider<Dio>.internal(
 // ignore: unused_element
 typedef DioRawgRef = ProviderRef<Dio>;
 String _$reviewManagementRepositoryHash() =>
-    r'df448b860ad450507961d47c21ecd6f2ed8e81ea';
+    r'a7e4c1c5b547235d25f1c5acdaf8b1992a7e6d44';
 
 /// See also [reviewManagementRepository].
 @ProviderFor(reviewManagementRepository)

@@ -1,8 +1,8 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/features/review_management/providers/review_management_providers.dart';
 import 'package:gamelog/features/review_management/use_cases/search_game_use_case.dart';
 
+import '../../../core/data/providers/games_providers.dart';
 import '../../../core/domain/entities/game.dart';
 
 final searchGameControllerProvider =
@@ -15,7 +15,7 @@ class SearchGameController extends Notifier<AsyncValue<Game?>> {
 
   @override
   AsyncValue<Game?> build() {
-    final repo = ref.read(reviewManagementRepositoryProvider);
+    final repo = ref.read(gameRepositoryProvider);
 
     _searchGameUseCase = SearchGameUseCase(repo);
 

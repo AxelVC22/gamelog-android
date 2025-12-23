@@ -135,7 +135,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white54,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -144,7 +143,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         title: AppModuleTitle(title: l10n.profileTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(
@@ -196,7 +194,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black54,
                             ),
                           ),
                         ],

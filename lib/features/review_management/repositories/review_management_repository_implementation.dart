@@ -12,51 +12,22 @@ import 'package:gamelog/features/review_management/models/review_game_response.d
 import 'package:gamelog/features/review_management/repositories/review_management_repository.dart';
 
 import '../../../core/constants/api_constants.dart';
-import '../../../core/domain/entities/game.dart';
 import '../../../core/messages/error_codes.dart';
 import '../models/add_to_pendings_request.dart';
 import '../models/register_game_response.dart';
 
-class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
-  final Dio dioRawg;
+class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
   final String apiKey;
   final FlutterSecureStorage storage;
   final Dio dio;
 
   ReviewManagementRepositoryImpl(
-    this.dioRawg,
     this.apiKey,
     this.storage,
     this.dio,
   );
 
-  @override
-  Future<Either<Failure, Game>> searchGame(String gameName) async {
-    try {
-      final response = await dioRawg.get(
-        '${ApiConstants.searchGame}/$gameName',
-        queryParameters: {'key': apiKey},
-        options: Options(validateStatus: (status) => status! < 600,)
-      );
 
-      if (response.statusCode == 200) {
-        final res = Game.fromJson(response.data);
-        return Right(res);
-      } else {
-        final data = response.data;
-
-        final message =
-            data['error'] ??
-            data['detail'] ??
-            data['message'] ??
-            'Unknown server error';
-
-        return Left(Failure.server(message));
-      }
-    } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
-    }
-  }
 
   Future<Either<Failure, RegisterGameResponse>> _registerGame(
     RegisterGameRequest request,
@@ -246,4 +217,6 @@ class ReviewManagementRepositoryImpl implements ReviewManagementRepository {
 
     return ErrorCodes.unexpectedError;
   }
+
+
 }

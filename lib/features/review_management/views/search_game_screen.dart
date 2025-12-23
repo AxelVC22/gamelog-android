@@ -80,7 +80,6 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -89,7 +88,6 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
         title: AppModuleTitle(title: l10n.searchGameTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(

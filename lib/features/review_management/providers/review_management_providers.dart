@@ -9,6 +9,11 @@ import 'package:dio/dio.dart';
 import '../../auth/providers/auth_providers.dart';
 part 'review_management_providers.g.dart';
 
+// final apiKeyProvider = Provider<String>((ref) {
+//   return dotenv.env['RAWG_API_KEY']!;
+// });
+
+
 @Riverpod(keepAlive: true)
 String apiKey(ApiKeyRef ref) {
   return dotenv.env['RAWG_API_KEY']!;
@@ -31,7 +36,6 @@ ReviewManagementRepository reviewManagementRepository(
   ReviewManagementRepositoryRef ref,
 ) {
   return ReviewManagementRepositoryImpl(
-    ref.watch(dioRawgProvider),
     ref.read(apiKeyProvider),
     ref.watch(secureStorageProvider),
     ref.watch(dioProvider)

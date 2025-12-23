@@ -18,7 +18,6 @@ import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_start_rating.dart';
 
-import 'package:flutter_html/flutter_html.dart';
 
 import '../../auth/providers/auth_providers.dart';
 
@@ -83,7 +82,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -92,7 +90,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         title: AppModuleTitle(title: l10n.gameTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -156,6 +153,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
 
               AppStarRating(rating: widget.game.rating, onRatingChanged: null),
+              Text(widget.game.released.toString()),
 
               const SizedBox(height: 16.0),
 

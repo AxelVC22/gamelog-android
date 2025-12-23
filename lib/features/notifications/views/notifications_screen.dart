@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart' hide Notification;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/core/domain/entities/game.dart';
-import 'package:gamelog/features/review_management/views/review_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import '../../../core/domain/entities/notification.dart';
 
 import '../../../core/domain/entities/player.dart';
-import '../../../core/domain/entities/review.dart';
-import '../../../widgets/app_filter_tab.dart';
+
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
-import '../../../widgets/app_poster_review_card.dart';
 import '../../../widgets/app_notification_card.dart';
-import '../../../widgets/app_review_card.dart';
-import '../../../widgets/app_search_bar.dart';
+
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -73,7 +68,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -82,7 +76,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         title: AppModuleTitle(title: l10n.notificationsTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(

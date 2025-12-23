@@ -128,6 +128,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get socialTitle => 'Social';
 
   @override
+  String get statisticsTitle => 'Estadísticas';
+
+  @override
   String get login => 'Iniciar sesiôn';
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamelog/core/constants/app_colors.dart';
 enum AppButtonType {
   primary,
   success,
@@ -27,16 +28,17 @@ class AppButton extends StatelessWidget {
 
   Color _getColor() {
     switch (type) {
+      case AppButtonType.primary:
+        return AppColors.buttonPrimary;
       case AppButtonType.success:
-        return Colors.green;
+        return AppColors.buttonSuccess;
       case AppButtonType.danger:
-        return Colors.red;
+        return AppColors.buttonDanger;
       case AppButtonType.cancel:
-        return Colors.grey;
+        return AppColors.surfaceAlt;
       case AppButtonType.secondary:
-        return Colors.yellow;
-      default:
-        return Colors.blue;
+        return AppColors.buttonSecondary;
+
     }
   }
 

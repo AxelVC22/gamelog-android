@@ -1,18 +1,16 @@
-
 import 'package:dartz/dartz.dart';
-import 'package:gamelog/features/review_management/repositories/review_management_repository.dart';
+import 'package:gamelog/core/data/repositories/game_reporitory.dart';
 
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/failures/failure.dart';
 import '../../../core/messages/error_codes.dart';
 
 class SearchGameUseCase {
-  final ReviewManagementRepository repository;
+  final GameRepository repository;
 
   SearchGameUseCase(this.repository);
 
   Future<Either<Failure, Game>> call(String gameName) async {
-
     if (gameName.trim().isEmpty || gameName.length > 50) {
       return left(Failure.local(ErrorCodes.invalidUsername));
     }
@@ -26,8 +24,11 @@ class SearchGameUseCase {
   String _normalizeGameName(String input) {
     return input
         .replaceAll(RegExp(r'\s*\(itch\)\s*', caseSensitive: false), '')
+        .replaceAll(RegExp(r'\s*:\s*the game\s*', caseSensitive: false), '')
+        .replaceAll(RegExp(r'\s*\+\s*'), '')
+        .replaceAll(RegExp(r'\s*\.\s*'), '')
         .trim()
         .replaceAll(RegExp(r'\s+'), '-');
-  }
 
+  }
 }

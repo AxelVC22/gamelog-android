@@ -27,7 +27,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -36,7 +35,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         title: AppModuleTitle(title: l10n.myReviewTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(
@@ -67,7 +65,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black54,
                 ),
               ),
 
