@@ -304,6 +304,12 @@ abstract class AppLocalizations {
   /// **'Historial de reseñas'**
   String get reviewHistoryTitle;
 
+  /// No description provided for @reviewsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Reseñas'**
+  String get reviewsTitle;
+
   /// No description provided for @gameTitle.
   ///
   /// In es, this message translates to:

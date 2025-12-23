@@ -158,7 +158,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
           icon: Icons.arrow_back,
           onPressed: () => Navigator.pop(context),
         ),
-        title: AppModuleTitle(title: l10n.reviewHistoryTitle),
+        title: AppModuleTitle(title: l10n.reviewsTitle),
         centerTitle: true,
         elevation: 0,
       ),
@@ -167,6 +167,8 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: <Widget>[
+              const SizedBox(height: 24.0),
+
               AppFilterTab(
                 options: [l10n.allReviews, l10n.friends],
                 onChanged: (index) {},

@@ -175,8 +175,8 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
                   context,
                 ).showSnackBar(SnackBar(content: Text(response!.message)));
                 _updateProfile();
-                Navigator.pop(context);
-
+                //Navigator.pop(context);
+                setState(() => isEditing = false);
               });
             },
             error: (error, stack) {
@@ -189,6 +189,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(msg)));
+              _performCancel();
             },
           );
         }
@@ -201,10 +202,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: AppIconButton(
-          icon: Icons.arrow_back,
-          onPressed: () => Navigator.pop(context),
-        ),
+
         title: AppModuleTitle(title: l10n.profileTitle),
         centerTitle: true,
         elevation: 0,

@@ -64,10 +64,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: AppIconButton(
-          icon: Icons.arrow_back,
-          onPressed: () => Navigator.pop(context),
-        ),
+
         title: AppModuleTitle(title: l10n.socialTitle),
         centerTitle: true,
         elevation: 0,
@@ -77,6 +74,8 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: <Widget>[
+              const SizedBox(height: 24.0),
+
               AppFilterTab(
                 options: [l10n.followedPlayers, l10n.followers],
                 onChanged: (index) {

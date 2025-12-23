@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamelog/core/constants/app_colors.dart';
 
 class AppModuleButton extends StatelessWidget {
   final IconData icon;
@@ -21,19 +22,17 @@ class AppModuleButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 110,
-        height: 120,
-        padding: const EdgeInsets.all(16),
+        height: 50,
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: effectiveColor.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: effectiveColor.withOpacity(0.4), width: 1),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: Column(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: effectiveColor),
-            const SizedBox(height: 8),
+            Icon(icon, size: 20, color: effectiveColor),
+            const SizedBox(width: 8),
             Text(
               label,
               textAlign: TextAlign.center,

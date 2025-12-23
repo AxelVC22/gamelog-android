@@ -11,6 +11,7 @@ import '../../../core/domain/failures/failure.dart';
 import '../../../core/helpers/failure_handler.dart';
 import '../../../core/helpers/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
+import '../../../core/presentation/main_layout.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_link_text.dart';
@@ -87,7 +88,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              MaterialPageRoute(builder: (_) => const MainLayout()),
             );
           },
           error: (error, stack) {

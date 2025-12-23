@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/constants/app_colors.dart';
+
 class AppFilterTab extends StatefulWidget {
   final List<String> options;
   final ValueChanged<int>? onChanged;
@@ -47,13 +49,12 @@ class _AppFilterTabState extends State<AppFilterTab> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: isActive ? Colors.blue : Colors.grey[200],
+                  color: isActive ? AppColors.primary : AppColors.buttonSecondary,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   widget.options[index],
                   style: TextStyle(
-                    color: isActive ? Colors.white : Colors.black87,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),

@@ -116,6 +116,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reviewHistoryTitle => 'Historial de reseñas';
 
   @override
+  String get reviewsTitle => 'Reseñas';
+
+  @override
   String get gameTitle => 'Juego';
 
   @override

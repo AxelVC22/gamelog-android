@@ -18,7 +18,6 @@ import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_start_rating.dart';
 
-
 import '../../auth/providers/auth_providers.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
@@ -96,6 +95,38 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
           child: Column(
             children: <Widget>[
+              if (widget.game.backgroundImageAdditional != null)
+                SizedBox(
+                  width: double.infinity,
+                  height: 150,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      widget.game.backgroundImageAdditional!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
+              else
+                SizedBox(
+                  width: double.infinity,
+                  height: 160,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      color: Colors.grey.shade300,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.videogame_asset,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 12),
+
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -153,7 +184,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
 
               AppStarRating(rating: widget.game.rating, onRatingChanged: null),
-              Text(widget.game.released.toString()),
+              Align( alignment: Alignment.centerLeft,child: Text(widget.game.released.toString())),
 
               const SizedBox(height: 16.0),
 
