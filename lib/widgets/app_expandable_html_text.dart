@@ -40,7 +40,6 @@ class _ExpandableHtmlState extends State<AppExpandableHtmlText>
                   "body": Style(
                     fontSize: FontSize(14),
                     fontWeight: FontWeight.w600,
-                    color: Colors.black54,
                     margin: Margins.zero,
                     padding: HtmlPaddings.zero,
                   ),

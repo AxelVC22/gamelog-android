@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/widgets/app_global_loader.dart';
+import 'core/theme/dark_theme.dart';
 import 'features/auth/views/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
@@ -32,7 +33,7 @@ class MyApp extends ConsumerWidget {
 
       title: 'GameLog',
 
-      theme: ThemeData(primarySwatch: Colors.red),
+      theme: darkTheme,
 
       builder: (context, child) {
         return Stack(

@@ -44,4 +44,5 @@ class Review {
           (json['existeLike'] as bool? ?? false),
     );
   }
+
 }

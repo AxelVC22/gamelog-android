@@ -328,6 +328,12 @@ abstract class AppLocalizations {
   /// **'Social'**
   String get socialTitle;
 
+  /// No description provided for @statisticsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Estadísticas'**
+  String get statisticsTitle;
+
   /// No description provided for @login.
   ///
   /// In es, this message translates to:

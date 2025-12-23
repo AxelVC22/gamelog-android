@@ -200,7 +200,6 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -209,7 +208,6 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
         title: AppModuleTitle(title: l10n.profileTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

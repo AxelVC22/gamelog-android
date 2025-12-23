@@ -82,7 +82,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -91,7 +91,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
         title: AppModuleTitle(title: l10n.searchProfileTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
+
       ),
       body: SafeArea(
         child: Padding(

@@ -8,6 +8,7 @@ import 'package:gamelog/features/auth/views/recover_password_screen.dart';
 import 'package:gamelog/features/home/views/home_screen.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/failure_handler.dart';
 import '../../../core/helpers/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
 import '../../../widgets/app_button.dart';
@@ -75,7 +76,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       next,
     ) {
       if (previous?.isLoading == true && next.isLoading == false) {
-
         next.when(
           loading: () {},
           data: (response) {
@@ -85,28 +85,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ref.read(currentUserProvider.notifier).state =
                 response.accounts.first;
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text("Bienvenido")));
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
-              );
-            });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
           },
           error: (error, stack) {
             ref.read(globalLoadingProvider.notifier).state = false;
 
-            final msg = error is Failure
-                ? (error.serverMessage ?? l10n.byKey(error.code))
-                : error.toString();
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(msg)));
-            });
+            handleFailure(context: context, error: error);
           },
         );
       }

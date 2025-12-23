@@ -42,7 +42,6 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   Future<void> _search(String query) async {
     setState(() => isLoading = true);
 
-    // Simula un delay de API
     await Future.delayed(const Duration(milliseconds: 600));
 
     setState(() {
@@ -64,7 +63,6 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -73,7 +71,6 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
         title: AppModuleTitle(title: l10n.socialTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(

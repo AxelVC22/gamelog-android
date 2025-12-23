@@ -10,10 +10,10 @@ class ApiConstants {
 
   static const String recoverPassword = '/gamelog/login/recuperacionDeCuenta';
 
-  static const String recoverPasswordValidation = '/gamelog/login/recuperacionDeCuenta/validacion';
+  static const String recoverPasswordValidation =
+      '/gamelog/login/recuperacionDeCuenta/validacion';
 
   static const String recoverPasswordChangePassword = '/gamelog/acceso';
-
 
   //username_management
 
@@ -41,4 +41,10 @@ class ApiConstants {
   static const String registerGame = '/gamelog/juego';
 
   static const String addGameToPendings = '/gamelog/juego/pendiente';
+
+  //satistics
+
+  static const String retrieveTrendStatistics = '/gamelog/reporte/tendencias/';
+
+  static const String retrieveRevivalRetroStatistics = '/gamelog/reporte/revivalretro/';
 }
