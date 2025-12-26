@@ -189,7 +189,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                         userType: ref
                             .read(currentUserProvider.notifier)
                             .state!
-                            .accessType,
+                            .accessType!,
                         date: DateTime.parse(results[i].date),
                         username: results[i].username!,
                         imageUrl: "",

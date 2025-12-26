@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'app_icon_button.dart';
-
 class AppFollowerCard extends StatelessWidget {
   final String name;
   final String imageUrl;
@@ -20,7 +18,7 @@ class AppFollowerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -46,10 +44,7 @@ class AppFollowerCard extends StatelessWidget {
                 ),
 
               ),
-              AppIconButton(
-                icon: Icons.delete,
-                onPressed: onDelete,
-              ),
+
             ],
           ),
         ),

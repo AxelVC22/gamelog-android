@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 
 @immutable
 class Account {
-  final int idAccount;
-  final String email;
-  final String status;
-  final String accessType;
+  final int? idAccount;
+  final String? email;
+  final String? status;
+  final String? accessType;
   final int idPlayer;
   final String name;
   final String fathersSurname;
@@ -32,10 +32,10 @@ class Account {
 
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
-      idAccount: json['idCuenta'] as int,
-      email: json['correo'] as String,
-      status: json['estado'] as String,
-      accessType: json['tipoDeAcceso'] as String,
+      idAccount: json['idCuenta'] as int?,
+      email: json['correo'] as String?,
+      status: json['estado'] as String?,
+      accessType: json['tipoDeAcceso'] as String?,
       idPlayer: json['idJugador'] as int,
       name: json['nombre'] as String,
       fathersSurname: json['primerApellido'] as String,

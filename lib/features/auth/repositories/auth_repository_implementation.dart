@@ -6,6 +6,7 @@ import 'package:gamelog/core/messages/error_codes.dart';
 import 'package:gamelog/features/auth/models/logout_response.dart';
 import 'package:gamelog/features/auth/models/recover_password_request.dart';
 import 'package:gamelog/features/auth/models/recover_password_response.dart';
+import '../../../core/helpers/dio_error_handler.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import '../models/register_user_reponse.dart';
@@ -40,7 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 

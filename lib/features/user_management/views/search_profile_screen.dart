@@ -29,9 +29,7 @@ class SearchProfileScreen extends ConsumerStatefulWidget {
 class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
   final _searchingStringController = TextEditingController();
 
-
   Future<void> _search(String query) async {
-
     await ref.read(searchUserControllerProvider.notifier).searchUser(query);
   }
 
@@ -82,7 +80,6 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
     });
 
     return Scaffold(
-
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
@@ -91,7 +88,6 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
         title: AppModuleTitle(title: l10n.searchProfileTitle),
         centerTitle: true,
         elevation: 0,
-
       ),
       body: SafeArea(
         child: Padding(
@@ -102,27 +98,26 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
 
               const SizedBox(height: 12),
 
-
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (_, i) {
-                      return AppProfileCard(
-                        name: results[i].username,
-                        imageUrl: "",
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  ProfileScreen(username: results[i].username),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: results.length,
+                  itemBuilder: (_, i) {
+                    return AppProfileCard(
+                      name: results[i].username,
+                      imageUrl: "",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                ProfileScreen(username: results[i].username),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
+              ),
             ],
           ),
         ),

@@ -3,6 +3,10 @@ import 'package:gamelog/features/user_management/models/search_user_response.dar
 import 'package:gamelog/features/user_management/providers/user_management_providers.dart';
 import 'package:gamelog/features/user_management/use_cases/search_user_use_case.dart';
 
+final loadUserControllerProvider =
+NotifierProvider<SearchUserController, AsyncValue<SearchUserResponse?>>(
+  SearchUserController.new,
+);
 
 final searchUserControllerProvider =
 NotifierProvider<SearchUserController, AsyncValue<SearchUserResponse?>>(
