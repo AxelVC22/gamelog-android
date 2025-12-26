@@ -13,7 +13,7 @@ class AppColors {
 
   static const success = Color(0xFF3BA55D);
   static const warning = Color(0xFFFEE75C);
-  static const error = Color(0xFFCF0002);
+  static const error = Color(0xFF7E0000);
 
   static const buttonPrimary = primary;
   static const buttonSecondary = surfaceAlt;

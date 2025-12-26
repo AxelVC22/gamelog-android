@@ -46,5 +46,14 @@ class ApiConstants {
 
   static const String retrieveTrendStatistics = '/gamelog/reporte/tendencias/';
 
-  static const String retrieveRevivalRetroStatistics = '/gamelog/reporte/revivalretro/';
+  static const String retrieveRevivalRetroStatistics =
+      '/gamelog/reporte/revivalretro/';
+
+  //follow
+
+  static const String followUser = '/gamelog/seguidor';
+
+  static const String retrieveFollowed = '/gamelog/seguidor/seguidos/';
+
+  static const String retrieveFollowers = '/gamelog/seguidor/seguidores/';
 }

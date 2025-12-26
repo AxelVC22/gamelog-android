@@ -9,18 +9,14 @@ import 'package:dio/dio.dart';
 import '../../auth/providers/auth_providers.dart';
 part 'review_management_providers.g.dart';
 
-// final apiKeyProvider = Provider<String>((ref) {
-//   return dotenv.env['RAWG_API_KEY']!;
-// });
 
-
-@Riverpod(keepAlive: true)
-String apiKey(ApiKeyRef ref) {
+@riverpod
+String apiKey(Ref ref) {
   return dotenv.env['RAWG_API_KEY']!;
 }
 
-@Riverpod(keepAlive: true)
-Dio dioRawg(DioRawgRef ref) {
+@riverpod
+Dio dioRawg(Ref ref) {
   return Dio(
     BaseOptions(
       baseUrl: ApiConstants.baseRawgUrl,
@@ -31,13 +27,13 @@ Dio dioRawg(DioRawgRef ref) {
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 ReviewManagementRepository reviewManagementRepository(
-  ReviewManagementRepositoryRef ref,
-) {
+    Ref ref,
+    ) {
   return ReviewManagementRepositoryImpl(
     ref.read(apiKeyProvider),
     ref.watch(secureStorageProvider),
-    ref.watch(dioProvider)
+    ref.watch(dioProvider),
   );
 }

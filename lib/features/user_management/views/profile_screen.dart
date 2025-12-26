@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/follows/models/follow_user_request.dart';
+import 'package:gamelog/features/follows/providers/follow_user_controller.dart';
 import 'package:gamelog/features/user_management/models/add_to_black_list_request.dart';
 import 'package:gamelog/features/user_management/models/add_to_black_list_response.dart';
 import 'package:gamelog/features/user_management/models/search_user_response.dart';
 import 'package:gamelog/features/user_management/providers/add_to_black_list_controller.dart';
-import 'package:gamelog/features/user_management/providers/profile_controller.dart';
+import 'package:gamelog/features/user_management/providers/search_user_controller.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
-import 'package:gamelog/l10n/app_localizations_extension.dart';
 
 import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/entities/user.dart';
-import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
+import '../../../widgets/app_skeleton_loader.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../follows/models/follow_user_response.dart';
 
-final searchResultProvider = StateProvider<Account?>((ref) => null);
+final searchResultProvider = StateProvider.autoDispose<Account?>((ref) => null);
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String username;
@@ -30,41 +33,126 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  late final ProviderSubscription _searchUserSub;
   late final bool isCurrentUser =
       ref.read(currentUserProvider.notifier).state?.username == widget.username;
   late final bool isAdmin =
       ref.read(currentUserProvider.notifier).state?.accessType ==
       UserType.Administrador.name;
+  bool notFoundUser = false;
 
   Future<void> performAddToBlackList(String email, String userType) async {
+    if (!mounted) return;
 
     final request = AddToBlackListRequest(email: email, userType: userType);
 
-    await ref.read(addToBlackListControllerProvider.notifier).addToBlackList(request);
+    if (!mounted) return;
+    await ref
+        .read(addToBlackListControllerProvider.notifier)
+        .addToBlackList(request);
+  }
+
+  Future<void> performFollowUser(int idPlayerToFollow) async {
+    if (!mounted) return;
+
+    final request = FollowUserRequest(
+      idPlayerFollowed: idPlayerToFollow,
+      idPlayerFollower: ref.read(currentUserProvider.notifier).state!.idPlayer,
+    );
+
+    if (!mounted) return;
+    await ref.read(followUserControllerProvider.notifier).followUser(request);
   }
 
   @override
   void initState() {
     super.initState();
 
+    _searchUserSub = ref.listenManual<AsyncValue<SearchUserResponse?>>(
+      loadUserControllerProvider,
+      _onSearchUserChanged,
+    );
     Future.microtask(() => _search(widget.username));
   }
 
   Future<void> _search(String username) async {
-    await ref.read(profileControllerProvider.notifier).load(username);
+    if (!mounted) return;
+    ref.read(searchResultProvider.notifier).state = null;
+
+    await ref.read(loadUserControllerProvider.notifier).searchUser(username);
   }
 
-  Future<void> performFollow() async {}
+  @override
+  void dispose() {
+    _searchUserSub.close();
+    super.dispose();
+  }
 
+  void _onSearchUserChanged(
+    AsyncValue<SearchUserResponse?>? previous,
+    AsyncValue<SearchUserResponse?> next,
+  ) {
+    if (!mounted) return;
+
+    if (previous?.isLoading == true && !next.isLoading) {
+      next.when(
+        loading: () {},
+        data: (response) {
+          if (!mounted) return;
+
+          if (response == null) return;
+
+          if (response.accounts.first.idPlayer <= 0) {
+            notFoundUser = true;
+          } else {
+            final notifier = ref.read(searchResultProvider.notifier);
+            notifier.state = response.accounts.first;
+          }
+        },
+        error: (error, __) {},
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    ref.listen<AsyncValue<AddToBlackListResponse?>>(addToBlackListControllerProvider, (
-        previous,
-        next,
-        ) {
+    final user = ref.watch(searchResultProvider);
+
+    ref.listen<AsyncValue<AddToBlackListResponse?>>(
+      addToBlackListControllerProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(response!.message)));
+                Navigator.pop(context);
+              });
+            },
+            error: (error, stack) {
+              if (!mounted) return;
+              ref.read(globalLoadingProvider.notifier).state = false;
+              handleFailure(context: context, error: error);
+            },
+          );
+        }
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
+
+    ref.listen<AsyncValue<FollowUserResponse?>>(followUserControllerProvider, (
+      previous,
+      next,
+    ) {
       if (previous?.isLoading == true && next.isLoading == false) {
         next.when(
           loading: () {},
@@ -75,60 +163,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(response!.message)));
-
               Navigator.pop(context);
             });
           },
           error: (error, stack) {
+            if (!mounted) return;
             ref.read(globalLoadingProvider.notifier).state = false;
 
-            final msg = error is Failure
-                ? (error.serverMessage ?? l10n.byKey(error.code))
-                : error.toString();
-
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(msg)));
+            handleFailure(context: context, error: error);
           },
         );
       }
-
-      if (next.isLoading) {
-        ref.read(globalLoadingProvider.notifier).state = true;
-      }
-    });
-
-    ref.listen<AsyncValue<SearchUserResponse?>>(profileControllerProvider, (
-      previous,
-      next,
-    ) {
-      if (previous?.isLoading == true && next.isLoading == false) {
-        next.when(
-          loading: () {},
-          data: (response) {
-            ref.read(globalLoadingProvider.notifier).state = false;
-
-            if (response == null) return;
-
-            ref.read(searchResultProvider.notifier).state =
-                response.accounts.first;
-          },
-          error: (error, stack) {
-            ref.read(globalLoadingProvider.notifier).state = false;
-
-            final msg = error is Failure
-                ? (error.serverMessage ?? l10n.byKey(error.code))
-                : error.toString();
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(msg)));
-            });
-          },
-        );
-      }
-
       if (next.isLoading) {
         ref.read(globalLoadingProvider.notifier).state = true;
       }
@@ -145,68 +190,117 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         elevation: 0,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (ref.read(searchResultProvider.notifier).state == null)
+              if (notFoundUser)
                 Text(l10n.notFoundUser)
+              else if (user == null)
+                const AppSkeletonLoader(
+                  height: 220,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                )
               else
-                Row(
-                  children: [
-                    Expanded(
-                      //todo: cambiar por foto de perfil
-                      child: Image.asset(
-                        'assets/images/isotipo.png',
-                        height: 60.0,
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          AppModuleTitle(
-                            title: ref
-                                .read(searchResultProvider.notifier)
-                                .state!
-                                .name,
-                          ),
-                          AppButton(
-                            text: l10n.follow,
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Avatar
+                            CircleAvatar(
+                              radius: 32,
+                              backgroundImage: const AssetImage(
+                                'assets/images/isotipo.png',
+                              ),
+                            ),
+                            const SizedBox(width: 16),
 
-                            onPressed: isCurrentUser ? null : performFollow,
-                          ),
+                            // Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AppModuleTitle(
+                                    title:
+                                        '${user.name} ${user.fathersSurname}\n (${user.username})',
+                                  ),
 
-                          const SizedBox(height: 8.0),
+                                  const SizedBox(height: 8),
 
-                          AppButton(
-                            text: l10n.blackList,
-                            type: AppButtonType.danger,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            AppButton(
+                                              text: l10n.follow,
+                                              type: AppButtonType.primary,
+                                              onPressed: () =>
+                                                  performFollowUser(
+                                                    user.idPlayer,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: AppButton(
+                                          text: l10n.blackList,
+                                          type: AppButtonType.danger,
+                                          onPressed: isAdmin
+                                              ? () async =>
+                                                    await performAddToBlackList(
+                                                      user.email!,
+                                                      user.accessType!,
+                                                    )
+                                              : null,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
 
-                            onPressed: isAdmin ? () async => await performAddToBlackList(ref.read(searchResultProvider.notifier).state!.email, ref.read(searchResultProvider.notifier).state!.accessType) : null,
-                          ),
-                          const SizedBox(height: 16.0),
-
-                          Text(
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
                             ref
                                 .read(searchResultProvider.notifier)
                                 .state!
                                 .description,
                             style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              height: 1.4,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
 
-              Divider(color: Colors.grey),
+              const SizedBox(height: 24),
 
               AppModuleTitle(title: l10n.favoriteGames),
 
-              Divider(color: Colors.grey),
+              const SizedBox(height: 8),
+
+              const Divider(),
 
               const SizedBox(height: 12),
             ],

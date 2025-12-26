@@ -118,7 +118,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
       picture: 'foto.jpg',
       idPlayer: ref.read(currentUserProvider.notifier).state?.idPlayer,
       oldEmail: ref.read(currentUserProvider.notifier).state?.email,
-      userType: ref.read(currentUserProvider.notifier).state!.accessType,
+      userType: ref.read(currentUserProvider.notifier).state!.accessType!,
     );
 
     await ref.read(editProfileControllerProvider.notifier).editProfile(request);

@@ -149,7 +149,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),

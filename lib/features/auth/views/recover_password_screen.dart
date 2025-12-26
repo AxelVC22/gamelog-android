@@ -149,13 +149,11 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: AppModuleTitle(title: l10n.recoverPasswordTitle),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

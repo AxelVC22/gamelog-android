@@ -49,7 +49,7 @@ final mergedGamesProvider = Provider<List<Game>>((ref) {
       description: detailed.description,
       released: detailed.released,
       rating: detailed.rating,
-      backgroundImageAdditional: detailed.backgroundImageAdditional
+      backgroundImageAdditional: detailed.backgroundImageAdditional,
     );
   }).toList();
 });
@@ -80,6 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> performLogout() async {
     final email = ref.read(currentUserProvider)?.email;
 
+    if (!mounted) return;
     await ref.read(logoutControllerProvider.notifier).logout(email!);
   }
 
@@ -210,10 +211,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         );
       }
-
-      if (next.isLoading) {
-        // ref.read(globalLoadingProvider.notifier).state = true;
-      }
     });
 
     return Scaffold(
@@ -246,13 +243,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-
               AppModuleTitle(
                 title: 'Visita el juego mas resenado de la semana',
-                ),
-              if (mergedGames.isNotEmpty)
+              ),
+
+              if (notFoundTrendStatistics)
+                Text('no se eonctro el mas resenado')
+              else if (mergedGames.isEmpty)
+                const AppSkeletonLoader(
+                  height: 200,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                )
+              else
                 AppGameCard(
-                  name: mergedGames.first.name, //TODO: cambiar por mejor imagen
+                  name: mergedGames.first.name,
                   imageUrl:
                       mergedGames.first.backgroundImage ??
                       'https://picsum.photos/800/450',
@@ -267,7 +271,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               const SizedBox(height: 8.0),
 
-              if (mergedGames.isNotEmpty)
+              if (notFoundTrendStatistics)
+                Text('noo se encontraron estadiscicas')
+              else if (mergedGames.isEmpty)
+                const AppSkeletonLoader(
+                  height: 297,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                )
+              else
                 AppGraph(
                   games: mergedGames,
                   title: 'Top de la semanna',
@@ -277,11 +288,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       MaterialPageRoute(builder: (_) => StatisticsScreen()),
                     );
                   },
-                )
-              else if (!notFoundTrendStatistics)
-                const AppSkeletonLoader(
-                  height: 290,
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
               const SizedBox(height: 12.0),
 
@@ -304,7 +310,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: Colors.grey,
               ),
               const SizedBox(height: 12.0),
-
             ],
           ),
         ),

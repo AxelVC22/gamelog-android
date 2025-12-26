@@ -6,11 +6,11 @@ part of 'review_management_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$apiKeyHash() => r'3a2dacd09ea89facc9c1b84cfbe3cbf56ac4fe73';
+String _$apiKeyHash() => r'f5586068bebebf38b00a0b73f4ea0a33261bd0d1';
 
 /// See also [apiKey].
 @ProviderFor(apiKey)
-final apiKeyProvider = Provider<String>.internal(
+final apiKeyProvider = AutoDisposeProvider<String>.internal(
   apiKey,
   name: r'apiKeyProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,12 +22,12 @@ final apiKeyProvider = Provider<String>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ApiKeyRef = ProviderRef<String>;
-String _$dioRawgHash() => r'ef865ca2ad44d72541db57d58da94c137a9dd176';
+typedef ApiKeyRef = AutoDisposeProviderRef<String>;
+String _$dioRawgHash() => r'b0e8fcddbb494ee1f31b2ab92a741a30412f47e8';
 
 /// See also [dioRawg].
 @ProviderFor(dioRawg)
-final dioRawgProvider = Provider<Dio>.internal(
+final dioRawgProvider = AutoDisposeProvider<Dio>.internal(
   dioRawg,
   name: r'dioRawgProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -39,14 +39,14 @@ final dioRawgProvider = Provider<Dio>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef DioRawgRef = ProviderRef<Dio>;
+typedef DioRawgRef = AutoDisposeProviderRef<Dio>;
 String _$reviewManagementRepositoryHash() =>
-    r'a7e4c1c5b547235d25f1c5acdaf8b1992a7e6d44';
+    r'5ceb64bf2e488c5377f26c13727f1918a2cc9417';
 
 /// See also [reviewManagementRepository].
 @ProviderFor(reviewManagementRepository)
 final reviewManagementRepositoryProvider =
-    Provider<ReviewManagementRepository>.internal(
+    AutoDisposeProvider<ReviewManagementRepository>.internal(
       reviewManagementRepository,
       name: r'reviewManagementRepositoryProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -58,6 +58,7 @@ final reviewManagementRepositoryProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ReviewManagementRepositoryRef = ProviderRef<ReviewManagementRepository>;
+typedef ReviewManagementRepositoryRef =
+    AutoDisposeProviderRef<ReviewManagementRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
