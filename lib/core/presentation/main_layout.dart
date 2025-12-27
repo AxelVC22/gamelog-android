@@ -1,6 +1,7 @@
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:flutter/material.dart';
+import 'package:gamelog/features/review_management/views/games_screen.dart';
 import 'package:gamelog/features/review_management/views/search_game_screen.dart';
 import 'package:gamelog/features/user_management/views/my_profile_screen.dart';
 
@@ -18,7 +19,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _index = 0;
 
-  final screens = const [HomeScreen(), SearchGameScreen(), SocialScreen(), MyProfileScreen()];
+  final screens = const [HomeScreen(), GamesScreen(), SocialScreen(), MyProfileScreen()];
 
   @override
   Widget build(BuildContext context) {

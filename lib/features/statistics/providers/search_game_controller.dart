@@ -4,6 +4,12 @@ import 'package:gamelog/features/review_management/use_cases/search_game_use_cas
 
 import '../../../core/domain/entities/game.dart';
 
+final searchFavoriteGameControllerProvider =
+NotifierProvider<SearchGameController, AsyncValue<Game?>>(
+  SearchGameController.new,
+);
+
+
 final searchTrendGameControllerProvider =
     NotifierProvider<SearchGameController, AsyncValue<Game?>>(
       SearchGameController.new,

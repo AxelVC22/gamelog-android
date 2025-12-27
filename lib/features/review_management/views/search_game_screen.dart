@@ -8,8 +8,9 @@ import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/helpers/failure_handler.dart';
+import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_game_card.dart';
-import '../../../widgets/app_global_loader.dart';
+import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_search_bar.dart';
 import 'game_screen.dart';
@@ -74,6 +75,10 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
         title: AppModuleTitle(title: l10n.searchGameTitle),
         centerTitle: true,
         elevation: 0,
+        leading: AppIconButton(
+          icon: Icons.arrow_back,
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -120,6 +125,7 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
                     },
                   ),
                 ),
+
             ],
           ),
         ),
