@@ -7,6 +7,7 @@ class ErrorCodes {
   static const invalidFathersSurname = 'invalidFathersSurname';
   static const invalidMothersSurname = 'invalidMothersSurname';
   static const invalidUsername = 'invalidUsername';
+  static const invalidGameName = 'invalidGameName';
   static const invalidEmail = 'invalidEmail';
   static const invalidPassword = 'invalidPassword';
   static const invalidDescription = 'invalidDescription';

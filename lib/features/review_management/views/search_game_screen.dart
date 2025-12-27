@@ -5,12 +5,11 @@ import 'package:gamelog/core/domain/entities/game.dart';
 import 'package:gamelog/features/review_management/providers/search_game_controller.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
-import 'package:gamelog/l10n/app_localizations_extension.dart';
+import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
-import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_game_card.dart';
 import '../../../widgets/app_global_loader.dart';
-import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_search_bar.dart';
 import 'game_screen.dart';
@@ -25,14 +24,15 @@ class SearchGameScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
-  bool isLoading = false;
+  bool notFoundResults = false;
 
   Future<void> _search(String query) async {
-    setState(() => isLoading = true);
+    setState(() => notFoundResults = false);
+    ref.read(searchResultProvider.notifier).state = null;
 
-    await ref.read(searchGameControllerProvider.notifier).searchGame(query);
-
-    setState(() => isLoading = false);
+    if (query.isNotEmpty) {
+      await ref.read(searchGameControllerProvider.notifier).searchGame(query);
+    }
   }
 
   @override
@@ -43,6 +43,7 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final results = ref.watch(searchResultProvider);
 
     ref.listen<AsyncValue<Game?>>(searchGameControllerProvider, (
       previous,
@@ -52,30 +53,19 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
         next.when(
           loading: () {},
           data: (response) {
-            ref.read(globalLoadingProvider.notifier).state = false;
 
             if (response == null) return;
-
-            ref.read(searchResultProvider.notifier).state = response;
+            if (response.id <= 0) {
+              setState(() => notFoundResults = true);
+            } else {
+              ref.read(searchResultProvider.notifier).state = response;
+            }
           },
           error: (error, stack) {
-            ref.read(globalLoadingProvider.notifier).state = false;
-
-            final msg = error is Failure
-                ? (error.serverMessage ?? l10n.byKey(error.code))
-                : error.toString();
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(msg)));
-            });
+            setState(() => notFoundResults = true);
+            handleFailure(context: context, error: error);
           },
         );
-      }
-
-      if (next.isLoading) {
-        ref.read(globalLoadingProvider.notifier).state = true;
       }
     });
 
@@ -94,7 +84,11 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
 
               const SizedBox(height: 12),
 
-              if (ref.read(searchResultProvider.notifier).state != null)
+              if (notFoundResults)
+                Text('Sin resultados')
+              else if (results == null)
+                AppSkeletonLoader(height: 200)
+              else
                 Expanded(
                   child: ListView.builder(
                     itemCount: 1,
@@ -103,7 +97,7 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
                         name: ref
                             .read(searchResultProvider.notifier)
                             .state!
-                            .name, //TODO: cambiar por mejor imagen
+                            .name,
                         imageUrl:
                             ref
                                 .read(searchResultProvider.notifier)

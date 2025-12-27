@@ -14,6 +14,8 @@ extension AppLocalizationsDynamic on AppLocalizations {
     ErrorCodes.invalidUsername: () => invalidUsername,
     ErrorCodes.invalidPassword: () => invalidPassword,
     ErrorCodes.invalidDescription: () => invalidDescription,
+    ErrorCodes.invalidGameName: () => invalidGameName,
+
     // ErrorCodes.invalidPassword: () => validationPasswordInvalid,
     // ErrorCodes.shortPassword: () => validationPasswordShort,
     //

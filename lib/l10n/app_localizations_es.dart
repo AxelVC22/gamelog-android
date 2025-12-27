@@ -209,6 +209,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'El nombre es invalido (3-50 caracteres solo letras)';
 
   @override
+  String get invalidGameName => 'El nombre del juego es invalido';
+
+  @override
   String get invalidFathersSurname => 'El primer apellido es invalido';
 
   @override

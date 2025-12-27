@@ -197,17 +197,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           error: (error, stack) {
-            ref.read(globalLoadingProvider.notifier).state = false;
-
-            final msg = error is Failure
-                ? (error.serverMessage ?? l10n.byKey(error.code))
-                : error.toString();
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(msg)));
-            });
+            setState(() => notFoundTrendStatistics = true);
+            handleFailure(context: context, error: error);
           },
         );
       }
