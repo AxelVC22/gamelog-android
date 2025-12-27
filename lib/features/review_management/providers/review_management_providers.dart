@@ -32,7 +32,6 @@ ReviewManagementRepository reviewManagementRepository(
     Ref ref,
     ) {
   return ReviewManagementRepositoryImpl(
-    ref.read(apiKeyProvider),
     ref.watch(secureStorageProvider),
     ref.watch(dioProvider),
   );

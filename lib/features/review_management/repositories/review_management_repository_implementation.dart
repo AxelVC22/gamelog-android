@@ -19,12 +19,10 @@ import '../models/add_to_pendings_request.dart';
 import '../models/register_game_response.dart';
 
 class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
-  final String apiKey;
   final FlutterSecureStorage storage;
   final Dio dio;
 
   ReviewManagementRepositoryImpl(
-    this.apiKey,
     this.storage,
     this.dio,
   );
@@ -93,13 +91,13 @@ class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
 
   @override
   Future<Either<Failure, RetrievePlayerReviewsResponse>>
-  retrievePlayerReviewsResponse(int idGame, int idPlayer) async {
+  retrievePlayerReviews(int idGame, int idPlayer) async {
     try {
       final token = await storage.read(key: 'access_token');
 
       final response = await dio.get(
         '${ApiConstants.retrievePlayerReviews}/$idGame',
-        queryParameters: {'idJugadorBuscador': idPlayer},
+        queryParameters: {ApiConstants.queryIdPlayerSeeker: idPlayer},
         options: Options(
           headers: {"Authorization": "Bearer $token"},
           validateStatus: (status) => status! < 600,
@@ -156,7 +154,7 @@ class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
 
       final response = await dio.get(
         '${ApiConstants.retriveReviewHistory}/$idPlayerToSearch',
-        queryParameters: {'idJugadorBuscador': idPlayer},
+        queryParameters: {ApiConstants.queryIdPlayerSeeker: idPlayer},
         options: Options(
           headers: {"Authorization": "Bearer $token"},
           validateStatus: (status) => status! < 600,
@@ -270,6 +268,33 @@ class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
       } else {
         final message = _parseMessages(response.data['mensaje']);
         return Left(Failure.server(_parseMessages(message)));
+      }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+  @override
+  Future<Either<Failure, RetrievePlayerReviewsResponse>> retrieveFollowedPlayerReviews(int idGame, int idPlayer) async{
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.get(
+        ApiConstants.retrieveFollowedPlayerReview(idGame),
+        queryParameters: {'idJugador': idPlayer},
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final res = RetrievePlayerReviewsResponse.fromJson(response.data);
+        return Right(res);
+      } else if (response.statusCode == 404) {
+        return Right(RetrievePlayerReviewsResponse(reviews: [], error: false));
+      } else {
+        return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));
