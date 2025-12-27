@@ -3,22 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/providers/auth_providers.dart';
 import 'package:gamelog/features/review_management/models/delete_review_response.dart';
+import 'package:gamelog/features/review_management/models/like_request.dart';
+import 'package:gamelog/features/review_management/models/like_response.dart';
 import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
 import 'package:gamelog/features/review_management/providers/delete_review_controller.dart';
 import 'package:gamelog/features/review_management/providers/retrieve_player_reviews_controller.dart';
-import 'package:gamelog/features/user_management/views/profile_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
-import 'package:gamelog/l10n/app_localizations_extension.dart';
+import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/review.dart';
-import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_review_card.dart';
+import '../providers/like_review_controller.dart';
+import '../providers/unlike_review_controller.dart';
 
 final retrieveResultsProvider = StateProvider<List<Review>>((ref) => []);
 
@@ -33,6 +36,7 @@ class PlayerReviewsScreen extends ConsumerStatefulWidget {
 
 class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   bool isLoading = false;
+  bool notFoundResults = false;
 
   @override
   void initState() {
@@ -45,20 +49,61 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
     if (!mounted) return;
 
     setState(() => isLoading = true);
+    setState(() => notFoundResults = false);
+
+    ref.read(retrieveResultsProvider.notifier).state = [];
 
     int idPlayer = ref.read(currentUserProvider.notifier).state!.idPlayer;
 
     await ref
         .read(retrievePlayerReviewsControllerProvider.notifier)
         .retrievePlayerReviews(widget.game.id, idPlayer);
-
-    if (mounted) setState(() => isLoading = false);
   }
 
-  Future<void> _performDeleteReview(int idReview) async {
+  Future<void> performDeleteReview(int idReview) async {
     await ref
         .read(deleteReviewControllerProvider.notifier)
         .deleteReview(widget.game.id, idReview);
+  }
+
+  Future<void> performLikeReview(Review review) async {
+    if (!mounted) return;
+    final request = LikeRequest(
+      idReview: review.idReview,
+      idGame: review.idGame,
+      idPlayerAuthor: review.idPlayer,
+      idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+      gameName: review.name,
+    );
+
+    if (!mounted) return;
+
+    await ref.read(likeReviewControllerProvider.notifier).likeReview(request);
+  }
+
+  Future<void> performUnlikeReview(Review review) async {
+    if (!mounted) return;
+    final request = LikeRequest(
+      idReview: review.idReview,
+      idGame: review.idGame,
+      idPlayerAuthor: review.idPlayer,
+      idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+      gameName: review.name,
+    );
+
+    if (!mounted) return;
+
+    await ref
+        .read(unlikeReviewControllerProvider.notifier)
+        .unlikeReview(request);
+  }
+
+  Future<void> reactToReview(Review review) async {
+    if (review.isLiked) {
+      await performUnlikeReview(review);
+    } else {
+      await performLikeReview(review);
+    }
   }
 
   @override
@@ -78,38 +123,27 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
           next.when(
             loading: () {},
             data: (response) {
-              ref.read(globalLoadingProvider.notifier).state = false;
-
               if (response == null) return;
+
+              if (response.reviews.isEmpty) {
+                setState(() => notFoundResults = true);
+              }
 
               ref.read(retrieveResultsProvider.notifier).state =
                   response.reviews;
             },
             error: (error, stack) {
-              ref.read(globalLoadingProvider.notifier).state = false;
-
-              final msg = error is Failure
-                  ? (error.serverMessage ?? l10n.byKey(error.code))
-                  : error.toString();
-
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(msg)));
-              });
+              setState(() => notFoundResults = true);
+              handleFailure(context: context, error: error);
             },
           );
-        }
-
-        if (next.isLoading) {
-          ref.read(globalLoadingProvider.notifier).state = true;
         }
       },
     );
 
     ref.listen<AsyncValue<DeleteReviewResponse?>>(
       deleteReviewControllerProvider,
-          (previous, next) {
+      (previous, next) {
         if (previous?.isLoading == true && next.isLoading == false) {
           next.when(
             loading: () {},
@@ -132,16 +166,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
             },
             error: (error, stack) {
               ref.read(globalLoadingProvider.notifier).state = false;
-
-              final msg = error is Failure
-                  ? (error.serverMessage ?? l10n.byKey(error.code))
-                  : error.toString();
-
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(msg)));
-              });
+              handleFailure(context: context, error: error);
             },
           );
         }
@@ -151,6 +176,88 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
         }
       },
     );
+
+    ref.listen<AsyncValue<LikeResponse?>>(likeReviewControllerProvider, (
+      previous,
+      next,
+    ) {
+      if (previous?.isLoading == true && next.isLoading == false) {
+        next.when(
+          loading: () {},
+          data: (response) {
+            ref.read(globalLoadingProvider.notifier).state = false;
+
+            if (response == null) return;
+
+            final currentReviews = ref
+                .read(retrieveResultsProvider.notifier)
+                .state;
+
+            ref.read(retrieveResultsProvider.notifier).state = currentReviews
+                .map((review) {
+                  if (review.idReview == response.idReview) {
+                    return review.copyWith(
+                      isLiked: true,
+                      likesTotal: review.likesTotal + 1,
+                    );
+                  }
+                  return review;
+                })
+                .toList();
+          },
+          error: (error, stack) {
+            ref.read(globalLoadingProvider.notifier).state = false;
+            handleFailure(context: context, error: error);
+          },
+        );
+      }
+
+      if (next.isLoading) {
+        ref.read(globalLoadingProvider.notifier).state = true;
+      }
+    });
+
+    ref.listen<AsyncValue<LikeResponse?>>(unlikeReviewControllerProvider, (
+      previous,
+      next,
+    ) {
+      if (previous?.isLoading == true && next.isLoading == false) {
+        next.when(
+          loading: () {},
+          data: (response) {
+            ref.read(globalLoadingProvider.notifier).state = false;
+
+            if (response == null) return;
+
+            final currentReviews = ref
+                .read(retrieveResultsProvider.notifier)
+                .state;
+
+            ref.read(retrieveResultsProvider.notifier).state = currentReviews
+                .map((review) {
+                  if (review.idReview == response.idReview) {
+                    return review.copyWith(
+                      isLiked: false,
+                      likesTotal: review.likesTotal - 1,
+                    );
+                  }
+                  return review;
+                })
+                .toList();
+
+
+          },
+          error: (error, stack) {
+            ref.read(globalLoadingProvider.notifier).state = false;
+            handleFailure(context: context, error: error);
+          },
+        );
+      }
+
+      if (next.isLoading) {
+        ref.read(globalLoadingProvider.notifier).state = true;
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -175,10 +282,10 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
               ),
               const SizedBox(height: 16.0),
 
-              if (isLoading)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
+              if (notFoundResults)
+                Text('Sin resultados')
+              else if (results.isEmpty)
+                const AppSkeletonLoader.listTile()
               else
                 Expanded(
                   child: ListView.builder(
@@ -196,11 +303,12 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                         rating: results[i].rating,
                         opinion: results[i].opinion,
                         onDelete: () {
-                          _performDeleteReview(results[i].idReview);
+                          performDeleteReview(results[i].idReview);
                         },
                         isLiked: results[i].isLiked,
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder:(_) => ProfileScreen(username: results[i].username!)));
+                        onTap: () {},
+                        onLiked: () {
+                          reactToReview(results[i]);
                         },
                       );
                     },

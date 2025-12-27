@@ -45,4 +45,23 @@ class Review {
     );
   }
 
+  Review copyWith({
+    int? likesTotal,
+    bool? isLiked,
+  }) {
+    return Review(
+      idReview: idReview,
+      idPlayer: idPlayer,
+      username: username,
+      picture: picture,
+      idGame: idGame,
+      name: name,
+      date: date,
+      opinion: opinion,
+      rating: rating,
+      likesTotal: likesTotal ?? this.likesTotal,
+      isLiked: isLiked ?? this.isLiked,
+    );
+  }
+
 }
