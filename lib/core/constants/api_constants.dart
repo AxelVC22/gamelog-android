@@ -48,6 +48,8 @@ class ApiConstants {
   static const String registerGame = '/gamelog/juego';
 
   static const String addGameToPendings = '/gamelog/juego/pendiente';
+  static const String addGameToFavorites = '/gamelog/juego/favorito';
+
 
   //satistics
 

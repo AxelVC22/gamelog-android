@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/data/models/add_to_favorites_response.dart';
 import 'package:gamelog/features/review_management/models/add_to_pendings_request.dart';
 import 'package:gamelog/features/review_management/models/add_to_pendings_response.dart';
+import 'package:gamelog/features/review_management/providers/add_game_to_favorites_controller.dart';
 import 'package:gamelog/features/review_management/providers/add_game_to_pendings_controller.dart';
 import 'package:gamelog/features/review_management/views/player_reviews_screen.dart';
 import 'package:gamelog/features/review_management/views/review_game_screen.dart';
@@ -9,8 +11,10 @@ import 'package:gamelog/features/review_management/views/review_game_screen.dart
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 
+import '../../../core/data/models/add_to_favorites_request.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_expandable_html_text.dart';
 import '../../../widgets/app_global_loader.dart';
@@ -30,20 +34,31 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
+  Future<void> performAddGameToPendings() async {
+    final request = AddToPendingsRequest(
+      idGame: widget.game.id,
+      idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+    );
+
+    await ref
+        .read(addGameToPendingsControllerProvider.notifier)
+        .addGameToPendings(request);
+  }
+
+  Future<void> performAddGameToFavorites() async {
+    final request = AddToFavoritesRequest(
+      idGame: widget.game.id,
+      idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+    );
+
+    await ref
+        .read(addGameToFavoritesControllerProvider.notifier)
+        .addGameToFavorites(request);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
-    Future<void> _performAddGameToPendings() async {
-      final request = AddToPendingsRequest(
-        idGame: widget.game.id,
-        idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
-      );
-
-      await ref
-          .read(addGameToPendingsControllerProvider.notifier)
-          .addGameToPendings(request);
-    }
 
     ref.listen<AsyncValue<AddToPendingsResponse?>>(
       addGameToPendingsControllerProvider,
@@ -63,13 +78,36 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             error: (error, stack) {
               ref.read(globalLoadingProvider.notifier).state = false;
 
-              final msg = error is Failure
-                  ? (error.serverMessage ?? l10n.byKey(error.code))
-                  : error.toString();
+              handleFailure(context: context, error: error);
+            },
+          );
+        }
 
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(msg)));
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
+
+    ref.listen<AsyncValue<AddToFavoritesResponse?>>(
+      addGameToFavoritesControllerProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(response!.message)));
+              });
+            },
+            error: (error, stack) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+
+              handleFailure(context: context, error: error);
             },
           );
         }
@@ -183,8 +221,24 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ),
               ),
 
-              AppStarRating(rating: widget.game.rating, onRatingChanged: null),
-              Align( alignment: Alignment.centerLeft,child: Text(widget.game.released.toString())),
+              Row(
+                children: [
+                  AppStarRating(
+                    rating: widget.game.rating,
+                    onRatingChanged: null,
+                  ),
+                  AppIconButton(
+                    icon: Icons.stars_rounded,
+                    onPressed: () {
+                      performAddGameToFavorites();
+                    },
+                  ),
+                ],
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(widget.game.released.toString()),
+              ),
 
               const SizedBox(height: 16.0),
 
@@ -237,7 +291,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               AppButton(
                 text: l10n.addToPendings,
                 onPressed: () {
-                  _performAddGameToPendings();
+                  performAddGameToPendings();
                 },
               ),
               const SizedBox(height: 12),
