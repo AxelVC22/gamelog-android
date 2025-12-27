@@ -9,7 +9,7 @@ class AppLikeButton extends StatefulWidget {
     super.key,
     this.initialValue = false,
     this.onChanged,
-    this.size = 32,
+    this.size = 24,
   });
 
   @override
@@ -44,6 +44,7 @@ class _LikeButtonState extends State<AppLikeButton>
           key: ValueKey(isLiked),
           color: isLiked ? Colors.red : Colors.grey,
           size: widget.size,
+
         ),
       ),
     );

@@ -9,7 +9,7 @@ class AppStarRating extends StatelessWidget {
     super.key,
     required this.rating,
     this.onRatingChanged,
-    this.size = 32,
+    this.size = 24,
   });
 
   @override

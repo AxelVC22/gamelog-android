@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
 import 'package:gamelog/features/review_management/models/add_to_pendings_response.dart';
 import 'package:gamelog/features/review_management/models/delete_review_response.dart';
+import 'package:gamelog/features/review_management/models/like_request.dart';
+import 'package:gamelog/features/review_management/models/like_response.dart';
 import 'package:gamelog/features/review_management/models/register_game_request.dart';
 import 'package:gamelog/features/review_management/models/retrieve_player_reviews_response.dart';
 import 'package:gamelog/features/review_management/models/retrieve_review_history_response.dart';
@@ -216,6 +218,62 @@ class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
     }
 
     return ErrorCodes.unexpectedError;
+  }
+
+  @override
+  Future<Either<Failure, LikeResponse>> likeReview(LikeRequest request) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.post(
+        ApiConstants.likeReview,
+        data: request.toJson(),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final base = LikeResponse.fromJson(response.data);
+
+        final res = base.copyWith(idReview: request.idReview);
+        return Right(res);
+      } else {
+        final message = _parseMessages(response.data['mensaje']);
+        return Left(Failure.server(_parseMessages(message)));
+      }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
+  }
+
+  @override
+  Future<Either<Failure, LikeResponse>> unlikeReview(LikeRequest request) async {
+    try {
+      final token = await storage.read(key: 'access_token');
+
+      final response = await dio.delete(
+        '${ApiConstants.likeReview}/${request.idGame}',
+        data: request.toJson(),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (status) => status! < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final base = LikeResponse.fromJson(response.data);
+
+        final res = base.copyWith(idReview: request.idReview);
+        return Right(res);
+      } else {
+        final message = _parseMessages(response.data['mensaje']);
+        return Left(Failure.server(_parseMessages(message)));
+      }
+    } catch (e) {
+      return Left(Failure(ErrorCodes.unexpectedError));
+    }
   }
 
 
