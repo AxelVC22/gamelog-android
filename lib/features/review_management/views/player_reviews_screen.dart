@@ -21,9 +21,12 @@ import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_review_card.dart';
 import '../providers/like_review_controller.dart';
+import '../providers/retrieve_followed_player_reviews_controller.dart';
 import '../providers/unlike_review_controller.dart';
 
-final retrieveResultsProvider = StateProvider<List<Review>>((ref) => []);
+final retrieveResultsProvider = StateProvider.autoDispose<List<Review>>(
+  (ref) => [],
+);
 
 class PlayerReviewsScreen extends ConsumerStatefulWidget {
   final Game game;
@@ -37,15 +40,82 @@ class PlayerReviewsScreen extends ConsumerStatefulWidget {
 class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   bool isLoading = false;
   bool notFoundResults = false;
+  late final ProviderSubscription _retrieveReviewsSub;
+  late final ProviderSubscription _retrieveFollowedReviewsSub;
+  bool showingFollowed = false;
 
   @override
   void initState() {
     super.initState();
 
-    Future.microtask(() => _search());
+    _retrieveReviewsSub = ref
+        .listenManual<AsyncValue<RetrievePlayerReviewsResponse?>>(
+          retrievePlayerReviewsControllerProvider,
+          _onRetrieveReviewsChanged,
+        );
+
+    _retrieveFollowedReviewsSub = ref
+        .listenManual<AsyncValue<RetrievePlayerReviewsResponse?>>(
+          retrieveFollowedPlayerReviewsControllerProvider,
+          _onRetrieveFollowedChanged,
+        );
+
+    Future.microtask(() => _retrieveReviews());
   }
 
-  Future<void> _search() async {
+  void _onRetrieveReviewsChanged(
+    AsyncValue<RetrievePlayerReviewsResponse?>? previous,
+    AsyncValue<RetrievePlayerReviewsResponse?> next,
+  ) {
+    if (!mounted) return;
+    if (previous?.isLoading == true && !next.isLoading) {
+      next.when(
+        loading: () {},
+        data: (response) {
+          if (response == null) return;
+
+          if (response.reviews.isEmpty) {
+            setState(() => notFoundResults = true);
+          }
+
+          ref.read(retrieveResultsProvider.notifier).state = response.reviews;
+        },
+        error: (error, __) {
+          if (!mounted) return;
+          setState(() => notFoundResults = true);
+          handleFailure(context: context, error: error);
+        },
+      );
+    }
+  }
+
+  void _onRetrieveFollowedChanged(
+    AsyncValue<RetrievePlayerReviewsResponse?>? previous,
+    AsyncValue<RetrievePlayerReviewsResponse?> next,
+  ) {
+    if (!mounted) return;
+    if (previous?.isLoading == true && !next.isLoading) {
+      next.when(
+        loading: () {},
+        data: (response) {
+          if (response == null) return;
+
+          if (response.reviews.isEmpty) {
+            setState(() => notFoundResults = true);
+          }
+
+          ref.read(retrieveResultsProvider.notifier).state = response.reviews;
+        },
+        error: (error, __) {
+          if (!mounted) return;
+          setState(() => notFoundResults = true);
+          handleFailure(context: context, error: error);
+        },
+      );
+    }
+  }
+
+  Future<void> _retrieveReviews() async {
     if (!mounted) return;
 
     setState(() => isLoading = true);
@@ -60,6 +130,21 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
         .retrievePlayerReviews(widget.game.id, idPlayer);
   }
 
+  Future<void> _retrieveFollowedReviews() async {
+    if (!mounted) return;
+
+    setState(() => isLoading = true);
+    setState(() => notFoundResults = false);
+
+    ref.read(retrieveResultsProvider.notifier).state = [];
+
+    int idPlayer = ref.read(currentUserProvider.notifier).state!.idPlayer;
+
+    await ref
+        .read(retrieveFollowedPlayerReviewsControllerProvider.notifier)
+        .retrieveFollowedPlayerReviews(widget.game.id, idPlayer);
+  }
+
   Future<void> performDeleteReview(int idReview) async {
     await ref
         .read(deleteReviewControllerProvider.notifier)
@@ -68,6 +153,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
   Future<void> performLikeReview(Review review) async {
     if (!mounted) return;
+
     final request = LikeRequest(
       idReview: review.idReview,
       idGame: review.idGame,
@@ -83,6 +169,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
   Future<void> performUnlikeReview(Review review) async {
     if (!mounted) return;
+
     final request = LikeRequest(
       idReview: review.idReview,
       idGame: review.idGame,
@@ -108,6 +195,8 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
   @override
   void dispose() {
+    _retrieveReviewsSub.close();
+    _retrieveFollowedReviewsSub.close();
     super.dispose();
   }
 
@@ -115,31 +204,6 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final results = ref.watch(retrieveResultsProvider);
-
-    ref.listen<AsyncValue<RetrievePlayerReviewsResponse?>>(
-      retrievePlayerReviewsControllerProvider,
-      (previous, next) {
-        if (previous?.isLoading == true && next.isLoading == false) {
-          next.when(
-            loading: () {},
-            data: (response) {
-              if (response == null) return;
-
-              if (response.reviews.isEmpty) {
-                setState(() => notFoundResults = true);
-              }
-
-              ref.read(retrieveResultsProvider.notifier).state =
-                  response.reviews;
-            },
-            error: (error, stack) {
-              setState(() => notFoundResults = true);
-              handleFailure(context: context, error: error);
-            },
-          );
-        }
-      },
-    );
 
     ref.listen<AsyncValue<DeleteReviewResponse?>>(
       deleteReviewControllerProvider,
@@ -161,7 +225,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 ScaffoldMessenger.of(
                   context,
-                ).showSnackBar(SnackBar(content: Text(response!.message)));
+                ).showSnackBar(SnackBar(content: Text(response.message)));
               });
             },
             error: (error, stack) {
@@ -244,8 +308,6 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                   return review;
                 })
                 .toList();
-
-
           },
           error: (error, stack) {
             ref.read(globalLoadingProvider.notifier).state = false;
@@ -278,7 +340,16 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
               AppFilterTab(
                 options: [l10n.allReviews, l10n.friends],
-                onChanged: (index) {},
+                onChanged: (index) async {
+                  switch (index) {
+                    case 0:
+                      await _retrieveReviews();
+                      break;
+                    case 1:
+                      await _retrieveFollowedReviews();
+                      break;
+                  }
+                },
               ),
               const SizedBox(height: 16.0),
 

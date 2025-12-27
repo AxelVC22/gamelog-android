@@ -16,7 +16,9 @@ abstract class ReviewManagementRepository {
 
   Future<Either<Failure, ReviewGameResponse>> reviewGame (ReviewGameRequest request);
 
-  Future<Either<Failure, RetrievePlayerReviewsResponse>> retrievePlayerReviewsResponse (int idGame, int idPlayer);
+  Future<Either<Failure, RetrievePlayerReviewsResponse>> retrievePlayerReviews (int idGame, int idPlayer);
+
+  Future<Either<Failure, RetrievePlayerReviewsResponse>> retrieveFollowedPlayerReviews (int idGame, int idPlayer);
 
   Future<Either<Failure, AddToPendingsResponse>> addGameToPendings (AddToPendingsRequest request);
 

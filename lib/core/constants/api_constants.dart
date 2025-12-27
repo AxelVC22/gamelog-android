@@ -2,6 +2,8 @@ class ApiConstants {
   static const String baseUrl = 'http://192.168.0.24:1234'; //10.0.2.2
   static const String baseRawgUrl = 'https://api.rawg.io/api';
 
+  static const String queryIdPlayerSeeker = 'idJugadorBuscador';
+
   //Auth
   static const String login = '/gamelog/login';
   static const String logout = '/gamelog/login/logout';
@@ -35,7 +37,11 @@ class ApiConstants {
   static const String retriveReviewHistory = '/gamelog/resena/jugador';
 
   static const String deleteReview = '/gamelog/resena';
+
   static const String likeReview = '/gamelog/MeGusta';
+
+  static String retrieveFollowedPlayerReview(int idGame) =>
+      '/gamelog/resena/juego/$idGame/seguidos';
 
   //games
 
