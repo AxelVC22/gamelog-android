@@ -16,5 +16,6 @@ GameRepository gameRepository(
       ref.watch(dioRawgProvider),
       ref.read(apiKeyProvider),
       ref.watch(secureStorageProvider),
+    ref.watch(dioProvider)
   );
 }
