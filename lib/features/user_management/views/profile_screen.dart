@@ -11,17 +11,51 @@ import 'package:gamelog/features/user_management/providers/search_user_controlle
 import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../../../core/domain/entities/account.dart';
+import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/user.dart';
 import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_button.dart';
+import '../../../widgets/app_game_detailed_card.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_skeleton_loader.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../follows/models/follow_user_response.dart';
+import '../../games/models/games_response.dart';
+import '../../games/providers/retrieve_favorite_games_controller.dart';
+import '../../review_management/views/game_screen.dart';
+import '../../statistics/providers/search_game_controller.dart';
 
+final searchFavoriteResultProvider = StateProvider.autoDispose<List<Game?>>(
+  (ref) => [],
+);
+
+final retrieveResultsProvider = StateProvider.autoDispose<List<Game>>(
+  (ref) => [],
+);
 final searchResultProvider = StateProvider.autoDispose<Account?>((ref) => null);
+
+final mergedFavoriteGamesProvider = Provider<List<Game>>((ref) {
+  final games = ref.watch(retrieveResultsProvider);
+  final detailedGames = ref.watch(searchFavoriteResultProvider);
+
+  final detailedById = {for (final game in detailedGames) game?.id: game};
+
+  return games.map((game) {
+    final detailed = detailedById[game.id];
+    if (detailed == null) return game;
+
+    return game.copyWith(
+      name: detailed.name,
+      backgroundImage: detailed.backgroundImage ?? '',
+      description: detailed.description,
+      backgroundImageAdditional: detailed.backgroundImageAdditional,
+      rating: detailed.rating,
+      released: detailed.released,
+    );
+  }).toList();
+});
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String username;
@@ -40,6 +74,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ref.read(currentUserProvider.notifier).state?.accessType ==
       UserType.Administrador.name;
   bool notFoundUser = false;
+  late final ProviderSubscription _searchGameSub;
+  late final ProviderSubscription _retrieveFavoriteGameSub;
+  bool isLoading = false;
+  bool notFoundResults = false;
+
+  Future<void> _retrieveFavorite() async {
+    if (!mounted) return;
+
+    setState(() => isLoading = true);
+    setState(() => notFoundResults = false);
+
+    ref.read(retrieveResultsProvider.notifier).state = [];
+    ref.read(searchFavoriteResultProvider.notifier).state = [];
+
+    await ref
+        .read(retrieveFavoriteGamesControllerProvider.notifier)
+        .retrieveFavoriteGames(ref
+        .read(searchResultProvider.notifier)
+        .state!
+        .idPlayer);
+
+    if (!mounted) return;
+    setState(() => isLoading = false);
+  }
 
   Future<void> performAddToBlackList(String email, String userType) async {
     if (!mounted) return;
@@ -64,15 +122,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     await ref.read(followUserControllerProvider.notifier).followUser(request);
   }
 
+  Future<void> _searchGame(String query) async {
+    if (!mounted) return;
+    ref.read(retrieveResultsProvider.notifier).state = [];
+
+    await ref
+        .read(searchFavoriteGameControllerProvider.notifier)
+        .searchGame(query);
+  }
+
   @override
   void initState() {
     super.initState();
-
     _searchUserSub = ref.listenManual<AsyncValue<SearchUserResponse?>>(
       loadUserControllerProvider,
       _onSearchUserChanged,
     );
+
+    _retrieveFavoriteGameSub = ref.listenManual<AsyncValue<GamesResponse?>>(
+      retrieveFavoriteGamesControllerProvider,
+      _onRetrieveFavoriteChanged,
+    );
+
+    _searchGameSub = ref.listenManual<AsyncValue<Game?>>(
+      searchFavoriteGameControllerProvider,
+      _onSearchGameChanged,
+    );
+
     Future.microtask(() => _search(widget.username));
+  }
+
+  void _onSearchGameChanged(
+    AsyncValue<Game?>? previous,
+    AsyncValue<Game?> next,
+  ) {
+    if (previous?.isLoading == true && !next.isLoading) {
+      next.when(
+        loading: () {},
+        data: (response) {
+          if (response == null) return;
+
+          final notifier = ref.read(searchFavoriteResultProvider.notifier);
+          notifier.state = [...notifier.state, response];
+        },
+        error: (error, __) {},
+      );
+    }
+  }
+
+  void _onRetrieveFavoriteChanged(
+    AsyncValue<GamesResponse?>? previous,
+    AsyncValue<GamesResponse?> next,
+  ) {
+    if (!mounted) return;
+    if (previous?.isLoading == true && !next.isLoading) {
+      next.when(
+        loading: () {},
+        data: (response) async {
+          if (!mounted) return;
+          if (response == null) return;
+
+          if (response.games.isEmpty) {
+            setState(() => notFoundResults = true);
+          } else {
+            for (int i = 0; i < response.games.length; i++) {
+              await _searchGame(response.games[i].name);
+            }
+          }
+          final notifier = ref.read(retrieveResultsProvider.notifier);
+          notifier.state = response.games;
+        },
+        error: (error, __) {
+          if (!mounted) return;
+          setState(() => notFoundResults = true);
+          handleFailure(context: context, error: error);
+        },
+      );
+    }
   }
 
   Future<void> _search(String username) async {
@@ -85,6 +211,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   void dispose() {
     _searchUserSub.close();
+    _retrieveFavoriteGameSub.close();
+    _searchGameSub.close();
     super.dispose();
   }
 
@@ -107,6 +235,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           } else {
             final notifier = ref.read(searchResultProvider.notifier);
             notifier.state = response.accounts.first;
+            _retrieveFavorite();
+
           }
         },
         error: (error, __) {},
@@ -119,6 +249,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     final user = ref.watch(searchResultProvider);
+    final results = ref.watch(mergedFavoriteGamesProvider);
 
     ref.listen<AsyncValue<AddToBlackListResponse?>>(
       addToBlackListControllerProvider,
@@ -190,26 +321,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         elevation: 0,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 8),
+
               if (notFoundUser)
                 Text(l10n.notFoundUser)
               else if (user == null)
                 const AppSkeletonLoader(
                   height: 220,
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
                 )
               else
                 Card(
-                  elevation: 2,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(4),
                     child: Column(
                       children: [
                         Row(
@@ -294,13 +428,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
 
               AppModuleTitle(title: l10n.favoriteGames),
 
-              const SizedBox(height: 8),
-
               const Divider(),
+
+              if (notFoundResults)
+                Text('Sin resultados')
+              else if (results.isEmpty)
+                AppSkeletonLoader.listTile()
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: results.length,
+                    itemBuilder: (_, i) {
+                      return AppGameDetailedCard(
+                        name: results[i].name,
+                        imageUrl:
+                            results[i].backgroundImage ??
+                            'https://picsum.photos/800/450',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => GameScreen(game: results[i]),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
 
               const SizedBox(height: 12),
             ],

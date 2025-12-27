@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:gamelog/core/data/repositories/game_reporitory.dart';
+import 'package:gamelog/core/data/repositories/game_repository.dart';
 
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/failures/failure.dart';

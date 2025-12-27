@@ -9,11 +9,9 @@ import 'package:gamelog/features/review_management/views/player_reviews_screen.d
 import 'package:gamelog/features/review_management/views/review_game_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
-import 'package:gamelog/l10n/app_localizations_extension.dart';
 
 import '../../../core/data/models/add_to_favorites_request.dart';
 import '../../../core/domain/entities/game.dart';
-import '../../../core/domain/failures/failure.dart';
 import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_expandable_html_text.dart';
@@ -38,6 +36,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final request = AddToPendingsRequest(
       idGame: widget.game.id,
       idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+      name: widget.game.name,
+      releaseDate: widget.game.released!,
     );
 
     await ref
@@ -49,6 +49,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final request = AddToFavoritesRequest(
       idGame: widget.game.id,
       idPlayer: ref.read(currentUserProvider.notifier).state!.idPlayer,
+      name: widget.game.name,
+      releaseDate: widget.game.released!,
     );
 
     await ref

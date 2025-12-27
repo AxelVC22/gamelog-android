@@ -119,30 +119,44 @@ class ReviewManagementRepositoryImpl extends ReviewManagementRepository {
 
   @override
   Future<Either<Failure, AddToPendingsResponse>> addGameToPendings(
-    AddToPendingsRequest request,
-  ) async {
+      AddToPendingsRequest request,
+      ) async {
     try {
       final token = await storage.read(key: 'access_token');
 
-      final response = await dio.post(
-        ApiConstants.addGameToPendings,
-        data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
+      final registerGameRequest = RegisterGameRequest(
+        idGame: request.idGame,
+        name: request.name,
+        releaseDate: request.releaseDate,
       );
 
-      if (response.statusCode == 200) {
-        final res = AddToPendingsResponse.fromJson(response.data);
-        return Right(res);
-      } else {
-        return left(Failure.server(response.data['mensaje']));
-      }
+      final gameRegistration = await _registerGame(registerGameRequest);
+
+      return gameRegistration.fold(
+            (failure) => Left(failure),
+            (_) async {
+          final response = await dio.post(
+            ApiConstants.addGameToPendings,
+            data: request.toJson(),
+            options: Options(
+              headers: {"Authorization": "Bearer $token"},
+              validateStatus: (status) => status! < 600,
+            ),
+          );
+
+          if (response.statusCode == 200) {
+            final res = AddToPendingsResponse.fromJson(response.data);
+            return Right(res);
+          } else {
+            return Left(Failure.server(response.data['mensaje']));
+          }
+        },
+      );
     } catch (e) {
       return Left(Failure(ErrorCodes.unexpectedError));
     }
   }
+
 
   @override
   Future<Either<Failure, RetrieveReviewHistoryResponse>> retrieveReviewHistory(
