@@ -108,6 +108,8 @@
   "@@ValidationMessages": "=== Mensajes de validacion UI===",
   "requiredField" : "El campo es obligatorio",
   "invalidName": "El nombre es invalido (3-50 caracteres solo letras)",
+  "invalidGameName": "El nombre del juego es invalido",
+
   "invalidFathersSurname": "El primer apellido es invalido",
   "invalidMotherSurname": "El segundo apellido es invalido",
   "invalidUsername": "El nombre de usuario es invalido",

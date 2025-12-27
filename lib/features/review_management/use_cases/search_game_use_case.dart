@@ -12,7 +12,7 @@ class SearchGameUseCase {
 
   Future<Either<Failure, Game>> call(String gameName) async {
     if (gameName.trim().isEmpty || gameName.length > 50) {
-      return left(Failure.local(ErrorCodes.invalidUsername));
+      return left(Failure.local(ErrorCodes.invalidGameName));
     }
     final normalizedName = _normalizeGameName(gameName);
 

@@ -484,6 +484,12 @@ abstract class AppLocalizations {
   /// **'El nombre es invalido (3-50 caracteres solo letras)'**
   String get invalidName;
 
+  /// No description provided for @invalidGameName.
+  ///
+  /// In es, this message translates to:
+  /// **'El nombre del juego es invalido'**
+  String get invalidGameName;
+
   /// No description provided for @invalidFathersSurname.
   ///
   /// In es, this message translates to:

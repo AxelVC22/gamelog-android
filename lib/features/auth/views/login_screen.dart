@@ -5,9 +5,7 @@ import 'package:gamelog/features/auth/models/login_request.dart';
 import 'package:gamelog/features/auth/providers/auth_providers.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
-import 'package:gamelog/features/home/views/home_screen.dart';
-import 'package:gamelog/l10n/app_localizations_extension.dart';
-import '../../../core/domain/failures/failure.dart';
+
 import '../../../core/helpers/failure_handler.dart';
 import '../../../core/helpers/field_state.dart';
 import '../../../core/helpers/field_validator.dart';

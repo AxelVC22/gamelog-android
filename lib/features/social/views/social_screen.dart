@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/features/auth/providers/auth_providers.dart';
 import 'package:gamelog/features/follows/models/retrieve_social_response.dart';
+import 'package:gamelog/features/follows/models/unfollow_user_response.dart';
 import 'package:gamelog/features/follows/providers/retrieve_followed_controller.dart';
+import 'package:gamelog/features/follows/providers/unfollow_user_controller.dart';
 import 'package:gamelog/features/user_management/views/search_profile_screen.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
-import 'package:gamelog/widgets/app_follower_card.dart';
+import 'package:gamelog/widgets/app_social_card.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/domain/entities/account.dart';
 import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
+import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_module_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../follows/providers/retrieve_followers_controller.dart';
@@ -34,12 +37,14 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   late final ProviderSubscription _retrieveFollowersSub;
   bool isLoading = false;
   bool notFoundResults = false;
+  bool showingFollowed = true;
 
   Future<void> _retrieveFollowed() async {
     if (!mounted) return;
 
     setState(() => isLoading = true);
     setState(() => notFoundResults = false);
+    setState(() => showingFollowed = true);
 
     ref.read(retrieveResultsProvider.notifier).state = [];
 
@@ -58,9 +63,9 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
 
     setState(() => isLoading = true);
     setState(() => notFoundResults = false);
+    setState(() => showingFollowed = false);
 
     ref.read(retrieveResultsProvider.notifier).state = [];
-
 
     await ref
         .read(retrieveFollowersControllerProvider.notifier)
@@ -70,6 +75,17 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
 
     if (!mounted) return;
     setState(() => isLoading = false);
+  }
+
+  Future<void> performUnfollowUser(int idPlayerFollowed) async {
+    if (!mounted) return;
+
+    await ref
+        .read(unfollowUserControllerProvider.notifier)
+        .unfollowUser(
+          ref.read(currentUserProvider.notifier).state!.idPlayer,
+          idPlayerFollowed,
+        );
   }
 
   @override
@@ -157,6 +173,31 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
 
     final results = ref.watch(retrieveResultsProvider);
 
+    ref.listen<AsyncValue<UnfollowUserResponse?>>(
+      unfollowUserControllerProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && next.isLoading == false) {
+          next.when(
+            loading: () {},
+            data: (response) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+              if (response == null) return;
+
+              _retrieveFollowed();
+            },
+            error: (error, stack) {
+              ref.read(globalLoadingProvider.notifier).state = false;
+              handleFailure(context: context, error: error);
+            },
+          );
+        }
+
+        if (next.isLoading) {
+          ref.read(globalLoadingProvider.notifier).state = true;
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: AppModuleTitle(title: l10n.socialTitle),
@@ -207,9 +248,13 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                   child: ListView.builder(
                     itemCount: results.length,
                     itemBuilder: (_, i) {
-                      return AppFollowerCard(
+                      return AppSocialCard(
+                        followed: showingFollowed,
                         name: results[i].username,
                         imageUrl: "",
+                        onDelete: () {
+                          performUnfollowUser(results[i].idPlayer);
+                        },
                         onTap: () {
                           Navigator.push(
                             context,

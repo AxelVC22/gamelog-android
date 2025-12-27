@@ -53,6 +53,8 @@ class ApiConstants {
 
   static const String followUser = '/gamelog/seguidor';
 
+  static const String unfollowUser = '/gamelog/seguidor/';
+
   static const String retrieveFollowed = '/gamelog/seguidor/seguidos/';
 
   static const String retrieveFollowers = '/gamelog/seguidor/seguidores/';

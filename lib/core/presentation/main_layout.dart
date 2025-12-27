@@ -32,14 +32,14 @@ class _MainLayoutState extends State<MainLayout> {
         onTap: (i) => setState(() => _index = i),
         items: [
           CurvedNavigationBarItem(
-            child: Icon(Icons.home_outlined),
+            child: Icon(Icons.home),
             label: 'Home',
           ),
-          CurvedNavigationBarItem(child: Icon(Icons.search), label: 'Search'),
+          CurvedNavigationBarItem(child: Icon(Icons.search_rounded), label: 'Search'),
           CurvedNavigationBarItem(child: Icon(Icons.people), label: 'Social'),
 
           CurvedNavigationBarItem(
-            child: Icon(Icons.perm_identity),
+            child: Icon(Icons.person),
             label: 'Personal',
           ),
         ],
