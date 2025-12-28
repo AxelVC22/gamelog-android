@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gamelog/widgets/app_icon_button.dart';
 import 'package:intl/intl.dart';
-
-import 'app_like_button.dart';
 
 class AppNotificationCard extends StatelessWidget {
   final VoidCallback? onTap;
@@ -15,52 +12,41 @@ class AppNotificationCard extends StatelessWidget {
     this.onTap,
     required this.date,
     required this.message,
-    required this.onDelete
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+
             children: [
-
-
-              Column(
-                children: [
-
-                  Text(
-                    DateFormat('dd/MM/yyyy').format(date),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      DateFormat('EEE, M/d/y').format(date),
+                      style: const TextStyle(fontSize: 11),
                     ),
-                  ),
-
-                  Text(
-                    message,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                    Text(
+                      message,
+                      softWrap: true,
+                      style: const TextStyle(fontSize: 16),
                     ),
-                  ),
-                ],
+
+                  ],
+                ),
               ),
-
-              AppIconButton(
-                icon: Icons.delete,
-                onPressed: onDelete,
-              )
             ],
           ),
-
-
         ),
       ),
     );

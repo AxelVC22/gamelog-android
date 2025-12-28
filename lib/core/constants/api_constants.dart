@@ -67,4 +67,8 @@ class ApiConstants {
   static const String retrieveFollowed = '/gamelog/seguidor/seguidos/';
 
   static const String retrieveFollowers = '/gamelog/seguidor/seguidores/';
+
+  //notifications
+
+static const String retrieveNotifications = '/gamelog/notificacion/jugador';
 }
