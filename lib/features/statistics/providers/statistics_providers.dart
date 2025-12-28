@@ -13,7 +13,7 @@ part 'statistics_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 StatisticsRepositoryImpl statisticsRepository(
-    StatisticsRepositoryRef ref,
+    Ref ref,
     ) {
   return StatisticsRepositoryImpl(
 

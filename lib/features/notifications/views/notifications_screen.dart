@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart' hide Notification;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/notifications/models/retrieve_notifications_response.dart';
+import 'package:gamelog/features/notifications/providers/retrieve_notifications_controller.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import '../../../core/domain/entities/notification.dart';
 
 import '../../../core/domain/entities/player.dart';
 
+import '../../../core/helpers/failure_handler.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_notification_card.dart';
+import '../../../widgets/app_skeleton_loader.dart';
+import '../../auth/providers/auth_providers.dart';
 
+final retrieveResultsProvider = StateProvider.autoDispose<List<Notification>>(
+      (ref) => [],
+);
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -21,51 +29,78 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  List<Notification> allNotifications = [
-    Notification(
-      id: 0,
-      message: "follow",
-      notified: Player(username: 'Tu'),
-      notifier: Player(username: 'Papoi'),
-      date: DateTime.now(),
-    ),
-  ];
+
+  bool isLoading = false;
+  bool notFoundResults = false;
+  late final ProviderSubscription _retrieveNotificationsSub;
+
 
   @override
   void initState() {
     super.initState();
-    _search('p');
+
+    _retrieveNotificationsSub = ref
+        .listenManual<AsyncValue<RetrieveNotificationsResponse?>>(
+      retrieveNotificationsControllerProvider,
+      _onRetrieveNotificationsChanged,
+    );
+    Future.microtask(() => _retrieveNotifications());
+
   }
 
-  List<Notification> results = [];
-  bool isLoading = false;
+  Future<void> _retrieveNotifications() async {
+    if (!mounted) return;
 
-  Future<void> _search(String query) async {
     setState(() => isLoading = true);
+    setState(() => notFoundResults = false);
 
-    // Simula un delay de API
-    await Future.delayed(const Duration(milliseconds: 600));
+    ref.read(retrieveResultsProvider.notifier).state = [];
 
-    setState(() {
-      results = allNotifications
-          .where(
-            (notification) =>
-                notification.notifier.username.toLowerCase().contains(query.toLowerCase()),
-          )
-          .toList();
+    int idPlayer = ref.read(currentUserProvider.notifier).state!.idPlayer;
 
-      isLoading = false;
-    });
+    await ref
+        .read(retrieveNotificationsControllerProvider.notifier)
+        .retrieveNotifications(idPlayer);
   }
+
+  void _onRetrieveNotificationsChanged(
+      AsyncValue<RetrieveNotificationsResponse?>? previous,
+      AsyncValue<RetrieveNotificationsResponse?> next,
+      ) {
+    if (!mounted) return;
+    if (previous?.isLoading == true && !next.isLoading) {
+      next.when(
+        loading: () {},
+        data: (response) {
+          if (response == null) return;
+
+          if (response.notifications.isEmpty) {
+            setState(() => notFoundResults = true);
+          }
+
+          ref.read(retrieveResultsProvider.notifier).state = response.notifications;
+        },
+        error: (error, __) {
+          if (!mounted) return;
+          setState(() => notFoundResults = true);
+          handleFailure(context: context, error: error);
+        },
+      );
+    }
+  }
+
 
   @override
   void dispose() {
+    _retrieveNotificationsSub.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final results = ref.watch(retrieveResultsProvider);
+
 
     return Scaffold(
       appBar: AppBar(
@@ -82,12 +117,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: <Widget>[
-              if (isLoading)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
+              const SizedBox(height: 12),
+
+              if (notFoundResults)
+                Text('Sin resultados')
+              else if (results.isEmpty)
+                const AppSkeletonLoader.listTile()
+
               else
                 Expanded(
+
                   child: ListView.builder(
                     itemCount: results.length,
                     itemBuilder: (_, i) {
@@ -96,9 +135,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         onDelete: () {},
                         onTap: () {
 
-                        }, message: l10n.newFollowerNotification(
-                        results[i].notifier.username
-                      ),
+                        }, message: results[i].message
                       );
                     },
                   ),

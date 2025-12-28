@@ -8,7 +8,6 @@ import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/helpers/failure_handler.dart';
-import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_game_card.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
