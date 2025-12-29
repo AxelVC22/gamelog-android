@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/helpers/week_range.dart';
 
-import 'package:gamelog/features/statistics/models/retrieve_statistics_response.dart';
-import 'package:gamelog/features/statistics/providers/retrieve_revival_retro_statistics_controller.dart';
-import 'package:gamelog/features/statistics/providers/retrieve_trend_statistics_controller.dart';
+import 'package:gamelog/core/data/models/statistics/retrieve_statistics_response.dart';
+import 'package:gamelog/features/statistics/controllers/retrieve_revival_retro_statistics_controller.dart';
+import 'package:gamelog/features/statistics/controllers/retrieve_trend_statistics_controller.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/domain/entities/game.dart';
-import '../../../core/helpers/failure_handler.dart';
+import '../../../core/presentation/failure_handler.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../widgets/app_graph.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_skeleton_loader.dart';
-import '../providers/search_game_controller.dart';
+import '../controllers/search_game_controller.dart';
 
 final searchTrendResultProvider = StateProvider.autoDispose<List<Game?>>(
   (ref) => [],

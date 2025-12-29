@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/domain/entities/user.dart';
-import 'package:gamelog/features/auth/models/login_request.dart';
-import 'package:gamelog/features/auth/providers/auth_providers.dart';
+import 'package:gamelog/core/data/models/auth/login_request.dart';
+import 'package:gamelog/core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
 
-import '../../../core/helpers/failure_handler.dart';
-import '../../../core/helpers/field_state.dart';
+import '../../../core/presentation/failure_handler.dart';
+import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
 import '../../../core/presentation/main_layout.dart';
 import '../../../widgets/app_button.dart';
@@ -16,10 +16,10 @@ import '../../../widgets/app_link_text.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
-import '../models/login_response.dart';
+import '../../../core/data/models/auth/login_response.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
-import '../providers/login_controller.dart';
+import '../controllers/login_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});

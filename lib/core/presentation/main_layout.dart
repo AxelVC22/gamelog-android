@@ -1,12 +1,11 @@
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:flutter/material.dart';
-import 'package:gamelog/features/review_management/views/games_screen.dart';
-import 'package:gamelog/features/review_management/views/search_game_screen.dart';
-import 'package:gamelog/features/user_management/views/my_profile_screen.dart';
+import 'package:gamelog/features/reviews/views/games_screen.dart';
+import 'package:gamelog/features/users/views/my_profile_screen.dart';
 
 import '../../features/home/views/home_screen.dart';
-import '../../features/social/views/social_screen.dart';
+import '../../features/follows/views/social_screen.dart';
 import '../constants/app_colors.dart';
 
 class MainLayout extends StatefulWidget {

@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/features/auth/models/logout_response.dart';
-import 'package:gamelog/features/auth/providers/logout_controller.dart';
+import 'package:gamelog/core/data/models/auth/logout_response.dart';
+import 'package:gamelog/features/auth/controllers/logout_controller.dart';
 import 'package:gamelog/features/auth/views/login_screen.dart';
-import 'package:gamelog/features/home/providers/load_game_controller.dart';
-import 'package:gamelog/features/home/providers/load_trend_statistics_controller.dart';
+import 'package:gamelog/features/home/controllers/load_game_controller.dart';
+import 'package:gamelog/features/home/controllers/load_trend_statistics_controller.dart';
 import 'package:gamelog/features/notifications/views/notifications_screen.dart';
-import 'package:gamelog/features/statistics/models/retrieve_statistics_response.dart';
-import 'package:gamelog/features/review_management/views/review_history_screen.dart';
+import 'package:gamelog/core/data/models/statistics/retrieve_statistics_response.dart';
+import 'package:gamelog/features/reviews/views/review_history_screen.dart';
 import 'package:gamelog/features/statistics/views/statistics_screen.dart';
-import 'package:gamelog/l10n/app_localizations_extension.dart';
 
 import '../../../core/domain/entities/game.dart';
-import '../../../core/domain/failures/failure.dart';
-import '../../../core/helpers/failure_handler.dart';
+import '../../../core/presentation/failure_handler.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../widgets/app_game_card.dart';
 import '../../../widgets/app_global_loader.dart';
@@ -22,8 +20,8 @@ import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_skeleton_loader.dart';
-import '../../auth/providers/auth_providers.dart';
-import '../../review_management/views/game_screen.dart';
+import '../../../core/data/providers/auth/auth_providers.dart';
+import '../../reviews/views/game_screen.dart';
 
 final searchResultProvider = StateProvider.autoDispose<List<Game?>>(
   (ref) => [],

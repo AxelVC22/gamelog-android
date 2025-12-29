@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/domain/entities/user.dart';
-import 'package:gamelog/features/auth/models/recover_password_request.dart';
+import 'package:gamelog/core/data/models/auth/recover_password_request.dart';
 import 'package:gamelog/features/auth/views/login_screen.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 import 'package:gamelog/widgets/app_module_title.dart';
 import '../../../core/domain/failures/failure.dart';
-import '../../../core/helpers/field_state.dart';
+import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
-import '../models/recover_password_response.dart';
-import '../providers/auth_providers.dart';
+import '../../../core/data/models/auth/recover_password_response.dart';
+import '../../../core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
-import '../providers/recover_password_controller.dart';
+import '../controllers/recover_password_controller.dart';
 
 class RecoverPasswordScreen extends ConsumerStatefulWidget {
   const RecoverPasswordScreen({super.key});

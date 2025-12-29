@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
-import 'package:gamelog/features/auth/models/logout_response.dart';
-import 'package:gamelog/features/auth/repositories/auth_repository.dart';
+import 'package:gamelog/core/data/models/auth/logout_response.dart';
+import 'package:gamelog/core/data/repositories/auth/auth_repository.dart';
 
-import '../../../core/messages/error_codes.dart';
+import '../../../core/constants/error_codes.dart';
 
 class LogoutUseCase {
   final AuthRepository repository;

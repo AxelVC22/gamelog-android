@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart' hide Notification;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/features/notifications/models/retrieve_notifications_response.dart';
-import 'package:gamelog/features/notifications/providers/retrieve_notifications_controller.dart';
+import 'package:gamelog/core/data/models/notifications/retrieve_notifications_response.dart';
+import 'package:gamelog/features/notifications/controllers/retrieve_notifications_controller.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import '../../../core/domain/entities/notification.dart';
 
-import '../../../core/domain/entities/player.dart';
-
-import '../../../core/helpers/failure_handler.dart';
+import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_notification_card.dart';
 import '../../../widgets/app_skeleton_loader.dart';
-import '../../auth/providers/auth_providers.dart';
+import '../../../core/data/providers/auth/auth_providers.dart';
 
 final retrieveResultsProvider = StateProvider.autoDispose<List<Notification>>(
       (ref) => [],

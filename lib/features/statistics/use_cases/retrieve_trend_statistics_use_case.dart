@@ -1,8 +1,8 @@
 
 import 'package:dartz/dartz.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
-import 'package:gamelog/features/statistics/models/retrieve_statistics_response.dart';
-import 'package:gamelog/features/statistics/repositories/statistics_repository.dart';
+import 'package:gamelog/core/data/models/statistics/retrieve_statistics_response.dart';
+import 'package:gamelog/core/data/repositories/statistics/statistics_repository.dart';
 
 class RetrieveTrendStatisticsUseCase {
   final StatistisRepository repository;
