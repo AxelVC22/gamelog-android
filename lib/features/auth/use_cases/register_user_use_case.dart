@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
-import 'package:gamelog/features/auth/models/register_user_reponse.dart';
+import 'package:gamelog/core/data/models/auth/register_user_reponse.dart';
 import '../../../core/domain/failures/failure.dart';
-import '../../../core/messages/error_codes.dart';
-import '../models/register_user_request.dart';
-import '../repositories/auth_repository.dart';
+import '../../../core/constants/error_codes.dart';
+import '../../../core/data/models/auth/register_user_request.dart';
+import '../../../core/data/repositories/auth/auth_repository.dart';
 
 class RegisterUserUseCase {
   final AuthRepository repository;

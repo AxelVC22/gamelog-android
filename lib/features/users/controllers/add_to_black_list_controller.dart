@@ -1,0 +1,41 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/data/models/users/add_to_black_list_request.dart';
+import 'package:gamelog/core/data/models/users/add_to_black_list_response.dart';
+import 'package:gamelog/core/data/models/users/search_user_response.dart';
+import 'package:gamelog/core/data/providers/users/users_providers.dart';
+import 'package:gamelog/features/users/use_cases/add_to_black_list_use_case.dart';
+
+
+final addToBlackListControllerProvider =
+NotifierProvider<AddToBlackListController, AsyncValue<AddToBlackListResponse?>>(
+  AddToBlackListController.new,
+);
+
+class AddToBlackListController extends Notifier<AsyncValue<AddToBlackListResponse?>> {
+  late final AddToBlackListUseCase _addToBlackListUseCase;
+
+  @override
+  AsyncValue<AddToBlackListResponse?> build() {
+    final repo = ref.read(userManagementRepositoryProvider);
+    _addToBlackListUseCase = AddToBlackListUseCase(repo);
+    return const AsyncData(null);
+  }
+
+  Future<AddToBlackListResponse?> addToBlackList(AddToBlackListRequest request) async {
+    state = const AsyncLoading();
+
+    final result = await _addToBlackListUseCase(request);
+
+    return result.fold(
+          (f) {
+        state = AsyncError(f, StackTrace.current);
+        return null;
+      },
+          (r) {
+        state = AsyncData(r);
+        return r;
+      },
+    );
+  }
+
+}

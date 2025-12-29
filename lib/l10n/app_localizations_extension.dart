@@ -1,4 +1,4 @@
-import '../core/messages/error_codes.dart';
+import '../core/constants/error_codes.dart';
 import 'app_localizations.dart';
 
 extension AppLocalizationsDynamic on AppLocalizations {

@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:gamelog/core/messages/error_codes.dart';
-import 'package:gamelog/features/auth/models/recover_password_request.dart';
-import 'package:gamelog/features/auth/models/recover_password_response.dart';
-import 'package:gamelog/features/auth/repositories/auth_repository.dart';
+import 'package:gamelog/core/constants/error_codes.dart';
+import 'package:gamelog/core/data/models/auth/recover_password_request.dart';
+import 'package:gamelog/core/data/models/auth/recover_password_response.dart';
+import 'package:gamelog/core/data/repositories/auth/auth_repository.dart';
 
 import '../../../core/domain/failures/failure.dart';
 

@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:gamelog/features/auth/models/login_request.dart';
-import 'package:gamelog/features/auth/models/login_response.dart';
-import '../../../core/messages/error_codes.dart';
-import '../repositories/auth_repository.dart';
+import 'package:gamelog/core/data/models/auth/login_request.dart';
+import 'package:gamelog/core/data/models/auth/login_response.dart';
+import '../../../core/constants/error_codes.dart';
+import '../../../core/data/repositories/auth/auth_repository.dart';
 import '../../../core/domain/failures/failure.dart';
 
 class LoginUseCase {

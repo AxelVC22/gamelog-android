@@ -4,17 +4,17 @@ import 'package:gamelog/core/helpers/field_validator.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 import '../../../core/domain/entities/user.dart';
 import '../../../core/domain/failures/failure.dart';
-import '../../../core/helpers/field_state.dart';
+import '../../../core/presentation/field_state.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
 
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
-import '../models/register_user_reponse.dart';
-import '../models/register_user_request.dart';
+import '../../../core/data/models/auth/register_user_reponse.dart';
+import '../../../core/data/models/auth/register_user_request.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
-import '../providers/register_controller.dart';
+import '../controllers/register_controller.dart';
 
 class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});

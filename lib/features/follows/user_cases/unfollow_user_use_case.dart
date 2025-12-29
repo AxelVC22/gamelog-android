@@ -1,8 +1,8 @@
 
 import 'package:dartz/dartz.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
-import 'package:gamelog/features/follows/models/unfollow_user_response.dart';
-import 'package:gamelog/features/follows/repositories/follow_repository.dart';
+import 'package:gamelog/core/data/models/follows/unfollow_user_response.dart';
+import 'package:gamelog/core/data/repositories/follows/follow_repository.dart';
 
 class UnfollowUserUseCase {
   final FollowRepository repository;

@@ -1,4 +1,4 @@
-import '../../messages/error_codes.dart';
+import '../../constants/error_codes.dart';
 
 class Failure {
   final String code;
