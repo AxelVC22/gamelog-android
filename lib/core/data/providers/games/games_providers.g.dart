@@ -6,11 +6,11 @@ part of 'games_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gameRepositoryHash() => r'efb4b1a76121e1097fa6e1879dbe9157d75559e6';
+String _$gameRepositoryHash() => r'dd02ab0c5353b2f0c79b100a0f3f4937071d26c2';
 
 /// See also [gameRepository].
 @ProviderFor(gameRepository)
-final gameRepositoryProvider = Provider<GameRepository>.internal(
+final gameRepositoryProvider = AutoDisposeProvider<GameRepository>.internal(
   gameRepository,
   name: r'gameRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,6 +22,6 @@ final gameRepositoryProvider = Provider<GameRepository>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GameRepositoryRef = ProviderRef<GameRepository>;
+typedef GameRepositoryRef = AutoDisposeProviderRef<GameRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

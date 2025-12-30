@@ -12,6 +12,7 @@ import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../../../core/data/models/games/add_to_favorites_request.dart';
 import '../../../core/domain/entities/game.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_expandable_html_text.dart';
@@ -20,7 +21,6 @@ import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_start_rating.dart';
 
-import '../../../core/data/providers/auth/auth_providers.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final Game game;

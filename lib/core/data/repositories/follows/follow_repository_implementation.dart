@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/presentation/dio_error_handler.dart';
 import 'package:gamelog/core/data/models/follows/follow_user_response.dart';
 import 'package:gamelog/core/data/models/follows/retrieve_social_response.dart';
@@ -12,24 +11,17 @@ import 'follow_repository.dart';
 
 class FollowRepositoryImpl implements FollowRepository {
   final Dio dio;
-  final FlutterSecureStorage storage;
 
-  FollowRepositoryImpl(this.dio, this.storage);
+  FollowRepositoryImpl(this.dio);
 
   @override
   Future<Either<Failure, FollowUserResponse>> followUser(
     FollowUserRequest request,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.post(
         ApiConstants.followUser,
         data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -48,14 +40,8 @@ class FollowRepositoryImpl implements FollowRepository {
     int idPlayer,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.retrieveFollowed}${idPlayer}',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -72,16 +58,12 @@ class FollowRepositoryImpl implements FollowRepository {
   }
 
   @override
-  Future<Either<Failure, RetrieveSocialResponse>> retrieveFollowers(int idPlayer) async {
+  Future<Either<Failure, RetrieveSocialResponse>> retrieveFollowers(
+    int idPlayer,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.retrieveFollowers}${idPlayer}',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -98,16 +80,13 @@ class FollowRepositoryImpl implements FollowRepository {
   }
 
   @override
-  Future<Either<Failure, UnfollowUserResponse>> unfollowUser(int idPlayerFollower, int idPlayerFollowed) async {
+  Future<Either<Failure, UnfollowUserResponse>> unfollowUser(
+    int idPlayerFollower,
+    int idPlayerFollowed,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.delete(
         '${ApiConstants.unfollowUser}${idPlayerFollower}/${idPlayerFollowed}',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {

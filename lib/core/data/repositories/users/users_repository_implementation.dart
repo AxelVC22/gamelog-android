@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/data/models/users/add_to_black_list_request.dart';
 import 'package:gamelog/core/data/models/users/add_to_black_list_response.dart';
 import 'package:gamelog/core/data/models/users/edit_profile_request.dart';
@@ -12,28 +11,20 @@ import 'package:gamelog/core/data/repositories/users/users_repository.dart';
 import '../../../constants/api_constants.dart';
 import '../../../domain/failures/failure.dart';
 import '../../../constants/error_codes.dart';
+import '../../../presentation/dio_error_handler.dart';
 import '../../models/users/get_id_access_response.dart';
 
-class UsersRepositoryImpl implements UsersRepository {
+class UsersRepositoryImpl extends UsersRepository {
   final Dio dio;
-  final FlutterSecureStorage storage;
 
-  UsersRepositoryImpl(this.dio, this.storage);
+  UsersRepositoryImpl(this.dio);
 
   @override
   Future<Either<Failure, SearchUserResponse>> searchUser(
     String username,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
-      final response = await dio.get(
-        '${ApiConstants.searchUser}/$username',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
-      );
+      final response = await dio.get('${ApiConstants.searchUser}/$username');
 
       if (response.statusCode == 200) {
         final res = SearchUserResponse.fromJson(response.data);
@@ -42,22 +33,18 @@ class UsersRepositoryImpl implements UsersRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
+  @override
   Future<Either<Failure, EditProfileResponse>> editProfile(
     EditProfileRequest request,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
       final response = await dio.put(
         '${ApiConstants.editProfile}/${request.idPlayer}',
         data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -67,7 +54,7 @@ class UsersRepositoryImpl implements UsersRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
@@ -79,7 +66,6 @@ class UsersRepositoryImpl implements UsersRepository {
       final response = await dio.get(
         '${ApiConstants.getIdAccess}/$email',
         queryParameters: {'tipoDeUsuario': userType},
-        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -89,7 +75,7 @@ class UsersRepositoryImpl implements UsersRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
@@ -103,7 +89,6 @@ class UsersRepositoryImpl implements UsersRepository {
         final response = await dio.put(
           '${ApiConstants.recoverPasswordChangePassword}/$idAccess',
           data: request.toJson(),
-          options: Options(validateStatus: (status) => status! < 600),
         );
 
         if (response.statusCode == 200) {
@@ -114,41 +99,33 @@ class UsersRepositoryImpl implements UsersRepository {
         }
       });
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
-  Future<Either<Failure, AddToBlackListResponse>> addToBlackList(AddToBlackListRequest request) async {
+  Future<Either<Failure, AddToBlackListResponse>> addToBlackList(
+    AddToBlackListRequest request,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final idResult = await getIdAccess(request.email, request.userType);
 
-      return idResult.fold(
-            (failure) => Left(failure),
-            (idAccess) async {
-          final response = await dio.patch(
-            '${ApiConstants.addToBlackList}/$idAccess',
-            data: request.toJson(),
-            options: Options(
-              headers: {"Authorization": "Bearer $token"},
-              validateStatus: (status) => status! < 600,
-            ),
-          );
+      return idResult.fold((failure) => Left(failure), (idAccess) async {
+        final response = await dio.patch(
+          '${ApiConstants.addToBlackList}/$idAccess',
+          data: request.toJson(),
+        );
 
-          if (response.statusCode == 200) {
-            final res = AddToBlackListResponse.fromJson(response.data);
-            return Right(res);
-          } else {
-            final String message = response.data['mensaje'];
-            return Left(Failure.server(_parseMessages(message)));
-          }
-        },
-      );
-
+        if (response.statusCode == 200) {
+          final res = AddToBlackListResponse.fromJson(response.data);
+          return Right(res);
+        } else {
+          final String message = response.data['mensaje'];
+          return Left(Failure.server(_parseMessages(message)));
+        }
+      });
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 

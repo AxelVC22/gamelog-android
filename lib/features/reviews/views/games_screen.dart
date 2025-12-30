@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/core/data/models/games/games_response.dart';
 import 'package:gamelog/features/games/controllers/retrieve_favorite_games_controller.dart';
 import 'package:gamelog/features/reviews/views/search_game_screen.dart';
@@ -11,6 +10,7 @@ import 'package:gamelog/widgets/app_game_detailed_card.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/domain/entities/game.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_module_button.dart';

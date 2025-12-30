@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
 import 'package:gamelog/core/data/models/reviews/add_to_pendings_response.dart';
 import 'package:gamelog/core/data/models/reviews/delete_review_response.dart';
@@ -15,38 +14,27 @@ import 'package:gamelog/core/data/repositories/reviews/reviews_repository.dart';
 
 import '../../../constants/api_constants.dart';
 import '../../../constants/error_codes.dart';
+import '../../../presentation/dio_error_handler.dart';
 import '../../models/reviews/add_to_pendings_request.dart';
 import '../../models/reviews/register_game_response.dart';
 
 class ReviewsRepositoryImpl extends ReviewsRepository {
-  final FlutterSecureStorage storage;
   final Dio dio;
 
-  ReviewsRepositoryImpl(
-    this.storage,
-    this.dio,
-  );
-
-
+  ReviewsRepositoryImpl(this.dio);
 
   Future<Either<Failure, RegisterGameResponse>> _registerGame(
     RegisterGameRequest request,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.post(
         ApiConstants.registerGame,
         data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
       final res = RegisterGameResponse.fromJson(response.data);
       return Right(res);
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
@@ -55,8 +43,6 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
     ReviewGameRequest request,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final registerGameRequest = RegisterGameRequest(
         idGame: request.idGame,
         name: request.name,
@@ -71,10 +57,6 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         final response = await dio.post(
           ApiConstants.reviewGame,
           data: request.toJson(),
-          options: Options(
-            headers: {"Authorization": "Bearer $token"},
-            validateStatus: (status) => status! < 600,
-          ),
         );
 
         if (response.statusCode == 200) {
@@ -85,23 +67,19 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         }
       });
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
-  Future<Either<Failure, RetrievePlayerReviewsResponse>>
-  retrievePlayerReviews(int idGame, int idPlayer) async {
+  Future<Either<Failure, RetrievePlayerReviewsResponse>> retrievePlayerReviews(
+    int idGame,
+    int idPlayer,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.retrievePlayerReviews}/$idGame',
         queryParameters: {ApiConstants.queryIdPlayerSeeker: idPlayer},
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -113,17 +91,15 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
   Future<Either<Failure, AddToPendingsResponse>> addGameToPendings(
-      AddToPendingsRequest request,
-      ) async {
+    AddToPendingsRequest request,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final registerGameRequest = RegisterGameRequest(
         idGame: request.idGame,
         name: request.name,
@@ -132,31 +108,23 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
 
       final gameRegistration = await _registerGame(registerGameRequest);
 
-      return gameRegistration.fold(
-            (failure) => Left(failure),
-            (_) async {
-          final response = await dio.post(
-            ApiConstants.addGameToPendings,
-            data: request.toJson(),
-            options: Options(
-              headers: {"Authorization": "Bearer $token"},
-              validateStatus: (status) => status! < 600,
-            ),
-          );
+      return gameRegistration.fold((failure) => Left(failure), (_) async {
+        final response = await dio.post(
+          ApiConstants.addGameToPendings,
+          data: request.toJson(),
+        );
 
-          if (response.statusCode == 200) {
-            final res = AddToPendingsResponse.fromJson(response.data);
-            return Right(res);
-          } else {
-            return Left(Failure.server(response.data['mensaje']));
-          }
-        },
-      );
+        if (response.statusCode == 200) {
+          final res = AddToPendingsResponse.fromJson(response.data);
+          return Right(res);
+        } else {
+          return Left(Failure.server(response.data['mensaje']));
+        }
+      });
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
-
 
   @override
   Future<Either<Failure, RetrieveReviewHistoryResponse>> retrieveReviewHistory(
@@ -164,15 +132,10 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
     int idPlayer,
   ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.retriveReviewHistory}/$idPlayerToSearch',
         queryParameters: {ApiConstants.queryIdPlayerSeeker: idPlayer},
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
+        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -184,21 +147,19 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
-  Future<Either<Failure, DeleteReviewResponse>> deleteReview(int idGame, int idReview) async {
+  Future<Either<Failure, DeleteReviewResponse>> deleteReview(
+    int idGame,
+    int idReview,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.delete(
         '${ApiConstants.deleteReview}/$idGame/$idReview',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
+        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -211,10 +172,9 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         return Left(Failure.server(_parseMessages(message)));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
-
 
   static String _parseMessages(dynamic message) {
     if (message == null) return '';
@@ -235,15 +195,10 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
   @override
   Future<Either<Failure, LikeResponse>> likeReview(LikeRequest request) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.post(
         ApiConstants.likeReview,
         data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
+        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -256,22 +211,19 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         return Left(Failure.server(_parseMessages(message)));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
-  Future<Either<Failure, LikeResponse>> unlikeReview(LikeRequest request) async {
+  Future<Either<Failure, LikeResponse>> unlikeReview(
+    LikeRequest request,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.delete(
         '${ApiConstants.likeReview}/${request.idGame}',
         data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
+        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -284,22 +236,17 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         return Left(Failure.server(_parseMessages(message)));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
-  Future<Either<Failure, RetrievePlayerReviewsResponse>> retrieveFollowedPlayerReviews(int idGame, int idPlayer) async{
+  Future<Either<Failure, RetrievePlayerReviewsResponse>>
+  retrieveFollowedPlayerReviews(int idGame, int idPlayer) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         ApiConstants.retrieveFollowedPlayerReview(idGame),
         queryParameters: {'idJugador': idPlayer},
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -311,9 +258,7 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
-
-
 }

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/domain/entities/user.dart';
 import 'package:gamelog/core/data/models/auth/login_request.dart';
-import 'package:gamelog/core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
 
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
@@ -20,6 +20,7 @@ import '../../../core/data/models/auth/login_response.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../controllers/login_controller.dart';
+import '../state/auth_state.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -71,27 +72,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isValid = isEmailValid && isPasswordValid;
 
     ref.listen<AsyncValue<LoginResponse?>>(loginControllerProvider, (
-      previous,
-      next,
-    ) {
+        previous,
+        next,
+        ) {
       if (previous?.isLoading == true && next.isLoading == false) {
         next.when(
           loading: () {},
           data: (response) {
             ref.read(globalLoadingProvider.notifier).state = false;
+
             if (response == null) return;
 
-            ref.read(currentUserProvider.notifier).state =
-                response.accounts.first;
+            // ✅ Ya NO guardas nada aquí - el controller ya lo hizo
+            // Solo navegas
+            if (!mounted) return;
 
-            Navigator.pushReplacement(
-              context,
+            Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (_) => const MainLayout()),
             );
           },
           error: (error, stack) {
             ref.read(globalLoadingProvider.notifier).state = false;
-
             handleFailure(context: context, error: error);
           },
         );

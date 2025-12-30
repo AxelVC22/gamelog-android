@@ -5,6 +5,7 @@ import 'package:gamelog/l10n/app_localizations_extension.dart';
 
 import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/failures/failure.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
 import '../../../l10n/app_localizations.dart';
@@ -12,7 +13,6 @@ import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_text_field.dart';
-import '../../../core/data/providers/auth/auth_providers.dart';
 import '../../../core/data/models/users/edit_profile_response.dart';
 import '../controllers/edit_profile_controller.dart';
 

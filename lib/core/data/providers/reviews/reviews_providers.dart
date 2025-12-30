@@ -6,6 +6,7 @@ import 'package:gamelog/core/data/repositories/reviews/reviews_repository_implem
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:dio/dio.dart';
 
+import '../../../network/dio_client.dart';
 import '../auth/auth_providers.dart';
 part 'reviews_providers.g.dart';
 
@@ -32,7 +33,6 @@ ReviewsRepository reviewManagementRepository(
     Ref ref,
     ) {
   return ReviewsRepositoryImpl(
-    ref.watch(secureStorageProvider),
     ref.watch(dioProvider),
   );
 }

@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/data/models/games/add_to_favorites_request.dart';
 import 'package:gamelog/core/data/models/games/add_to_favorites_response.dart';
 import 'package:gamelog/core/data/repositories/games/game_repository.dart';
@@ -7,6 +6,7 @@ import 'package:gamelog/core/domain/entities/game.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
 import 'package:gamelog/core/data/models/games/games_response.dart';
 
+import '../../../presentation/dio_error_handler.dart';
 import '../../models/reviews/register_game_request.dart';
 import '../../models/reviews/register_game_response.dart';
 import '../../../constants/api_constants.dart';
@@ -16,29 +16,22 @@ import 'package:dio/dio.dart';
 class GameRepositoryImpl implements GameRepository {
   final Dio dioRawg;
   final String apiKey;
-  final FlutterSecureStorage storage;
   final Dio dio;
 
-  GameRepositoryImpl(this.dioRawg, this.apiKey, this.storage, this.dio);
+  GameRepositoryImpl(this.dioRawg, this.apiKey, this.dio);
 
   Future<Either<Failure, RegisterGameResponse>> _registerGame(
-      RegisterGameRequest request,
-      ) async {
+    RegisterGameRequest request,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.post(
         ApiConstants.registerGame,
         data: request.toJson(),
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
       final res = RegisterGameResponse.fromJson(response.data);
       return Right(res);
-    } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+    } on DioException catch (e) {
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
@@ -48,7 +41,6 @@ class GameRepositoryImpl implements GameRepository {
       final response = await dioRawg.get(
         '${ApiConstants.searchGame}/$gameName',
         queryParameters: {'key': apiKey},
-        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -67,18 +59,16 @@ class GameRepositoryImpl implements GameRepository {
 
         return Left(Failure.server(message));
       }
-    } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+    } on DioException catch (e) {
+      return Left(DioErrorHandler.handle(e));
     }
   }
 
   @override
   Future<Either<Failure, AddToFavoritesResponse>> addGameToFavorites(
-      AddToFavoritesRequest request,
-      ) async {
+    AddToFavoritesRequest request,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final registerGameRequest = RegisterGameRequest(
         idGame: request.idGame,
         name: request.name,
@@ -87,43 +77,30 @@ class GameRepositoryImpl implements GameRepository {
 
       final gameRegistration = await _registerGame(registerGameRequest);
 
-      return gameRegistration.fold(
-            (failure) => Left(failure),
-            (_) async {
-          final response = await dio.post(
-            ApiConstants.addGameToFavorites,
-            data: request.toJson(),
-            options: Options(
-              headers: {"Authorization": "Bearer $token"},
-              validateStatus: (status) => status! < 600,
-            ),
-          );
+      return gameRegistration.fold((failure) => Left(failure), (_) async {
+        final response = await dio.post(
+          ApiConstants.addGameToFavorites,
+          data: request.toJson(),
+        );
 
-          if (response.statusCode == 200) {
-            final res = AddToFavoritesResponse.fromJson(response.data);
-            return Right(res);
-          } else {
-            return Left(Failure.server(response.data['mensaje']));
-          }
-        },
-      );
-    } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+        if (response.statusCode == 200) {
+          final res = AddToFavoritesResponse.fromJson(response.data);
+          return Right(res);
+        } else {
+          return Left(Failure.server(response.data['mensaje']));
+        }
+      });
+    } on DioException catch (e) {
+      return Left(DioErrorHandler.handle(e));
+
     }
   }
-
 
   @override
   Future<Either<Failure, GamesResponse>> retrieveFavorites(int idPlayer) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.addGameToFavorites}/$idPlayer',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -136,8 +113,9 @@ class GameRepositoryImpl implements GameRepository {
         final message = response.data['mensaje'];
         return Left(Failure.server(_parseMessages(message)));
       }
-    } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+    } on DioException catch (e) {
+      return Left(DioErrorHandler.handle(e));
+
     }
   }
 
@@ -160,14 +138,8 @@ class GameRepositoryImpl implements GameRepository {
   @override
   Future<Either<Failure, GamesResponse>> retrievePendings(int idPlayer) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.addGameToPendings}/$idPlayer',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -180,8 +152,9 @@ class GameRepositoryImpl implements GameRepository {
         final message = response.data['mensaje'];
         return Left(Failure.server(_parseMessages(message)));
       }
-    } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+    } on DioException catch (e) {
+      return Left(DioErrorHandler.handle(e));
+
     }
   }
 }

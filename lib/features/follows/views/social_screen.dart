@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/core/data/models/follows/retrieve_social_response.dart';
 import 'package:gamelog/core/data/models/follows/unfollow_user_response.dart';
 import 'package:gamelog/features/follows/controllers/retrieve_followed_controller.dart';
@@ -13,6 +12,7 @@ import 'package:gamelog/widgets/app_social_card.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/domain/entities/account.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_global_loader.dart';
