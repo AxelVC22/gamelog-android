@@ -45,4 +45,21 @@ class Account {
       picture: json['foto'] as String,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'idCuenta': idAccount,
+      'correo': email,
+      'estado': status,
+      'tipoDeAcceso': accessType,
+      'idJugador': idPlayer,
+      'nombre': name,
+      'primerApellido': fathersSurname,
+      'segundoApellido': mothersSurname,
+      'nombreDeUsuario': username,
+      'descripcion': description,
+      'foto': picture,
+      //'idAcceso': idAccess,
+    };
+  }
 }

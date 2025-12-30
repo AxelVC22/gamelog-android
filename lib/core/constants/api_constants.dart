@@ -5,7 +5,11 @@ class ApiConstants {
   static const String queryIdPlayerSeeker = 'idJugadorBuscador';
 
   //Auth
+
+  static const String refreshToken = '/gamelog/autenticacion';
+
   static const String login = '/gamelog/login';
+
   static const String logout = '/gamelog/login/logout';
 
   static const String register = '/gamelog/acceso';

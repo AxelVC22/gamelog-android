@@ -196,10 +196,34 @@ class AppLocalizationsEs extends AppLocalizations {
   String get followedPlayers => 'Seguidos';
 
   @override
+  String get notFoundUser => 'Usuario no encontrado';
+
+  @override
   String get unexpectedError => 'Error inesperado';
 
   @override
-  String get notFoundUser => 'Usuario no encontrado';
+  String get timeoutError => 'La conexión tardó demasiado';
+
+  @override
+  String get noConnectionError => 'No hay conexión a internet';
+
+  @override
+  String get requestCancelled => 'La solicitud fue cancelada';
+
+  @override
+  String get unauthorized => 'Tu sesión ha expirado. Inicia sesión nuevamente';
+
+  @override
+  String get forbidden => 'No tienes permisos para realizar esta acción';
+
+  @override
+  String get notFound => 'No se encontró la información solicitada';
+
+  @override
+  String get badRequest => 'La solicitud es inválida';
+
+  @override
+  String get serverError => 'Error del servidor';
 
   @override
   String get requiredField => 'El campo es obligatorio';

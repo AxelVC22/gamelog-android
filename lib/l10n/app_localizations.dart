@@ -460,17 +460,65 @@ abstract class AppLocalizations {
   /// **'Seguidos'**
   String get followedPlayers;
 
+  /// No description provided for @notFoundUser.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario no encontrado'**
+  String get notFoundUser;
+
   /// No description provided for @unexpectedError.
   ///
   /// In es, this message translates to:
   /// **'Error inesperado'**
   String get unexpectedError;
 
-  /// No description provided for @notFoundUser.
+  /// No description provided for @timeoutError.
   ///
   /// In es, this message translates to:
-  /// **'Usuario no encontrado'**
-  String get notFoundUser;
+  /// **'La conexión tardó demasiado'**
+  String get timeoutError;
+
+  /// No description provided for @noConnectionError.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay conexión a internet'**
+  String get noConnectionError;
+
+  /// No description provided for @requestCancelled.
+  ///
+  /// In es, this message translates to:
+  /// **'La solicitud fue cancelada'**
+  String get requestCancelled;
+
+  /// No description provided for @unauthorized.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu sesión ha expirado. Inicia sesión nuevamente'**
+  String get unauthorized;
+
+  /// No description provided for @forbidden.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes permisos para realizar esta acción'**
+  String get forbidden;
+
+  /// No description provided for @notFound.
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontró la información solicitada'**
+  String get notFound;
+
+  /// No description provided for @badRequest.
+  ///
+  /// In es, this message translates to:
+  /// **'La solicitud es inválida'**
+  String get badRequest;
+
+  /// No description provided for @serverError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error del servidor'**
+  String get serverError;
 
   /// No description provided for @requiredField.
   ///

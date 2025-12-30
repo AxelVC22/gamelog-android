@@ -41,7 +41,7 @@ final dioRawgProvider = AutoDisposeProvider<Dio>.internal(
 // ignore: unused_element
 typedef DioRawgRef = AutoDisposeProviderRef<Dio>;
 String _$reviewManagementRepositoryHash() =>
-    r'ac73fc12087ddb04a0bb7ad3eaaa885e6f0e10ef';
+    r'e98318e67f9536cb3c8c22477a76fab24f5cddbc';
 
 /// See also [reviewManagementRepository].
 @ProviderFor(reviewManagementRepository)

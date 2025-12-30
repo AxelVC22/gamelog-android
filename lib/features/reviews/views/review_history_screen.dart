@@ -9,11 +9,11 @@ import 'package:gamelog/l10n/app_localizations.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/review.dart';
 
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_poster_review_card.dart';
-import '../../../core/data/providers/auth/auth_providers.dart';
 import '../controllers/search_game_controller.dart';
 
 final searchResultProvider = StateProvider.autoDispose<List<Game>>((ref) => []);

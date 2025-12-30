@@ -17,6 +17,7 @@ import '../../../core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../controllers/recover_password_controller.dart';
+import '../controllers/recover_password_step_controller.dart';
 
 class RecoverPasswordScreen extends ConsumerStatefulWidget {
   const RecoverPasswordScreen({super.key});

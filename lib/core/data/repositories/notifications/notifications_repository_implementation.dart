@@ -1,5 +1,3 @@
-
-
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,24 +7,20 @@ import 'package:gamelog/core/data/repositories/notifications/notifications_repos
 
 import '../../../constants/api_constants.dart';
 import '../../../constants/error_codes.dart';
+import '../../../presentation/dio_error_handler.dart';
 
 class NotificationsRepositoryImpl extends NotificationsRepository {
-   final Dio dio;
-   final FlutterSecureStorage storage;
+  final Dio dio;
 
-  NotificationsRepositoryImpl( this.dio,  this.storage);
+  NotificationsRepositoryImpl(this.dio);
 
   @override
-  Future<Either<Failure, RetrieveNotificationsResponse>> retrieveNotifications(int idPlayer) async {
+  Future<Either<Failure, RetrieveNotificationsResponse>> retrieveNotifications(
+    int idPlayer,
+  ) async {
     try {
-      final token = await storage.read(key: 'access_token');
-
       final response = await dio.get(
         '${ApiConstants.retrieveNotifications}/$idPlayer',
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-          validateStatus: (status) => status! < 600,
-        ),
       );
 
       if (response.statusCode == 200) {
@@ -34,14 +28,14 @@ class NotificationsRepositoryImpl extends NotificationsRepository {
 
         return Right(res);
       } else if (response.statusCode == 404) {
-        return Right(RetrieveNotificationsResponse(notifications: [], error: false));
+        return Right(
+          RetrieveNotificationsResponse(notifications: [], error: false),
+        );
       } else {
         return Left(Failure.server(response.data['mensaje']));
       }
     } catch (e) {
-      return Left(Failure(ErrorCodes.unexpectedError));
+      return Left(DioErrorHandler.handle(e));
     }
   }
-
-
 }

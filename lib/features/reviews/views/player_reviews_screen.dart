@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/core/data/models/reviews/delete_review_response.dart';
 import 'package:gamelog/core/data/models/reviews/like_request.dart';
 import 'package:gamelog/core/data/models/reviews/like_response.dart';
@@ -14,6 +13,7 @@ import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/review.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_global_loader.dart';

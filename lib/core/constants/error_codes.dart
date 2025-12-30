@@ -21,4 +21,11 @@ class ErrorCodes {
   static const networkError = 'networkError';
   static const serverError = 'serverError';
 
+  static const timeout = 'timeoutError';
+  static const noConnection = 'noConnectionError';
+  static const cancelled = 'requestCancelled';
+  static const unauthorized = 'unauthorized';
+  static const forbidden = 'forbidden';
+  static const notFound = 'notFound';
+  static const badRequest = 'badRequest';
 }

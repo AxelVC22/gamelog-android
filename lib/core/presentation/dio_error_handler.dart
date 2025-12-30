@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-
+import '../constants/error_codes.dart';
 import '../domain/failures/failure.dart';
 
 class DioErrorHandler {
@@ -7,11 +7,7 @@ class DioErrorHandler {
     if (error is DioException) {
       return _handleDioException(error);
     }
-
-    return Failure(
-      'Ocurrió un error inesperado. Intenta nuevamente.',
-     // code: 'UNEXPECTED_ERROR',
-    );
+    return const Failure.unexpected();
   }
 
   static Failure _handleDioException(DioException e) {
@@ -19,31 +15,19 @@ class DioErrorHandler {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return Failure(
-          'La conexión tardó demasiado. Verifica tu internet.',
-         // code: 'TIMEOUT',
-        );
+        return const Failure.local(ErrorCodes.timeout);
 
       case DioExceptionType.connectionError:
-        return Failure(
-          'No se pudo conectar con el servidor.',
-        //  code: 'NO_CONNECTION',
-        );
+        return const Failure.local(ErrorCodes.noConnection);
+
+      case DioExceptionType.cancel:
+        return const Failure.local(ErrorCodes.cancelled);
 
       case DioExceptionType.badResponse:
         return _handleHttpError(e);
 
-      case DioExceptionType.cancel:
-        return Failure(
-          'La solicitud fue cancelada.',
-       //   code: 'REQUEST_CANCELLED',
-        );
-
       default:
-        return Failure(
-          'Ocurrió un error de red inesperado.',
-        //  code: 'NETWORK_ERROR',
-        );
+        return const Failure.unexpected();
     }
   }
 
@@ -51,42 +35,31 @@ class DioErrorHandler {
     final statusCode = e.response?.statusCode;
     final data = e.response?.data;
 
-    // Si tu API manda mensajes
-    final apiMessage = data is Map && data['message'] != null
-        ? data['message'].toString()
+    // Mensaje técnico del backend (solo 500)
+    final serverMessage = data is Map && data['mensaje'] != null
+        ? data['mensaje'].toString()
         : null;
 
     switch (statusCode) {
       case 400:
-        return Failure(
-          apiMessage ?? 'La solicitud es inválida.',
-        //  code: 'BAD_REQUEST',
-        );
+        return const Failure.local(ErrorCodes.badRequest);
+
       case 401:
-        return Failure(
-          'Tu sesión ha expirado. Inicia sesión nuevamente.',
-         // code: 'UNAUTHORIZED',
-        );
+        return const Failure.local(ErrorCodes.unauthorized);
+
       case 403:
-        return Failure(
-          'No tienes permisos para realizar esta acción.',
-         // code: 'FORBIDDEN',
-        );
+        return const Failure.local(ErrorCodes.forbidden);
+
       case 404:
-        return Failure(
-          apiMessage ?? 'No se encontró la información solicitada.',
-         // code: 'NOT_FOUND',
-        );
+        return const Failure.local(ErrorCodes.notFound);
+
       case 500:
-        return Failure(
-          'Error interno del servidor. Intenta más tarde.',
-          //code: 'SERVER_ERROR',
+        return Failure.server(
+          serverMessage ?? 'Error interno del servidor',
         );
+
       default:
-        return Failure(
-          apiMessage ?? 'Ocurrió un error inesperado en el servidor.',
-         // code: 'HTTP_ERROR_$statusCode',
-        );
+        return const Failure.unexpected();
     }
   }
 }

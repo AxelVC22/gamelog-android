@@ -11,6 +11,7 @@ import 'package:gamelog/features/reviews/views/review_history_screen.dart';
 import 'package:gamelog/features/statistics/views/statistics_screen.dart';
 
 import '../../../core/domain/entities/game.dart';
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../widgets/app_game_card.dart';
@@ -20,7 +21,6 @@ import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_skeleton_loader.dart';
-import '../../../core/data/providers/auth/auth_providers.dart';
 import '../../reviews/views/game_screen.dart';
 
 final searchResultProvider = StateProvider.autoDispose<List<Game?>>(
@@ -76,14 +76,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> performLogout() async {
-    final email = ref.read(currentUserProvider)?.email;
+    final user = ref.read(currentUserProvider);
+    ref.read(globalLoadingProvider.notifier).state = true;
 
-    if (!mounted) return;
-    await ref.read(logoutControllerProvider.notifier).logout(email!);
+
+    if (user == null) return;
+    if (user.email == null) return;
+
+    await ref.read(logoutControllerProvider.notifier).logout(user.email!);
   }
 
   @override
   void initState() {
+
+
     super.initState();
 
     _searchGameSub = ref.listenManual<AsyncValue<Game?>>(
@@ -176,6 +182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+
     final mergedGames = ref.watch(mergedGamesProvider);
 
     ref.listen<AsyncValue<LogoutResponse?>>(logoutControllerProvider, (
@@ -196,6 +203,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
           error: (error, stack) {
             setState(() => notFoundTrendStatistics = true);
+            ref.read(globalLoadingProvider.notifier).state = false;
+
             handleFailure(context: context, error: error);
           },
         );
@@ -284,18 +293,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 icon: Icons.history,
                 label: l10n.reviewHistoryTitle,
                 onPressed: () {
+                  final user = ref.read(currentUserProvider);
+
+                  if (user == null) return;
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ReviewHistoryScreen(
-                        idPlayerToSearch: ref
-                            .read(currentUserProvider.notifier)
-                            .state!
-                            .idPlayer,
-                      ),
+                      builder: (_) =>
+                          ReviewHistoryScreen(idPlayerToSearch: user.idPlayer),
                     ),
                   );
                 },
+
                 color: Colors.grey,
               ),
               const SizedBox(height: 12.0),

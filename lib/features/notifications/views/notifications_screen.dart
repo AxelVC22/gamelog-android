@@ -7,12 +7,12 @@ import 'package:gamelog/features/notifications/controllers/retrieve_notification
 import 'package:gamelog/l10n/app_localizations.dart';
 import '../../../core/domain/entities/notification.dart';
 
+import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_notification_card.dart';
 import '../../../widgets/app_skeleton_loader.dart';
-import '../../../core/data/providers/auth/auth_providers.dart';
 
 final retrieveResultsProvider = StateProvider.autoDispose<List<Notification>>(
       (ref) => [],

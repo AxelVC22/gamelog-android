@@ -102,8 +102,19 @@
 
   "@@Errors": "=== Errores ===",
 
-  "unexpectedError": "Error inesperado",
   "notFoundUser": "Usuario no encontrado",
+
+  "unexpectedError": "Error inesperado",
+  "timeoutError": "La conexión tardó demasiado",
+  "noConnectionError": "No hay conexión a internet",
+  "requestCancelled": "La solicitud fue cancelada",
+
+  "unauthorized": "Tu sesión ha expirado. Inicia sesión nuevamente",
+  "forbidden": "No tienes permisos para realizar esta acción",
+  "notFound": "No se encontró la información solicitada",
+  "badRequest": "La solicitud es inválida",
+
+  "serverError": "Error del servidor",
 
   "@@ValidationMessages": "=== Mensajes de validacion UI===",
   "requiredField" : "El campo es obligatorio",
