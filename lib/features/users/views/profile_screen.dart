@@ -10,6 +10,7 @@ import 'package:gamelog/features/users/controllers/search_user_controller.dart';
 
 import 'package:gamelog/l10n/app_localizations.dart';
 
+import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/user.dart';
@@ -20,6 +21,7 @@ import '../../../widgets/app_game_detailed_card.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
+import '../../../widgets/app_profile_picture.dart';
 import '../../../widgets/app_skeleton_loader.dart';
 import '../../../core/data/models/follows/follow_user_response.dart';
 import '../../../core/data/models/games/games_response.dart';
@@ -59,8 +61,13 @@ final mergedFavoriteGamesProvider = Provider<List<Game>>((ref) {
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String username;
+  final int idPlayer;
 
-  const ProfileScreen({super.key, required this.username});
+  const ProfileScreen({
+    super.key,
+    required this.username,
+    required this.idPlayer,
+  });
 
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
@@ -90,10 +97,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     await ref
         .read(retrieveFavoriteGamesControllerProvider.notifier)
-        .retrieveFavoriteGames(ref
-        .read(searchResultProvider.notifier)
-        .state!
-        .idPlayer);
+        .retrieveFavoriteGames(
+          ref.read(searchResultProvider.notifier).state!.idPlayer,
+        );
 
     if (!mounted) return;
     setState(() => isLoading = false);
@@ -150,6 +156,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
 
     Future.microtask(() => _search(widget.username));
+    Future.microtask(_loadExistingPhoto);
+  }
+
+  Future<void> _loadExistingPhoto() async {
+    final controller = ref.read(profilePhotoControllerProvider.notifier);
+    await controller.getPhoto(widget.idPlayer.toString());
   }
 
   void _onSearchGameChanged(
@@ -236,7 +248,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final notifier = ref.read(searchResultProvider.notifier);
             notifier.state = response.accounts.first;
             _retrieveFavorite();
-
           }
         },
         error: (error, __) {},
@@ -247,7 +258,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
+    final photoState = ref.watch(profilePhotoControllerProvider);
     final user = ref.watch(searchResultProvider);
     final results = ref.watch(mergedFavoriteGamesProvider);
 
@@ -337,94 +348,87 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                 )
               else
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Avatar
-                            CircleAvatar(
-                              radius: 32,
-                              backgroundImage: const AssetImage(
-                                'assets/images/isotipo.png',
-                              ),
-                            ),
-                            const SizedBox(width: 16),
+                Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Column(
+                    children: [
+                      AppProfilePhoto(
+                        imageData: photoState.imageData,
+                        isLoading: photoState.isLoading,
+                        radius: 80,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Avatar
+                          const SizedBox(width: 16),
 
-                            // Info
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AppModuleTitle(
-                                    title:
-                                        '${user.name} ${user.fathersSurname}\n (${user.username})',
-                                  ),
+                          // Info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AppModuleTitle(
+                                  title:
+                                      '${user.name} ${user.fathersSurname}\n(${user.username})',
+                                ),
 
-                                  const SizedBox(height: 8),
+                                const SizedBox(height: 8),
 
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          children: [
-                                            AppButton(
-                                              text: l10n.follow,
-                                              type: AppButtonType.primary,
-                                              onPressed: () =>
-                                                  performFollowUser(
-                                                    user.idPlayer,
-                                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          AppButton(
+                                            text: l10n.follow,
+                                            type: AppButtonType.primary,
+                                            onPressed: () => performFollowUser(
+                                              user.idPlayer,
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: AppButton(
-                                          text: l10n.blackList,
-                                          type: AppButtonType.danger,
-                                          onPressed: isAdmin
-                                              ? () async =>
-                                                    await performAddToBlackList(
-                                                      user.email!,
-                                                      user.accessType!,
-                                                    )
-                                              : null,
-                                        ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: AppButton(
+                                        text: l10n.blackList,
+                                        type: AppButtonType.danger,
+                                        onPressed: isAdmin
+                                            ? () async =>
+                                                  await performAddToBlackList(
+                                                    user.email!,
+                                                    user.accessType!,
+                                                  )
+                                            : null,
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            ref
-                                .read(searchResultProvider.notifier)
-                                .state!
-                                .description,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              height: 1.4,
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          ref
+                              .read(searchResultProvider.notifier)
+                              .state!
+                              .description,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
 

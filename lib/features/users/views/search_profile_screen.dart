@@ -8,6 +8,7 @@ import 'package:gamelog/features/users/views/profile_screen.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 
+import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/failures/failure.dart';
 import '../../../widgets/app_global_loader.dart';
@@ -16,7 +17,7 @@ import '../../../widgets/app_module_title.dart';
 import '../../../widgets/app_search_bar.dart';
 import '../../../widgets/app_profile_card.dart';
 
-final searchResultsProvider = StateProvider<List<Account>>((ref) => []);
+final searchResultsProvider = StateProvider.autoDispose<List<Account>>((ref) => []);
 
 class SearchProfileScreen extends ConsumerStatefulWidget {
   const SearchProfileScreen({super.key});
@@ -29,6 +30,12 @@ class SearchProfileScreen extends ConsumerStatefulWidget {
 class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
   final _searchingStringController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState;
+
+  }
+
   Future<void> _search(String query) async {
     await ref.read(searchUserControllerProvider.notifier).searchUser(query);
   }
@@ -39,10 +46,16 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _loadExistingPhoto(int idPlayer) async {
+    final controller = ref.read(profilePhotoControllerProvider.notifier);
+    await controller.getPhoto(idPlayer.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final results = ref.watch(searchResultsProvider);
+    final photoState = ref.watch(profilePhotoControllerProvider);
 
     ref.listen<AsyncValue<SearchUserResponse?>>(searchUserControllerProvider, (
       previous,
@@ -51,10 +64,11 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
       if (previous?.isLoading == true && next.isLoading == false) {
         next.when(
           loading: () {},
-          data: (response) {
+          data: (response) async {
             ref.read(globalLoadingProvider.notifier).state = false;
 
             if (response == null) return;
+            await _loadExistingPhoto(response.accounts.first.idPlayer);
 
             ref.read(searchResultsProvider.notifier).state = response.accounts;
           },
@@ -103,6 +117,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
                   itemCount: results.length,
                   itemBuilder: (_, i) {
                     return AppProfileCard(
+                      photoState: photoState,
                       name: results[i].username,
                       imageUrl: "",
                       onTap: () {
@@ -110,7 +125,7 @@ class _SearchProfileScreenState extends ConsumerState<SearchProfileScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                ProfileScreen(username: results[i].username),
+                                ProfileScreen(username: results[i].username, idPlayer: results[i].idPlayer),
                           ),
                         );
                       },

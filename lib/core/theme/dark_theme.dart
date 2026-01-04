@@ -8,7 +8,6 @@ final darkTheme = ThemeData.dark().copyWith(
     primary: AppColors.primary,
     secondary: AppColors.primaryHover,
     error: AppColors.error,
-    background: AppColors.background,
     surface: AppColors.surface,
   ),
   appBarTheme: const AppBarTheme(

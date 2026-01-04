@@ -16,8 +16,8 @@ class AuthInterceptor extends Interceptor {
       RequestOptions options,
       RequestInterceptorHandler handler,
       ) async {
-    if (!options.path.contains('/gamelog/login') &&
-        !options.path.contains('/gamelog/registro') ){
+    if (!options.path.contains(ApiConstants.login) &&
+        !options.path.contains(ApiConstants.register) ){
       final accessToken = await storage.read(key: 'access_token');
       if (accessToken != null) {
         options.headers['Authorization'] = 'Bearer $accessToken';
@@ -31,7 +31,7 @@ class AuthInterceptor extends Interceptor {
     final refreshToken = await storage.read(key: 'refresh_token');
 
     if (err.response?.statusCode == 401 &&
-        !err.requestOptions.path.contains('/gamelog/autenticacion') &&
+        !err.requestOptions.path.contains(ApiConstants.refreshToken) &&
         refreshToken != null &&
         refreshToken.isNotEmpty) {
 

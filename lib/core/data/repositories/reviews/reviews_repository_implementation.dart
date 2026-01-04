@@ -135,7 +135,6 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
       final response = await dio.get(
         '${ApiConstants.retriveReviewHistory}/$idPlayerToSearch',
         queryParameters: {ApiConstants.queryIdPlayerSeeker: idPlayer},
-        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -159,7 +158,6 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
     try {
       final response = await dio.delete(
         '${ApiConstants.deleteReview}/$idGame/$idReview',
-        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -198,7 +196,6 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
       final response = await dio.post(
         ApiConstants.likeReview,
         data: request.toJson(),
-        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {
@@ -223,7 +220,6 @@ class ReviewsRepositoryImpl extends ReviewsRepository {
       final response = await dio.delete(
         '${ApiConstants.likeReview}/${request.idGame}',
         data: request.toJson(),
-        options: Options(validateStatus: (status) => status! < 600),
       );
 
       if (response.statusCode == 200) {

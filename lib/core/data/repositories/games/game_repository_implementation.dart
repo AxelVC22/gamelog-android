@@ -44,6 +44,10 @@ class GameRepositoryImpl implements GameRepository {
       );
 
       if (response.statusCode == 200) {
+        final bool redirect = response.data['redirect'] ?? false;
+        if (redirect) {
+          return searchGame(response.data['slug']);
+        }
         final res = Game.fromJson(response.data);
         return Right(res);
       } else if (response.statusCode == 404) {
