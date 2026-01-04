@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +13,12 @@ import 'package:gamelog/features/reviews/controllers/retrieve_player_reviews_con
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:video_player/video_player.dart';
 
+import '../../../core/data/providers/photos/photos_providers.dart';
+import '../../../core/data/providers/photos/reviews/reviews_multimedia_providers.dart';
+import '../../../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/review.dart';
 import '../../../core/network/dio_client.dart';
@@ -19,6 +27,7 @@ import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
+import '../../../widgets/app_photo.dart';
 import '../../../widgets/app_review_card.dart';
 import '../controllers/like_review_controller.dart';
 import '../controllers/retrieve_followed_player_reviews_controller.dart';
@@ -43,6 +52,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   late final ProviderSubscription _retrieveReviewsSub;
   late final ProviderSubscription _retrieveFollowedReviewsSub;
   bool showingFollowed = false;
+
 
   @override
   void initState() {
@@ -71,7 +81,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
     if (previous?.isLoading == true && !next.isLoading) {
       next.when(
         loading: () {},
-        data: (response) {
+        data: (response) async {
           if (response == null) return;
 
           if (response.reviews.isEmpty) {
@@ -79,6 +89,13 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
           }
 
           ref.read(retrieveResultsProvider.notifier).state = response.reviews;
+
+          final List<String> userIds =
+          response.reviews.map((a) => a.idPlayer.toString()).toList();
+
+
+          await ref.read(profilePhotoControllerProvider.notifier)
+              .getMultiplePhotos(userIds);
         },
         error: (error, __) {
           if (!mounted) return;
@@ -204,6 +221,8 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final results = ref.watch(retrieveResultsProvider);
+    final photoState = ref.watch(profilePhotoControllerProvider);
+
 
     ref.listen<AsyncValue<DeleteReviewResponse?>>(
       deleteReviewControllerProvider,
@@ -363,6 +382,9 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                     itemCount: results.length,
                     itemBuilder: (_, i) {
                       return AppReviewCard(
+                        review: results[i],
+                        imageData: photoState.multiplePhotos != null ? photoState.multiplePhotos![results[i].idPlayer.toString()] : null,
+                        isLoading: photoState.isLoading,
                         likes: results[i].likesTotal,
                         userType: ref
                             .read(currentUserProvider.notifier)

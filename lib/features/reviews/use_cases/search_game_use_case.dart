@@ -24,11 +24,10 @@ class SearchGameUseCase {
   String _normalizeGameName(String input) {
     return input
         .replaceAll(RegExp(r'\s*\(itch\)\s*', caseSensitive: false), '')
-        .replaceAll(RegExp(r'\s*:\s*the game\s*', caseSensitive: false), '')
-        .replaceAll(RegExp(r'\s*\+\s*'), '')
-        .replaceAll(RegExp(r'\s*\.\s*'), '')
+        .replaceAll(RegExp(r'\s*:\s*the game\s*', caseSensitive: false), ' ')
+        .replaceAll(RegExp(r'[\+:.\_]'), ' ')
         .trim()
-        .replaceAll(RegExp(r'\s+'), '-');
-
+        .replaceAll(RegExp(r'\s+'), '-').toLowerCase();
   }
+
 }

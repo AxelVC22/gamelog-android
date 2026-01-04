@@ -1,11 +1,24 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/widgets/app_icon_button.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
+import '../core/data/providers/photos/reviews/reviews_multimedia_providers.dart';
+import '../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
+import '../core/domain/entities/review.dart';
 import 'app_like_button.dart';
+import 'app_photo.dart';
+import 'app_profile_picture.dart';
 import 'app_start_rating.dart';
 
 class AppReviewCard extends StatelessWidget {
+  final Review review;
   final String username;
   final String imageUrl;
   final VoidCallback? onTap;
@@ -17,9 +30,12 @@ class AppReviewCard extends StatelessWidget {
   final String userType;
   final int likes;
   final VoidCallback? onLiked;
+  final Uint8List? imageData;
+  final bool isLoading;
 
   const AppReviewCard({
     super.key,
+    required this.review,
     required this.username,
     required this.imageUrl,
     this.onTap,
@@ -31,6 +47,8 @@ class AppReviewCard extends StatelessWidget {
     required this.userType,
     required this.likes,
     this.onLiked,
+    required this.imageData,
+    required this.isLoading
   });
 
   @override
@@ -55,14 +73,10 @@ class AppReviewCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
 
                     children: [
-                      CircleAvatar(
+                      AppProfilePhoto(
+                        imageData: imageData,
+                        isLoading: isLoading,
                         radius: 20,
-                        backgroundImage: imageUrl.isNotEmpty
-                            ? NetworkImage(imageUrl)
-                            : null,
-                        child: imageUrl.isEmpty
-                            ? const Icon(Icons.person, size: 24)
-                            : null,
                       ),
                       const SizedBox(width: 16),
                       Text(
@@ -114,6 +128,9 @@ class AppReviewCard extends StatelessWidget {
                       fontWeight: FontWeight.normal,
                     ),
                   ),
+                  const SizedBox(height: 16),
+
+                  ReviewItem(review: review)
                 ],
               ),
 
@@ -131,6 +148,253 @@ class AppReviewCard extends StatelessWidget {
                   const SizedBox(width: 8),
                 ],
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class ReviewItem extends ConsumerWidget {
+  final Review review;
+
+  const ReviewItem({super.key, required this.review});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final metaAsync =
+    ref.watch(reviewMetadataProvider(review.idReview.toString()));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+
+        metaAsync.when(
+          loading: () => const SizedBox(
+            height: 80,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+
+          error: (e, _) => const SizedBox(),
+
+          data: (meta) {
+            if (meta.numFotos == 0 && meta.numVideos == 0) {
+              return const SizedBox(); // no multimedia
+            }
+
+            return ReviewMultimedia(
+              reviewId: review.idReview.toString(),
+              metadata: meta,
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class ReviewMultimedia extends ConsumerWidget {
+  final String reviewId;
+  final MultimediaMetadata metadata;
+
+  const ReviewMultimedia({
+    super.key,
+    required this.reviewId,
+    required this.metadata,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      children: [
+        if (metadata.numFotos > 0)
+          ref.watch(reviewPhotosProvider(reviewId)).when(
+            loading: () => const CircularProgressIndicator(),
+            error: (_, __) => const SizedBox(),
+            data: (photos) => SizedBox(
+              height: 100,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: photos.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) => AspectRatio(
+                  aspectRatio: 1.0,
+                  child: AppPhoto(
+                    imageData: photos[i], onRemove: null, isEditable: false,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+        if (metadata.numVideos > 0)
+          ref.watch(reviewVideoProvider(reviewId)).when(
+            loading: () => const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: CircularProgressIndicator(),
+            ),
+            error: (_, __) => const SizedBox(),
+            data: (videoBytes) {
+              if (videoBytes == null) return const SizedBox();
+              return AppReviewVideo(videoBytes: videoBytes);
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class AppReviewVideo extends StatefulWidget {
+  final Uint8List videoBytes;
+
+  const AppReviewVideo({super.key, required this.videoBytes});
+
+  @override
+  State<AppReviewVideo> createState() => _AppReviewVideoState();
+}
+
+class _AppReviewVideoState extends State<AppReviewVideo> {
+  Uint8List? _thumbnail;
+  bool _isLoading = true;
+  VideoPlayerController? _controller;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateThumbnail();
+    _initializeVideo();
+  }
+
+  Future<void> _generateThumbnail() async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final tempVideoPath = '${tempDir.path}/temp_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+      final tempFile = File(tempVideoPath);
+      await tempFile.writeAsBytes(widget.videoBytes);
+
+      final thumbnailData = await VideoThumbnail.thumbnailData(
+        video: tempVideoPath,
+        imageFormat: ImageFormat.JPEG,
+        maxWidth: 512,
+        quality: 75,
+      );
+
+      await tempFile.delete();
+
+      if (mounted) {
+        setState(() {
+          _thumbnail = thumbnailData;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _initializeVideo() async {
+    try {
+      // Guardar video en archivo temporal para reproducción
+      final tempDir = await getTemporaryDirectory();
+      final videoPath = '${tempDir.path}/review_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+      final videoFile = File(videoPath);
+      await videoFile.writeAsBytes(widget.videoBytes);
+
+      _controller = VideoPlayerController.file(videoFile);
+      await _controller!.initialize();
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      print('Error inicializando video: $e');
+    }
+  }
+
+  void _togglePlayPause() {
+    if (_controller == null) return;
+
+    setState(() {
+      if (_controller!.value.isPlaying) {
+        _controller!.pause();
+        _isPlaying = false;
+      } else {
+        _controller!.play();
+        _isPlaying = true;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const SizedBox(
+        width: 150,
+        height: 100,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_thumbnail == null || _controller == null) {
+      return const SizedBox(
+        width: 150,
+        height: 100,
+        child: Center(child: Icon(Icons.error)),
+      );
+    }
+
+    return GestureDetector(
+      onTap: _togglePlayPause,
+      child: SizedBox(
+        width: 150,
+        height: 100,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Mostrar thumbnail o video según estado
+              if (!_isPlaying)
+                Image.memory(
+                  _thumbnail!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                )
+              else
+                AspectRatio(
+                  aspectRatio: _controller!.value.aspectRatio,
+                  child: VideoPlayer(_controller!),
+                ),
+
+              // Icono de play/pause
+              if (!_isPlaying)
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
             ],
           ),
         ),

@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/models/users/edit_profile_request.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/failures/failure.dart';
 import '../../../core/network/dio_client.dart';
@@ -12,8 +16,10 @@ import '../../../l10n/app_localizations.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_module_title.dart';
+import '../../../widgets/app_profile_picture.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../core/data/models/users/edit_profile_response.dart';
+import '../../photos/controllers/profile_photo_controller.dart';
 import '../controllers/edit_profile_controller.dart';
 
 class MyProfileScreen extends ConsumerStatefulWidget {
@@ -25,6 +31,8 @@ class MyProfileScreen extends ConsumerStatefulWidget {
 
 class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
   bool isEditing = false;
+  late final photoState = ref.watch(profilePhotoControllerProvider);
+  late final controller = ref.read(profilePhotoControllerProvider.notifier);
 
   late final _originalMothersSurname = ref
       .read(currentUserProvider.notifier)
@@ -78,6 +86,12 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     setState(() => isEditing = true);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_loadExistingPhoto);
+  }
+
   void _performCancel() {
     setState(() => isEditing = false);
     _mothersSurnameController.text = _originalMothersSurname!;
@@ -103,6 +117,8 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     );
 
     ref.read(currentUserProvider.notifier).state = newCurrentAccount;
+    setState(() => isEditing = false);
+
   }
 
   void _performAccept() async {
@@ -123,9 +139,42 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     await ref.read(editProfileControllerProvider.notifier).editProfile(request);
   }
 
+
+  Future<void> _pickAndSaveImage(WidgetRef ref) async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
+
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      final controller = ref.read(profilePhotoControllerProvider.notifier);
+      await controller.savePhoto(ref.read(currentUserProvider.notifier).state!.idPlayer.toString(), bytes);
+    }
+  }
+
+  Future<void> _loadExistingPhoto() async {
+    String idPlayer = ref.read(currentUserProvider.notifier).state!.idPlayer.toString();
+    final controller = ref.read(profilePhotoControllerProvider.notifier);
+    await controller.getPhoto(idPlayer);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    final photoState = ref.watch(profilePhotoControllerProvider);
+
+    ref.listen<PhotoState>(profilePhotoControllerProvider, (previous, next) {
+      if (next.error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
+        );
+      }
+    });
 
     final nameError = ref.watch(nameErrorProvider);
     final fathersSurnameError = ref.watch(fathersSurnameErrorProvider);
@@ -167,14 +216,11 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
             data: (response) {
               ref.read(globalLoadingProvider.notifier).state = false;
 
-
-
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(response!.message)));
                 _updateProfile();
-                //Navigator.pop(context);
                 setState(() => isEditing = false);
               });
             },
@@ -214,15 +260,28 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Center(
-                child: Image.asset('assets/images/isotipo.png', height: 150.0),
-              ),
-              const SizedBox(height: 16.0),
-              if (isEditing)
-                AppButton(
-                  text: l10n.changePicture,
-                  onPressed: _performEdit,
-                  type: AppButtonType.primary,
+                child:  Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 16.0),
+
+                    AppProfilePhoto(
+                      imageData: photoState.imageData,
+                      isLoading: photoState.isLoading,
+                      radius: 80,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    if (isEditing)
+                    AppButton(
+                      onPressed: photoState.isLoading ? null : () => _pickAndSaveImage(ref),
+                      text: 'Subir/Actualizar Foto',
+                    ),
+                  ],
                 ),
+              ),
+
               const SizedBox(height: 16.0),
 
               IgnorePointer(

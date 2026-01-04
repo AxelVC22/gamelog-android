@@ -11,6 +11,7 @@ import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_social_card.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
 
+import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/domain/entities/account.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
@@ -114,15 +115,24 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     if (previous?.isLoading == true && !next.isLoading) {
       next.when(
         loading: () {},
-        data: (response) {
+        data: (response) async {
           if (!mounted) return;
           if (response == null) return;
+
 
           if (response.accounts.isEmpty) {
             setState(() => notFoundResults = true);
           }
+
           final notifier = ref.read(retrieveResultsProvider.notifier);
           notifier.state = response.accounts;
+
+          final List<String> userIds =
+          response.accounts.map((a) => a.idPlayer.toString()).toList();
+
+
+          await ref.read(profilePhotoControllerProvider.notifier)
+              .getMultiplePhotos(userIds);
         },
         error: (error, __) {
           if (!mounted) return;
@@ -141,7 +151,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     if (previous?.isLoading == true && !next.isLoading) {
       next.when(
         loading: () {},
-        data: (response) {
+        data: (response) async {
           if (!mounted) return;
           if (response == null) return;
 
@@ -150,6 +160,13 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
           }
           final notifier = ref.read(retrieveResultsProvider.notifier);
           notifier.state = response.accounts;
+
+          final List<String> userIds =
+          response.accounts.map((a) => a.idPlayer.toString()).toList();
+
+
+          await ref.read(profilePhotoControllerProvider.notifier)
+              .getMultiplePhotos(userIds);
         },
         error: (error, __) {
           if (!mounted) return;
@@ -170,6 +187,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final photoState = ref.watch(profilePhotoControllerProvider);
 
     final results = ref.watch(retrieveResultsProvider);
 
@@ -249,6 +267,8 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                     itemCount: results.length,
                     itemBuilder: (_, i) {
                       return AppSocialCard(
+                        imageData: photoState.multiplePhotos != null ? photoState.multiplePhotos![results[i].idPlayer.toString()] : null,
+                        isLoading: photoState.isLoading,
                         followed: showingFollowed,
                         name: results[i].username,
                         imageUrl: "",
@@ -260,7 +280,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  ProfileScreen(username: results[i].username),
+                                  ProfileScreen(username: results[i].username, idPlayer: results[i].idPlayer),
                             ),
                           );
                         },

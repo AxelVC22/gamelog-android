@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gamelog/core/constants/app_colors.dart';
 
-/// Widget que simula carga con efecto shimmer
-/// Se adapta automáticamente al tamaño de cualquier widget
+
 class AppSkeletonLoader extends StatefulWidget {
   final double? width;
   final double? height;
@@ -19,7 +18,6 @@ class AppSkeletonLoader extends StatefulWidget {
     this.highlightColor,
   }) : super(key: key);
 
-  /// Constructor para simular un Text
   const AppSkeletonLoader.text({
     Key? key,
     double width = 100,
@@ -31,7 +29,6 @@ class AppSkeletonLoader extends StatefulWidget {
     borderRadius: const BorderRadius.all(Radius.circular(4)),
   );
 
-  /// Constructor para simular un círculo (avatar)
   const AppSkeletonLoader.circle({
     Key? key,
     required double size,
@@ -39,10 +36,8 @@ class AppSkeletonLoader extends StatefulWidget {
     key: key,
     width: size,
     height: size,
-   // borderRadius: 4,
   );
 
-  /// Constructor para simular un ListTile
   const AppSkeletonLoader.listTile({
     Key? key,
   }) : this(

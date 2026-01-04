@@ -7,7 +7,7 @@ part of 'users_providers.dart';
 // **************************************************************************
 
 String _$userManagementRepositoryHash() =>
-    r'bdd6f1cbb1359e721fa84479ebdac3bc93afaef9';
+    r'748bee52a1a0342257be36eb3560db884125865e';
 
 /// See also [userManagementRepository].
 @ProviderFor(userManagementRepository)

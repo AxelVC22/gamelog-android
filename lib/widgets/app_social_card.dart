@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'app_icon_button.dart';
+import 'app_profile_picture.dart';
 
 class AppSocialCard extends StatelessWidget {
   final String name;
@@ -8,6 +11,8 @@ class AppSocialCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
   final bool followed;
+  final Uint8List? imageData;
+  final bool isLoading;
 
   const AppSocialCard({
     super.key,
@@ -16,6 +21,8 @@ class AppSocialCard extends StatelessWidget {
     this.onTap,
     this.onDelete,
     required this.followed,
+    required this.imageData,
+    required this.isLoading
   });
 
   @override
@@ -34,15 +41,16 @@ class AppSocialCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundImage: imageUrl.isNotEmpty
-                        ? NetworkImage(imageUrl)
-                        : null,
-                    child: imageUrl.isEmpty
-                        ? const Icon(Icons.person, size: 32)
-                        : null,
+
+
+
+                  AppProfilePhoto(
+                    imageData: imageData,
+                    isLoading: isLoading,
+                    radius: 30,
                   ),
+
+
                   const SizedBox(width: 16),
                   Text(
                     name,

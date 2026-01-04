@@ -7,7 +7,7 @@ part of 'statistics_providers.dart';
 // **************************************************************************
 
 String _$statisticsRepositoryHash() =>
-    r'dc53924b6406c78c510f8fb2db1aed411465bdf5';
+    r'c76364f9d47494f621ff0ffd46cf5fcdc7b06f47';
 
 /// See also [statisticsRepository].
 @ProviderFor(statisticsRepository)
