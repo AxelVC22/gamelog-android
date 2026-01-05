@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import '../../../../features/photos/controllers/profile_photo_controller.dart';
 import '../../../../features/photos/use_cases/get_multiple_photos_use_case.dart';
 import '../../../../features/photos/use_cases/get_photo_use_case.dart';
@@ -7,8 +8,8 @@ import '../../data_sources/photo_grpc_data_source.dart';
 import '../../repositories/photos/photo_repository_implementation.dart';
 final photoDataSourceProvider = Provider<PhotoGrpcDataSource>((ref) {
   return PhotoGrpcDataSource(
-    host: '192.168.0.24',
-    port: 1235,
+    host: ApiConstants.host,
+    port: ApiConstants.port,
   );
 });
 

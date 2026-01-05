@@ -2,6 +2,10 @@ class ApiConstants {
   static const String baseUrl = 'http://192.168.0.24:1234'; //10.0.2.2
   static const String baseRawgUrl = 'https://api.rawg.io/api';
 
+  static const String host = '192.168.0.24';
+
+  static const int port = 1235;
+
   static const String queryIdPlayerSeeker = 'idJugadorBuscador';
 
   //Auth

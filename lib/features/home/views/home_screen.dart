@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/models/auth/logout_response.dart';
 import 'package:gamelog/features/auth/controllers/logout_controller.dart';
@@ -10,6 +11,7 @@ import 'package:gamelog/core/data/models/statistics/retrieve_statistics_response
 import 'package:gamelog/features/reviews/views/review_history_screen.dart';
 import 'package:gamelog/features/statistics/views/statistics_screen.dart';
 
+import '../../../core/data/providers/sockets/notifications/socket_providers.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
@@ -79,7 +81,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final user = ref.read(currentUserProvider);
     ref.read(globalLoadingProvider.notifier).state = true;
 
-
     if (user == null) return;
     if (user.email == null) return;
 
@@ -88,8 +89,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void initState() {
-
-
     super.initState();
 
     _searchGameSub = ref.listenManual<AsyncValue<Game?>>(
@@ -104,6 +103,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         );
 
     Future.microtask(() => _search());
+    Future.microtask(() => _connectSocket());
+  }
+
+  void _connectSocket() {
+    final socketController = ref.read(socketControllerProvider.notifier);
+    final currentUser = ref.read(currentUserProvider.notifier).state;
+    final socketState = ref.watch(socketControllerProvider);
+
+    if (currentUser == null) return;
+
+    if (!socketState.isConnected) {
+      socketController.connect(
+        usuario: dotenv.env['USUARIO_NOTI']!,
+        contrasenia: dotenv.env['CONTRASENIA_NOTI']!,
+        idJugador: currentUser.idPlayer.toString(),
+      );
+
+      socketController.suscribirBroadcast();
+    }
   }
 
   Future<void> _search() async {
@@ -182,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-
+    final socketState = ref.watch(socketControllerProvider);
     final mergedGames = ref.watch(mergedGamesProvider);
 
     ref.listen<AsyncValue<LogoutResponse?>>(logoutControllerProvider, (
@@ -221,6 +239,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onPressed: () => performLogout(),
         ),
         actions: [
+          Icon(socketState.isConnected ? Icons.wifi : Icons.wifi_off),
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {

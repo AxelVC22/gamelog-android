@@ -144,6 +144,7 @@ class AppReviewCard extends StatelessWidget {
                       onLiked!();
                     },
                   ),
+                  if (likes > 0)
                   Text(likes.toString(), style: const TextStyle(fontSize: 16)),
                   const SizedBox(width: 8),
                 ],
@@ -367,7 +368,6 @@ class _AppReviewVideoState extends State<AppReviewVideo> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Mostrar thumbnail o video según estado
               if (!_isPlaying)
                 Image.memory(
                   _thumbnail!,
@@ -385,7 +385,6 @@ class _AppReviewVideoState extends State<AppReviewVideo> {
               if (!_isPlaying)
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
                   padding: const EdgeInsets.all(12),
