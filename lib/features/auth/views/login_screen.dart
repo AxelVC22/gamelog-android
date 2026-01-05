@@ -4,7 +4,7 @@ import 'package:gamelog/core/domain/entities/user.dart';
 import 'package:gamelog/core/data/models/auth/login_request.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
-
+import '../../../core/data/providers/sockets/notifications/socket_providers.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../core/presentation/field_state.dart';
@@ -20,7 +20,6 @@ import '../../../core/data/models/auth/login_response.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../controllers/login_controller.dart';
-import '../state/auth_state.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -57,6 +56,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     await ref.read(loginControllerProvider.notifier).login(request);
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -83,8 +84,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
             if (response == null) return;
 
-            // ✅ Ya NO guardas nada aquí - el controller ya lo hizo
-            // Solo navegas
             if (!mounted) return;
 
             Navigator.of(context).pushReplacement(

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/widgets/app_global_loader.dart';
 import 'package:gamelog/core/theme/dark_theme.dart';
 
+import 'core/services/notification_service.dart';
 import 'features/auth/views/login_screen.dart';
 import 'core/presentation/main_layout.dart';
 import 'features/auth/state/auth_state.dart';
@@ -13,6 +14,7 @@ import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().initialize();
   await dotenv.load(fileName: '.env');
   runApp(const ProviderScope(child: MyApp()));
 }

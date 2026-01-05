@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import '../../../../../features/multimedia/controllers/review_multimedia_controller.dart';
 import '../../../../../features/multimedia/use_cases/delete_multimedia_review_use_case.dart';
 import '../../../../../features/multimedia/use_cases/retrieve_review_metadata_use_case.dart';
@@ -17,8 +18,8 @@ import '../../../repositories/photos/reviews/review_multimedia_repository_implem
 
 final reviewMultimediaDataSourceProvider = Provider<ReviewMultimediaGrpcDataSource>((ref) {
   return ReviewMultimediaGrpcDataSource(
-    host: '192.168.0.24',
-    port: 1235,
+    host: ApiConstants.host,
+    port: ApiConstants.port,
   );
 });
 
