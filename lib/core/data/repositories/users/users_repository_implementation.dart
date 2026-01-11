@@ -21,8 +21,8 @@ class UsersRepositoryImpl extends UsersRepository {
 
   @override
   Future<Either<Failure, SearchUserResponse>> searchUser(
-    String username,
-  ) async {
+      String username,
+      ) async {
     try {
       final response = await dio.get('${ApiConstants.searchUser}/$username');
 
@@ -30,7 +30,8 @@ class UsersRepositoryImpl extends UsersRepository {
         final res = SearchUserResponse.fromJson(response.data);
         return Right(res);
       } else {
-        return Left(Failure.server(response.data['mensaje']));
+        final dynamic message = response.data['mensaje'];
+        return Left(Failure.server(_parseMessages(message)));
       }
     } catch (e) {
       return Left(DioErrorHandler.handle(e));
@@ -39,8 +40,8 @@ class UsersRepositoryImpl extends UsersRepository {
 
   @override
   Future<Either<Failure, EditProfileResponse>> editProfile(
-    EditProfileRequest request,
-  ) async {
+      EditProfileRequest request,
+      ) async {
     try {
       final response = await dio.put(
         '${ApiConstants.editProfile}/${request.idPlayer}',
@@ -51,7 +52,8 @@ class UsersRepositoryImpl extends UsersRepository {
         final res = EditProfileResponse.fromJson(response.data);
         return Right(res);
       } else {
-        return Left(Failure.server(response.data['mensaje']));
+        final dynamic message = response.data['mensaje'];
+        return Left(Failure.server(_parseMessages(message)));
       }
     } catch (e) {
       return Left(DioErrorHandler.handle(e));
@@ -59,9 +61,9 @@ class UsersRepositoryImpl extends UsersRepository {
   }
 
   Future<Either<Failure, int>> getIdAccess(
-    String email,
-    String userType,
-  ) async {
+      String email,
+      String userType,
+      ) async {
     try {
       final response = await dio.get(
         '${ApiConstants.getIdAccess}/$email',
@@ -72,7 +74,8 @@ class UsersRepositoryImpl extends UsersRepository {
         final res = GetIdAccessResponse.fromJson(response.data);
         return Right(res.idAccess);
       } else {
-        return Left(Failure.server(response.data['mensaje']));
+        final dynamic message = response.data['mensaje'];
+        return Left(Failure.server(_parseMessages(message)));
       }
     } catch (e) {
       return Left(DioErrorHandler.handle(e));
@@ -80,8 +83,8 @@ class UsersRepositoryImpl extends UsersRepository {
   }
 
   Future<Either<Failure, EditProfileResponse>> changePasswordOrEmail(
-    EditProfileRequest request,
-  ) async {
+      EditProfileRequest request,
+      ) async {
     try {
       final idAccess = await getIdAccess(request.oldEmail!, request.userType);
 
@@ -95,7 +98,8 @@ class UsersRepositoryImpl extends UsersRepository {
           final res = EditProfileResponse.fromJson(response.data);
           return Right(res);
         } else {
-          return Left(Failure.server(response.data['mensaje']));
+          final dynamic message = response.data['mensaje'];
+          return Left(Failure.server(_parseMessages(message)));
         }
       });
     } catch (e) {
@@ -105,8 +109,8 @@ class UsersRepositoryImpl extends UsersRepository {
 
   @override
   Future<Either<Failure, AddToBlackListResponse>> addToBlackList(
-    AddToBlackListRequest request,
-  ) async {
+      AddToBlackListRequest request,
+      ) async {
     try {
       final idResult = await getIdAccess(request.email, request.userType);
 
@@ -120,7 +124,7 @@ class UsersRepositoryImpl extends UsersRepository {
           final res = AddToBlackListResponse.fromJson(response.data);
           return Right(res);
         } else {
-          final String message = response.data['mensaje'];
+          final dynamic message = response.data['mensaje'];
           return Left(Failure.server(_parseMessages(message)));
         }
       });
@@ -137,9 +141,7 @@ class UsersRepositoryImpl extends UsersRepository {
     }
 
     if (message is List) {
-      String concatString = '';
-      message.map((e) => concatString = concatString + e.toString());
-      return concatString;
+      return message.join('\n');
     }
 
     return ErrorCodes.unexpectedError;

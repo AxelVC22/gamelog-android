@@ -5,6 +5,13 @@ import '../../../services/notification_service.dart';
 class SocketIODataSource {
   IO.Socket? _socket;
   String? _idJugador;
+  final NotificationService _notificationService;
+
+  SocketIODataSource({
+    IO.Socket? socket,
+    NotificationService? notificationService,
+  })  : _socket = socket,
+        _notificationService = notificationService ?? NotificationService();
 
   Function(String)? onNotificacionJugador;
   Function(String)? onActualizacionResenas;
@@ -17,7 +24,7 @@ class SocketIODataSource {
   }) {
     _idJugador = idJugador;
 
-    _socket = IO.io(
+    _socket ??= IO.io(
       'http://192.168.0.24:1236',
       IO.OptionBuilder()
           .setTransports(['websocket'])
@@ -29,13 +36,11 @@ class SocketIODataSource {
     );
 
     _socket!.on('connect', (_) {
-
       print('Socket conectado');
       _socket!.emit('suscribir_notificacion_jugador', idJugador);
     });
 
     _socket!.on('notificacion_jugador', (data) {
-
       if (data is List && data.isNotEmpty) {
         final payload = data[0];
 
@@ -43,7 +48,7 @@ class SocketIODataSource {
           final accion = payload['accion'];
           final mensaje = payload['mensaje'];
 
-          NotificationService().mostrarNotificacion(
+          _notificationService.mostrarNotificacion(
             titulo: _tituloPorAccion(accion.toString()),
             mensaje: mensaje ?? 'Nueva notificación',
           );
@@ -101,10 +106,14 @@ class SocketIODataSource {
   }
 
   void disconnect() {
-    if (_socket != null && _socket!.connected) {
-      desuscribirNotificacionJugador();
-      _socket!.disconnect();
-      _socket!.dispose();
+    if (_socket != null) {
+      if (_socket!.connected) {
+        desuscribirNotificacionJugador();
+        _socket!.disconnect();
+      }
+      try {
+        _socket!.dispose();
+      } catch (e) {}
       _socket = null;
     }
   }
