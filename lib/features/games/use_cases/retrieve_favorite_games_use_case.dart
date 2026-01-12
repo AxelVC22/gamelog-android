@@ -10,6 +10,7 @@ class RetrieveFavoriteGamesUseCase {
   RetrieveFavoriteGamesUseCase(this.repository);
 
   Future<Either<Failure, GamesResponse>> call (int idPlayer) async {
+
     final result = await repository.retrieveFavorites(idPlayer);
     return result;
   }

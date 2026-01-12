@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/models/follows/retrieve_social_response.dart';
 import 'package:gamelog/core/data/models/follows/unfollow_user_response.dart';
 import 'package:gamelog/features/follows/controllers/retrieve_followed_controller.dart';
 import 'package:gamelog/features/follows/controllers/unfollow_user_controller.dart';
 import 'package:gamelog/features/users/views/search_profile_screen.dart';
-
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_social_card.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
-
 import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/domain/entities/account.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
+import '../../../core/presentation/feed_ui_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_module_button.dart';
 import '../../../widgets/app_module_title.dart';
 import '../../follows/controllers/retrieve_followers_controller.dart';
+import '../../photos/controllers/profile_photo_controller.dart';
 import '../../users/views/profile_screen.dart';
 
 final retrieveResultsProvider = StateProvider.autoDispose<List<Account>>(
@@ -43,6 +42,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   Future<void> _retrieveFollowed() async {
     if (!mounted) return;
 
+
     setState(() => isLoading = true);
     setState(() => notFoundResults = false);
     setState(() => showingFollowed = true);
@@ -61,6 +61,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
 
   Future<void> _retrieveFollowers() async {
     if (!mounted) return;
+
 
     setState(() => isLoading = true);
     setState(() => notFoundResults = false);
@@ -190,6 +191,17 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     final photoState = ref.watch(profilePhotoControllerProvider);
 
     final results = ref.watch(retrieveResultsProvider);
+    ref.listen<PhotoState>(profilePhotoControllerProvider, (previous, next) {
+      if (next.error != null) {
+        handleFailure(context: context, error: next.error!);
+      } else if (next.successMessage != null) {
+        handleSnackBarMessage(
+          context: context,
+          code: next.successMessage!,
+        );
+      }
+    });
+
 
     ref.listen<AsyncValue<UnfollowUserResponse?>>(
       unfollowUserControllerProvider,
@@ -258,7 +270,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
               const SizedBox(height: 16.0),
 
               if (notFoundResults)
-                Text('Sin resultados')
+                Text(l10n.noResults)
               else if (results.isEmpty)
                 AppSkeletonLoader.listTile()
               else

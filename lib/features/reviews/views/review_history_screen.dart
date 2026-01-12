@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/data/models/reviews/retrieve_review_history_response.dart';
 import 'package:gamelog/features/reviews/controllers/retrieve_review_history_controller.dart';
 
@@ -131,6 +132,7 @@ class _ReviewHistoryScreenState extends ConsumerState<ReviewHistoryScreen> {
 
     final l10n = AppLocalizations.of(context)!;
 
+
     return Scaffold(
       appBar: AppBar(
         leading: AppIconButton(
@@ -147,7 +149,7 @@ class _ReviewHistoryScreenState extends ConsumerState<ReviewHistoryScreen> {
           child: Column(
             children: [
               if (noResults)
-                Text('No results')
+                Text(l10n.noResults)
               else
                 Expanded(
                   child: ListView.builder(
@@ -160,10 +162,11 @@ class _ReviewHistoryScreenState extends ConsumerState<ReviewHistoryScreen> {
                       return AppPosterReviewCard(
                         date: DateTime.parse(results[i].date),
                         opinion: results[i].opinion,
-                        imageUrl: image ?? 'https://picsum.photos/800/450',
+                        imageUrl: image ?? ApiConstants.defaultImageUrl,
                         name: results[i].name,
                         rating: results[i].rating,
                         onTap: () {},
+                        review: results[i]
                       );
                     },
                   ),

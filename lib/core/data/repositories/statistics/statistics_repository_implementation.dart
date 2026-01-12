@@ -25,6 +25,7 @@ class StatisticsRepositoryImpl extends StatistisRepository {
 
       );
 
+
       if (response.statusCode == 200) {
         final res = RetrieveStatisticsResponse.fromJson(response.data);
 

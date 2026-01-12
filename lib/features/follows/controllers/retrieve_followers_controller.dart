@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/models/follows/retrieve_social_response.dart';
 import 'package:gamelog/core/data/providers/follows/follows_providers.dart';
-import 'package:gamelog/features/follows/user_cases/retrieve_followed_use_case.dart';
 import 'package:gamelog/features/follows/user_cases/retrieve_followers_use_case.dart';
 
 final retrieveFollowersControllerProvider =

@@ -1,10 +1,10 @@
 
 import '../../../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 
-class ObtenerMetadataUseCase {
+class RetrieveMetadataUseCase {
   final ReviewMultimediaRepository repository;
 
-  ObtenerMetadataUseCase(this.repository);
+  RetrieveMetadataUseCase(this.repository);
 
   Future<MultimediaMetadata> call(String idReview) async {
     if (idReview.isEmpty) {

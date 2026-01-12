@@ -1,7 +1,9 @@
 class ApiConstants {
   static const String baseUrl = 'http://192.168.0.24:1234'; //10.0.2.2
   static const String baseRawgUrl = 'https://api.rawg.io/api';
-
+  static const String defaultImageUrl = 'https://picsum.photos/800/450';
+  static const String webSocketsUrl = 'http://192.168.0.24:1236';
+  static const String appName = 'Gamelog';
   static const String host = '192.168.0.24';
 
   static const int port = 1235;

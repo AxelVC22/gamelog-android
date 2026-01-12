@@ -1,8 +1,7 @@
-// data/repositories/photo_repository_impl.dart
 import 'package:flutter/foundation.dart';
-import 'package:gamelog/core/data/repositories/photos/photo_repository.dart';
+import 'package:gamelog/core/data/repositories/photos/profile_picture/photo_repository.dart';
 
-import '../../data_sources/photo_grpc_data_source.dart';
+import '../../../data_sources/multimedia/photo_grpc_data_source.dart';
 class PhotoRepositoryImpl implements PhotoRepository {
   final PhotoGrpcDataSource _dataSource;
 
@@ -35,11 +34,11 @@ class PhotoRepositoryImpl implements PhotoRepository {
     final result = <String, Uint8List>{};
     final defaultPhoto = response.fotoDefault;
 
-    for (final foto in response.fotos) {
-      if (foto.tieneFoto) {
-        result[foto.idJugador] = Uint8List.fromList(foto.datos);
+    for (final photo in response.fotos) {
+      if (photo.tieneFoto) {
+        result[photo.idJugador] = Uint8List.fromList(photo.datos);
       } else {
-        result[foto.idJugador] = Uint8List.fromList(defaultPhoto);
+        result[photo.idJugador] = Uint8List.fromList(defaultPhoto);
       }
     }
 

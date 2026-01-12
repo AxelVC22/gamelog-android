@@ -1,3 +1,5 @@
+import 'package:gamelog/core/constants/app_messages.dart';
+
 import '../core/constants/error_codes.dart';
 import 'app_localizations.dart';
 extension AppLocalizationsDynamic on AppLocalizations {
@@ -15,6 +17,7 @@ extension AppLocalizationsDynamic on AppLocalizations {
     ErrorCodes.invalidPassword: () => invalidPassword,
     ErrorCodes.invalidDescription: () => invalidDescription,
     ErrorCodes.invalidGameName: () => invalidGameName,
+    ErrorCodes.invalidPhoto: () => invalidPhoto,
     ErrorCodes.timeout: () => timeoutError,
     ErrorCodes.noConnection: () => noConnectionError,
     ErrorCodes.cancelled: () => requestCancelled,
@@ -24,5 +27,11 @@ extension AppLocalizationsDynamic on AppLocalizations {
     ErrorCodes.notFound: () => notFound,
     ErrorCodes.serverError: () => serverError,
     ErrorCodes.unexpectedError: () => unexpectedError,
+    ErrorCodes.unexpectedValuesError: () => unexpectedValuesError,
+
+    //messages
+
+    AppMessages.profilePictureSaveFail : () => profilePictureSaveFail,
+    AppMessages.profilePictureSaveSuccess: () => profilePictureSaveSuccess,
   };
 }

@@ -35,7 +35,6 @@ class DioErrorHandler {
     final statusCode = e.response?.statusCode;
     final data = e.response?.data;
 
-    // Mensaje técnico del backend (solo 500)
     final serverMessage = data is Map && data['mensaje'] != null
         ? data['mensaje'].toString()
         : null;

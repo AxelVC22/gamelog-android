@@ -18,6 +18,7 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   runApp(const ProviderScope(child: MyApp()));
 }
+
 class MyApp extends ConsumerWidget {
 
   const MyApp({super.key});
@@ -28,6 +29,8 @@ class MyApp extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     return MaterialApp(
+      key: ValueKey(authState.status),
+
       title: 'GameLog',
       theme: darkTheme,
 

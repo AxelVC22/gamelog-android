@@ -4,8 +4,7 @@ import 'package:gamelog/core/domain/entities/user.dart';
 import 'package:gamelog/core/data/models/auth/login_request.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
-import '../../../core/data/providers/sockets/notifications/socket_providers.dart';
-import '../../../core/network/dio_client.dart';
+import '../../../core/helpers/password_helper.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
@@ -47,9 +46,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> performLogin() async {
+    String hashedPassword = PasswordHelper.hashPassword(_passwordController.text);
     final request = LoginRequest(
       email: _emailController.text,
-      password: _passwordController.text,
+      password: hashedPassword,
       userType: UserType.Jugador.name,
     );
 

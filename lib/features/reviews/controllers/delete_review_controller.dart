@@ -30,6 +30,7 @@ class DeleteReviewController
     return result.fold(
           (f) {
         state = AsyncError(f, StackTrace.current);
+        return null;
       },
           (r) {
         state = AsyncData(r);

@@ -12,7 +12,7 @@ import '../../../../../features/multimedia/use_cases/upload_review_photo_use_cas
 import '../../../../../features/multimedia/use_cases/upload_review_video_use_case.dart';
 
 
-import '../../../data_sources/review_multimedia_grpc_data_source.dart';
+import '../../../data_sources/multimedia/review_multimedia_grpc_data_source.dart';
 import '../../../repositories/photos/reviews/review_multimedia_repository.dart';
 import '../../../repositories/photos/reviews/review_multimedia_repository_implementation.dart';
 
@@ -23,70 +23,68 @@ final reviewMultimediaDataSourceProvider = Provider<ReviewMultimediaGrpcDataSour
   );
 });
 
-// Repository
 final reviewMultimediaRepositoryProvider = Provider((ref) {
   final dataSource = ref.watch(reviewMultimediaDataSourceProvider);
   return ReviewMultimediaRepositoryImpl(dataSource);
 });
 
-// Use Cases
-final subirFotoUseCaseProvider = Provider((ref) {
+final uploadPhotoUseCaseProvider = Provider((ref) {
   final repository = ref.watch(reviewMultimediaRepositoryProvider);
-  return SubirFotoUseCase(repository);
+  return UploadPhotoUseCase(repository);
 });
 
-final subirVideoUseCaseProvider = Provider((ref) {
+final uploadVideoUseCaseProvider = Provider((ref) {
   final repository = ref.watch(reviewMultimediaRepositoryProvider);
-  return SubirVideoUseCase(repository);
+  return UploadVideoUseCase(repository);
 });
 
-final obtenerFotosUseCaseProvider = Provider((ref) {
+final retrievePhotosUseCaseProvider = Provider((ref) {
   final repository = ref.watch(reviewMultimediaRepositoryProvider);
-  return ObtenerFotosUseCase(repository);
+  return RetrievePhotosUseCase(repository);
 });
 
-final obtenerVideoUseCaseProvider = Provider((ref) {
+final retrieveVideoUseCaseProvider = Provider((ref) {
   final repository = ref.watch(reviewMultimediaRepositoryProvider);
-  return ObtenerVideoUseCase(repository);
+  return RetrieveVideoUseCase(repository);
 });
 
-final obtenerMetadataUseCaseProvider = Provider((ref) {
+final retrieveMetadataUseCaseProvider = Provider((ref) {
   final repository = ref.watch(reviewMultimediaRepositoryProvider);
-  return ObtenerMetadataUseCase(repository);
+  return RetrieveMetadataUseCase(repository);
 });
 
-final eliminarArchivosUseCaseProvider = Provider((ref) {
+final deleteFilesUseCaseProvider = Provider((ref) {
   final repository = ref.watch(reviewMultimediaRepositoryProvider);
-  return EliminarArchivosUseCase(repository);
+  return DeleteFilesUseCase(repository);
 });
 
 final reviewMultimediaControllerProvider =
 StateNotifierProvider<ReviewMultimediaController, UploadState>((ref) {
   return ReviewMultimediaController(
-    subirFotoUseCase: ref.watch(subirFotoUseCaseProvider),
-    subirVideoUseCase: ref.watch(subirVideoUseCaseProvider),
+    uploadPhotoUseCase: ref.watch(uploadPhotoUseCaseProvider),
+    uploadVideoUseCase: ref.watch(uploadVideoUseCaseProvider),
 
-    eliminarArchivosUseCase: ref.watch(eliminarArchivosUseCaseProvider),
+    deleteFilesUseCase: ref.watch(deleteFilesUseCaseProvider),
   );
 });
 
 
 final reviewMetadataProvider =
 FutureProvider.family<MultimediaMetadata, String>((ref, idReview) {
-  final useCase = ref.read(obtenerMetadataUseCaseProvider);
+  final useCase = ref.read(retrieveMetadataUseCaseProvider);
   return useCase(idReview);
 });
 
 
 final reviewPhotosProvider =
 FutureProvider.family<List<Uint8List>, String>((ref, idReview) {
-  final useCase = ref.read(obtenerFotosUseCaseProvider);
+  final useCase = ref.read(retrievePhotosUseCaseProvider);
   return useCase(idReview);
 });
 
 final reviewVideoProvider =
 FutureProvider.family<Uint8List?, String>((ref, idReview) {
-  final useCase = ref.read(obtenerVideoUseCaseProvider);
+  final useCase = ref.read(retrieveVideoUseCaseProvider);
   return useCase(
     idReview: idReview,
     onProgress: (_) {},

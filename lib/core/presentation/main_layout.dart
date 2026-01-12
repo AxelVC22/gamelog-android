@@ -1,3 +1,4 @@
+
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:flutter/material.dart';
@@ -5,11 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gamelog/features/reviews/views/games_screen.dart';
 import 'package:gamelog/features/users/views/my_profile_screen.dart';
-import '../../features/auth/state/auth_state.dart';
-import '../../features/auth/views/login_screen.dart';
 import '../../features/home/views/home_screen.dart';
 import '../../features/follows/views/social_screen.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../constants/app_colors.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
@@ -31,6 +31,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: screens[_index],
       bottomNavigationBar: CurvedNavigationBar(
@@ -39,22 +41,22 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         buttonBackgroundColor: AppColors.surfaceAlt,
         index: _index,
         onTap: (i) => setState(() => _index = i),
-        items: const [
+        items: [
           CurvedNavigationBarItem(
-            child: Icon(Icons.home),
-            label: 'Home',
+            child: const Icon(Icons.home),
+            label: l10n.homeTitle,
           ),
           CurvedNavigationBarItem(
-            child: Icon(Icons.search_rounded),
-            label: 'Search',
+            child: const Icon(Icons.games),
+            label: l10n.gamesTitle,
           ),
           CurvedNavigationBarItem(
-            child: Icon(Icons.people),
-            label: 'Social',
+            child: const Icon(Icons.people),
+            label: l10n.socialTitle,
           ),
           CurvedNavigationBarItem(
-            child: Icon(Icons.person),
-            label: 'Personal',
+            child: const Icon(Icons.person),
+            label: l10n.profileTitle,
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/data/models/games/games_response.dart';
 import 'package:gamelog/features/games/controllers/retrieve_favorite_games_controller.dart';
 import 'package:gamelog/features/reviews/views/search_game_screen.dart';
@@ -250,7 +251,7 @@ class _SocialScreenState extends ConsumerState<GamesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: AppModuleTitle(title: 'Juegos'),
+        title: AppModuleTitle(title: l10n.gamesTitle),
         centerTitle: true,
         elevation: 0,
       ),
@@ -275,7 +276,7 @@ class _SocialScreenState extends ConsumerState<GamesScreen> {
               const SizedBox(height: 12.0),
 
               AppFilterTab(
-                options: ['Favoritos', 'Pendientes'],
+                options: [l10n.favoritesTitle, l10n.pendingsTitle],
                 onChanged: (index) async {
                   switch (index) {
                     case 0:
@@ -290,7 +291,7 @@ class _SocialScreenState extends ConsumerState<GamesScreen> {
               const SizedBox(height: 16.0),
 
               if (notFoundResults)
-                Text('Sin resultados')
+                Text(l10n.noResults)
               else if (results.isEmpty)
                 AppSkeletonLoader.listTile()
               else
@@ -302,7 +303,7 @@ class _SocialScreenState extends ConsumerState<GamesScreen> {
                         name: results[i].name,
                         imageUrl:
                             results[i].backgroundImage ??
-                            'https://picsum.photos/800/450',
+                            ApiConstants.defaultImageUrl,
                         onTap: () {
                           Navigator.push(
                             context,

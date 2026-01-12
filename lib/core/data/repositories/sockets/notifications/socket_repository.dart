@@ -1,20 +1,19 @@
-// domain/repositories/socket_repository.dart
 
 abstract class SocketRepository {
   void connect({
-    required String usuario,
-    required String contrasenia,
-    required String idJugador,
+    required String user,
+    required String password,
+    required String idPlayer,
   });
 
-  void suscribirResenasJuego(String idJuego);
-  void desuscribirResenasJuego(String idJuego);
-  void suscribirBroadcast();
+  void subscribeGameReviews(String idGame);
+  void unsubscribeGameReviews(String idGame);
+  void subscribeBroadcast();
   void disconnect();
+
   bool get isConnected;
 
-  // Callbacks
-  void setOnNotificacionJugador(Function(String) callback);
-  void setOnActualizacionResenas(Function(String) callback);
-  void setOnMensajeBroadcast(Function(String) callback);
+  void setOnPlayerNotification(Function(dynamic) callback);
+  void setOnReviewsUpdating(Function(dynamic) callback);
+  void setOnBroadcastMessage(Function(dynamic) callback);
 }
