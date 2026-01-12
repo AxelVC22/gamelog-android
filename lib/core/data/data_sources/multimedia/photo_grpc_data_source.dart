@@ -1,7 +1,7 @@
 import 'package:grpc/grpc.dart';
 import 'dart:typed_data';
 
-import '../../../grpc/Fotos_De_Perfil.pbgrpc.dart';
+import '../../../../grpc/Fotos_De_Perfil.pbgrpc.dart';
 class PhotoGrpcDataSource {
   late ClientChannel _channel;
   late FotosDePerfilClient _stub;
@@ -28,7 +28,7 @@ class PhotoGrpcDataSource {
 
       return await _stub.subirFoto(request);
     } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
+      throw Exception(e.message);
     }
   }
 
@@ -39,7 +39,7 @@ class PhotoGrpcDataSource {
 
       return await _stub.obtenerFoto(request);
     } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
+      throw Exception(e.message);
     }
   }
 
@@ -48,7 +48,7 @@ class PhotoGrpcDataSource {
       final request = MultipleFotosRequest()..idsJugadores.addAll(playerIds);
       return await _stub.obtenerMultiplesFotos(request);
     } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
+      throw Exception(e.message);
     }
   }
 

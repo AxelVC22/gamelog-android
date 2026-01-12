@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/app_messages.dart';
 import 'dart:typed_data';
 
 import '../use_cases/get_multiple_photos_use_case.dart';
@@ -65,13 +66,13 @@ class ProfilePhotoController extends StateNotifier<PhotoState> {
         state = state.copyWith(
           isLoading: false,
           imageData: imageData,
-          successMessage: '✅ Foto guardada correctamente',
+          successMessage: AppMessages.profilePictureSaveSuccess,
           isDefault: false,
         );
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: 'No se pudo guardar la foto',
+          error: AppMessages.profilePictureSaveFail,
         );
       }
     } catch (e) {
@@ -92,9 +93,7 @@ class ProfilePhotoController extends StateNotifier<PhotoState> {
         isLoading: false,
         imageData: result.imageData,
         isDefault: result.isDefault,
-        successMessage: result.isDefault
-            ? 'ℹ️ Mostrando foto por defecto'
-            : '✅ Foto cargada',
+
       );
     } catch (e) {
       state = state.copyWith(
@@ -103,7 +102,6 @@ class ProfilePhotoController extends StateNotifier<PhotoState> {
       );
     }
   }
-// ⬅️ NUEVO
   Future<void> getMultiplePhotos(List<String> playerIds) async {
     state = state.copyWith(isLoading: true, error: null, successMessage: null);
 
@@ -113,7 +111,6 @@ class ProfilePhotoController extends StateNotifier<PhotoState> {
       state = state.copyWith(
         isLoading: false,
         multiplePhotos: photos,
-        successMessage: '✅ ${photos.length} fotos cargadas',
       );
     } catch (e) {
       state = state.copyWith(

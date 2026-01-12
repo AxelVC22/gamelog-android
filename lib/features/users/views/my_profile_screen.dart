@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/models/users/edit_profile_request.dart';
+import 'package:gamelog/core/presentation/failure_handler.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -10,6 +11,7 @@ import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/domain/entities/account.dart';
 import '../../../core/domain/failures/failure.dart';
 import '../../../core/network/dio_client.dart';
+import '../../../core/presentation/feed_ui_handler.dart';
 import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';
 import '../../../l10n/app_localizations.dart';
@@ -165,16 +167,22 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final storage = ref.watch(secureStorageProvider);
 
     final photoState = ref.watch(profilePhotoControllerProvider);
 
     ref.listen<PhotoState>(profilePhotoControllerProvider, (previous, next) {
       if (next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
+       handleFailure(context: context, error: next.error!);
+      } else if (next.successMessage != null) {
+        handleSnackBarMessage(
+          context: context,
+          code: next.successMessage!,
         );
       }
     });
+
+
 
     final nameError = ref.watch(nameErrorProvider);
     final fathersSurnameError = ref.watch(fathersSurnameErrorProvider);
@@ -271,12 +279,28 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
                       radius: 80,
                     ),
 
+
+
+                    FutureBuilder<String?>(
+                      future: storage.read(key: 'refresh_token'),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Text(l10n.readingToken);
+                        }
+
+                        if (!snapshot.hasData || snapshot.data == null) {
+                          return Text(l10n.noRefreshToken);
+                        }
+
+                        return Text('${l10n.refreshToken} ${snapshot.data}');
+                      },
+                    ),
                     const SizedBox(height: 20),
 
                     if (isEditing)
                     AppButton(
                       onPressed: photoState.isLoading ? null : () => _pickAndSaveImage(ref),
-                      text: 'Subir/Actualizar Foto',
+                      text: l10n.changeProfilePicture,
                     ),
                   ],
                 ),

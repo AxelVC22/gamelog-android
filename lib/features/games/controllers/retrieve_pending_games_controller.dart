@@ -2,8 +2,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/providers/games/games_providers.dart';
 import 'package:gamelog/core/data/models/games/games_response.dart';
-import 'package:gamelog/features/games/use_cases/retrieve_favorite_games_use_case.dart';
-
 import '../use_cases/retrieve_pending_games_use_case.dart';
 
 

@@ -1,10 +1,10 @@
 
 import '../../../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 
-class EliminarArchivosUseCase {
+class DeleteFilesUseCase {
   final ReviewMultimediaRepository repository;
 
-  EliminarArchivosUseCase(this.repository);
+  DeleteFilesUseCase(this.repository);
 
   Future<void> call(String idReview) async {
     if (idReview.isEmpty) {

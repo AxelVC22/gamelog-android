@@ -3,10 +3,10 @@ import 'dart:io';
 
 import '../../../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 
-class SubirFotoUseCase {
+class UploadPhotoUseCase {
   final ReviewMultimediaRepository repository;
 
-  SubirFotoUseCase(this.repository);
+  UploadPhotoUseCase(this.repository);
 
   Future<void> call({
     required String idReview,

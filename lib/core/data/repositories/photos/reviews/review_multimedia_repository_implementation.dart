@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:gamelog/core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 
-import '../../../data_sources/review_multimedia_grpc_data_source.dart';
+import '../../../data_sources/multimedia/review_multimedia_grpc_data_source.dart';
 
 class ReviewMultimediaRepositoryImpl implements ReviewMultimediaRepository {
   final ReviewMultimediaGrpcDataSource dataSource;
@@ -12,13 +12,13 @@ class ReviewMultimediaRepositoryImpl implements ReviewMultimediaRepository {
   ReviewMultimediaRepositoryImpl(this.dataSource);
 
   @override
-  Future<void> uploadPhoto(String idReview, int indice, File foto) async {
-    final bytes = await foto.readAsBytes();
-    final extension = foto.path.split('.').last;
+  Future<void> uploadPhoto(String idReview, int index, File photo) async {
+    final bytes = await photo.readAsBytes();
+    final extension = photo.path.split('.').last;
 
     final response = await dataSource.uploadPhoto(
       idReview: idReview,
-      indice: indice,
+      index: index,
       extension: extension,
       data: bytes,
     );
@@ -52,7 +52,7 @@ class ReviewMultimediaRepositoryImpl implements ReviewMultimediaRepository {
   @override
   Future<List<Uint8List>> retrievePhotos(String idReview) async {
     final response = await dataSource.retrievePhotos(idReview);
-    return response.fotos.map((foto) => Uint8List.fromList(foto.datos)).toList();
+    return response.fotos.map((photo) => Uint8List.fromList(photo.datos)).toList();
   }
 
   @override

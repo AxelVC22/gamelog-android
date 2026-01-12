@@ -6,29 +6,19 @@ import 'package:gamelog/core/network/dio_client.dart';
 
 import '../../../core/domain/entities/account.dart';
 
-enum AuthStatus {
-  authenticated,
-  unauthenticated,
-  expired,
-}
+enum AuthStatus { authenticated, unauthenticated, expired }
 
 class AuthState {
   final AuthStatus status;
 
   const AuthState(this.status);
 
-  const AuthState.authenticated()
-      : status = AuthStatus.authenticated;
+  const AuthState.authenticated() : status = AuthStatus.authenticated;
 
-  const AuthState.unauthenticated()
-      : status = AuthStatus.unauthenticated;
+  const AuthState.unauthenticated() : status = AuthStatus.unauthenticated;
 
-  const AuthState.expired()
-      : status = AuthStatus.expired;
-
+  const AuthState.expired() : status = AuthStatus.expired;
 }
-
-
 
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier(this._storage) : super(const AuthState.unauthenticated());
@@ -38,14 +28,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> persistUser(Account account) async {
     final jsonString = jsonEncode(account.toJson());
 
-    await _storage.write(
-      key: 'current_user',
-      value: jsonString,
-    );
-
-    final saved = await _storage.read(key: 'current_user');
-
+    await _storage.write(key: 'current_user', value: jsonString);
   }
+
   Future<void> restoreUser(Ref ref) async {
     final rawUser = await _storage.read(key: 'current_user');
 
@@ -53,11 +38,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return;
     }
 
-
     try {
       final account = Account.fromJson(jsonDecode(rawUser));
       ref.read(currentUserProvider.notifier).state = account;
     } catch (e) {
+      await logout();
     }
   }
 
@@ -67,10 +52,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> restoreSession() async {
-
     final accessToken = await _storage.read(key: 'access_token');
     final refreshToken = await _storage.read(key: 'refresh_token');
-
 
     if (accessToken != null && refreshToken != null) {
       state = const AuthState.authenticated();
@@ -101,7 +84,6 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 });
 
 final authBootstrapProvider = FutureProvider<void>((ref) async {
-
   final auth = ref.read(authStateProvider.notifier);
 
   await auth.restoreSession();

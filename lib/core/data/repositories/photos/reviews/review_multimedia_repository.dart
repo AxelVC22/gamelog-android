@@ -11,7 +11,7 @@ class MultimediaMetadata {
 }
 
 abstract class ReviewMultimediaRepository {
-  Future<void> uploadPhoto(String idReview, int indice, File foto);
+  Future<void> uploadPhoto(String idReview, int index, File photo);
   Future<void> uploadVideo(String idReview, File video, {Function(double)? onProgress});
   Future<List<Uint8List>> retrievePhotos(String idReview);
   Future<Uint8List?> retrieveVideo(String idReview, {Function(double)? onProgress});

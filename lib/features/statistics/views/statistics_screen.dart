@@ -95,6 +95,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   Future<void> _reloadTrendStatistics() async {
     if (!mounted || trendStartDate == null || trendEndDate == null) return;
 
+
     setState(() => notFoundTrendStatistics = false);
 
     ref.read(searchTrendResultProvider.notifier).state = [];
@@ -358,8 +359,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
 
-              AppModuleTitle(title: 'Juegos más reseñados}'),
-              Text('Echa un vistazo a los jiegos más reseñados de la semana'),
+              AppModuleTitle(title: l10n.mostReviewedGamesTitle),
+              Text(l10n.mostReviewedGamesDescription),
               const SizedBox(height: 24.0),
               GestureDetector(
                 onTap: () => _selectTrendDateRange(context),
@@ -377,7 +378,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     children: [
                       const Icon(Icons.date_range),
                       const SizedBox(width: 8),
-                      Text(_trendSelectedRange ?? 'Seleccionar rango de fecha'),
+                      Text(_trendSelectedRange ?? l10n.selectRange),
                     ],
                   ),
                 ),
@@ -386,15 +387,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               const SizedBox(height: 12.0),
 
               if (trendMergedGames.isNotEmpty)
-                AppGraph(games: trendMergedGames, onTap: () {}, title: 'Top res;eados',)
+                AppGraph(games: trendMergedGames, onTap: () {}, title: l10n.mostReviewedGamesTitle,)
               else if (!notFoundTrendStatistics)
                 const AppSkeletonLoader(
                   height: 290,
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
 
-              AppModuleTitle(title: 'Juegos retro'),
-              Text('Echa un vistazo a los jiegos retros'),
+              AppModuleTitle(title:l10n.retroRevivalGamesTitle),
+              Text(l10n.mostReviewedRetroRevivalGamesDescription),
               const SizedBox(height: 24.0),
 
 
@@ -414,7 +415,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     children: [
                       const Icon(Icons.date_range),
                       const SizedBox(width: 8),
-                      Text(_revivalRetroSelectedRange ?? 'Seleccionar rango de fecha'),
+                      Text(_revivalRetroSelectedRange ?? l10n.selectRange),
                     ],
                   ),
                 ),
@@ -423,7 +424,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               const SizedBox(height: 12.0),
 
               if (revivalRetroMergedGames.isNotEmpty)
-                AppGraph(games: revivalRetroMergedGames, onTap: () {}, title: 'top retroo',)
+                AppGraph(games: revivalRetroMergedGames, onTap: () {}, title: l10n.retroRevivalGamesTitle,)
               else if (!notFoundRevivalRetroStatistics)
                 const AppSkeletonLoader(
                   height: 290,

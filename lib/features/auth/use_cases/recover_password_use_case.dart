@@ -14,7 +14,9 @@ class RecoverPasswordSendEmailUseCase {
   Future<Either<Failure, RecoverPasswordResponse>> call(
     RecoverPasswordRequest request,
   ) async {
-    if (request.email.trim().isEmpty || !request.email.contains("@") || request.email.length > 50) {
+    if (request.email.trim().isEmpty ||
+        !request.email.contains("@") ||
+        request.email.length > 50) {
       return left(Failure(ErrorCodes.invalidEmail));
     }
     final result = await repository.sendEmail(request);
@@ -29,9 +31,11 @@ class RecoverPasswordVerifyCodeUseCase {
   RecoverPasswordVerifyCodeUseCase(this.repository);
 
   Future<Either<Failure, RecoverPasswordResponse>> call(
-      RecoverPasswordRequest request,
-      ) async {
-    if (request.email.trim().isEmpty || !request.email.contains("@") || request.email.length > 50) {
+    RecoverPasswordRequest request,
+  ) async {
+    if (request.email.trim().isEmpty ||
+        !request.email.contains("@") ||
+        request.email.length > 50) {
       return left(Failure(ErrorCodes.invalidEmail));
     }
     final result = await repository.verifyCode(request);
@@ -46,9 +50,11 @@ class RecoverPasswordChangePasswordUseCase {
   RecoverPasswordChangePasswordUseCase(this.repository);
 
   Future<Either<Failure, RecoverPasswordResponse>> call(
-      RecoverPasswordRequest request,
-      ) async {
-    if (request.email.trim().isEmpty || !request.email.contains("@") || request.email.length > 50) {
+    RecoverPasswordRequest request,
+  ) async {
+    if (request.email.trim().isEmpty ||
+        !request.email.contains("@") ||
+        request.email.length > 50) {
       return left(Failure(ErrorCodes.invalidEmail));
     }
     final result = await repository.changePassword(request);
@@ -56,4 +62,3 @@ class RecoverPasswordChangePasswordUseCase {
     return result;
   }
 }
-

@@ -1,12 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gamelog/core/domain/failures/failure.dart';
 import 'package:gamelog/core/data/models/notifications/retrieve_notifications_response.dart';
 import 'package:gamelog/core/data/repositories/notifications/notifications_repository.dart';
 
 import '../../../constants/api_constants.dart';
-import '../../../constants/error_codes.dart';
 import '../../../presentation/dio_error_handler.dart';
 
 class NotificationsRepositoryImpl extends NotificationsRepository {

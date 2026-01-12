@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/data/models/follows/follow_user_request.dart';
 import 'package:gamelog/features/follows/controllers/follow_user_controller.dart';
 import 'package:gamelog/core/data/models/users/add_to_black_list_request.dart';
@@ -333,125 +336,112 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 8),
 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
+                    if (notFoundUser)
+                      Text(l10n.notFoundUser)
+                    else if (user == null)
+                      const AppSkeletonLoader(
+                        height: 220,
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Column(
+                          children: [
+                            AppProfilePhoto(
+                              imageData: photoState.imageData,
+                              isLoading: photoState.isLoading,
+                              radius: 80,
+                            ),
 
-              if (notFoundUser)
-                Text(l10n.notFoundUser)
-              else if (user == null)
-                const AppSkeletonLoader(
-                  height: 220,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Column(
-                    children: [
-                      AppProfilePhoto(
-                        imageData: photoState.imageData,
-                        isLoading: photoState.isLoading,
-                        radius: 80,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Avatar
-                          const SizedBox(width: 16),
+                            const SizedBox(height: 16),
 
-                          // Info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            AppModuleTitle(
+                              title:
+                              '${user.name} ${user.fathersSurname}\n(${user.username})',
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            Row(
                               children: [
-                                AppModuleTitle(
-                                  title:
-                                      '${user.name} ${user.fathersSurname}\n(${user.username})',
+                                Expanded(
+                                  child: AppButton(
+                                    text: l10n.follow,
+                                    type: AppButtonType.primary,
+                                    onPressed: () =>
+                                        performFollowUser(user.idPlayer),
+                                  ),
                                 ),
-
-                                const SizedBox(height: 8),
-
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          AppButton(
-                                            text: l10n.follow,
-                                            type: AppButtonType.primary,
-                                            onPressed: () => performFollowUser(
-                                              user.idPlayer,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: AppButton(
-                                        text: l10n.blackList,
-                                        type: AppButtonType.danger,
-                                        onPressed: isAdmin
-                                            ? () async =>
-                                                  await performAddToBlackList(
-                                                    user.email!,
-                                                    user.accessType!,
-                                                  )
-                                            : null,
-                                      ),
-                                    ),
-                                  ],
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: AppButton(
+                                    text: l10n.blackList,
+                                    type: AppButtonType.danger,
+                                    onPressed: isAdmin
+                                        ? () async =>
+                                        performAddToBlackList(
+                                          user.email!,
+                                          user.accessType!,
+                                        )
+                                        : null,
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
 
-                      const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          ref
-                              .read(searchResultProvider.notifier)
-                              .state!
-                              .description,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            height: 1.4,
-                          ),
+                            const SizedBox(height: 16),
+
+                            Text(
+                              ref
+                                  .read(searchResultProvider.notifier)
+                                  .state!
+                                  .description,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                height: 1.4,
+                              ),
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            AppModuleTitle(title: l10n.favoriteGames),
+                            const Divider(),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
+                  ],
                 ),
-
-              const SizedBox(height: 8),
-
-              AppModuleTitle(title: l10n.favoriteGames),
-
-              const Divider(),
+              ),
 
               if (notFoundResults)
-                Text('Sin resultados')
+                SliverToBoxAdapter(
+                  child: Text(l10n.noResults),
+                )
               else if (results.isEmpty)
-                AppSkeletonLoader.listTile()
+                SliverToBoxAdapter(
+                  child: AppSkeletonLoader.listTile(),
+                )
               else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (_, i) {
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (context, i) {
                       return AppGameDetailedCard(
                         name: results[i].name,
                         imageUrl:
-                            results[i].backgroundImage ??
-                            'https://picsum.photos/800/450',
+                        results[i].backgroundImage ??
+                            ApiConstants.defaultImageUrl,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -462,10 +452,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         },
                       );
                     },
+                    childCount: results.length,
                   ),
                 ),
 
-              const SizedBox(height: 12),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 12),
+              ),
             ],
           ),
         ),

@@ -30,33 +30,32 @@ class UploadState {
 }
 
 class ReviewMultimediaController extends StateNotifier<UploadState> {
-  final SubirFotoUseCase subirFotoUseCase;
-  final SubirVideoUseCase subirVideoUseCase;
-  final EliminarArchivosUseCase eliminarArchivosUseCase;
+  final UploadPhotoUseCase uploadPhotoUseCase;
+  final UploadVideoUseCase uploadVideoUseCase;
+  final DeleteFilesUseCase deleteFilesUseCase;
 
   ReviewMultimediaController({
-    required this.subirFotoUseCase,
-    required this.subirVideoUseCase,
-    required this.eliminarArchivosUseCase,
+    required this.uploadPhotoUseCase,
+    required this.uploadVideoUseCase,
+    required this.deleteFilesUseCase,
   }) : super(UploadState());
 
   Future<void> uploadPhoto({
     required String idReview,
-    required int indice,
-    required File foto,
+    required int index,
+    required File photo,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await subirFotoUseCase(
+      await uploadPhotoUseCase(
         idReview: idReview,
-        indice: indice,
-        foto: foto,
+        indice: index,
+        foto: photo,
       );
       state = state.copyWith(isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      rethrow;
     }
   }
 
@@ -67,7 +66,7 @@ class ReviewMultimediaController extends StateNotifier<UploadState> {
     state = state.copyWith(isLoading: true, progress: 0.0, error: null);
 
     try {
-      await subirVideoUseCase(
+      await uploadVideoUseCase(
         idReview: idReview,
         video: video,
         onProgress: (progress) {
@@ -81,16 +80,14 @@ class ReviewMultimediaController extends StateNotifier<UploadState> {
         progress: 0.0,
         error: e.toString(),
       );
-      rethrow;
     }
   }
 
   Future<void> deleteFiles(String idReview) async {
     try {
-      await eliminarArchivosUseCase(idReview);
+      await deleteFilesUseCase(idReview);
     } catch (e) {
-      state = state.copyWith(error: e.toString());
-      rethrow;
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 }

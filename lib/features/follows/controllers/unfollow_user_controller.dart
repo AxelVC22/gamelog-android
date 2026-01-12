@@ -1,9 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gamelog/core/data/models/follows/follow_user_request.dart';
-import 'package:gamelog/core/data/models/follows/follow_user_response.dart';
 import 'package:gamelog/core/data/models/follows/unfollow_user_response.dart';
 import 'package:gamelog/core/data/providers/follows/follows_providers.dart';
-import 'package:gamelog/features/follows/user_cases/follow_user_use_case.dart';
 import 'package:gamelog/features/follows/user_cases/unfollow_user_use_case.dart';
 
 

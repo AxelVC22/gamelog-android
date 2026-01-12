@@ -202,11 +202,17 @@ abstract class AppLocalizations {
   /// **'Amigos'**
   String get friends;
 
-  /// No description provided for @welcomeMessage.
+  /// No description provided for @noResults.
   ///
   /// In es, this message translates to:
-  /// **'¡Bienvenido, {username}!'**
-  String welcomeMessage(String username);
+  /// **'Sin resultados'**
+  String get noResults;
+
+  /// No description provided for @selectRange.
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar rango'**
+  String get selectRange;
 
   /// No description provided for @email.
   ///
@@ -250,6 +256,30 @@ abstract class AppLocalizations {
   /// **'Nombre de usuario'**
   String get userName;
 
+  /// No description provided for @readingToken.
+  ///
+  /// In es, this message translates to:
+  /// **'Leyendo token...'**
+  String get readingToken;
+
+  /// No description provided for @noRefreshToken.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin refresh token'**
+  String get noRefreshToken;
+
+  /// No description provided for @refreshToken.
+  ///
+  /// In es, this message translates to:
+  /// **'Refresh token:'**
+  String get refreshToken;
+
+  /// No description provided for @changeProfilePicture.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar foto de perfil'**
+  String get changeProfilePicture;
+
   /// No description provided for @recoverPasswordTitle.
   ///
   /// In es, this message translates to:
@@ -267,12 +297,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Buscar perfil'**
   String get searchProfileTitle;
-
-  /// No description provided for @profileTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Perfil de usuario'**
-  String get profileTitle;
 
   /// No description provided for @editProfileTitle.
   ///
@@ -328,22 +352,82 @@ abstract class AppLocalizations {
   /// **'Notificaciones'**
   String get notificationsTitle;
 
-  /// No description provided for @socialTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Social'**
-  String get socialTitle;
-
   /// No description provided for @statisticsTitle.
   ///
   /// In es, this message translates to:
   /// **'Estadísticas'**
   String get statisticsTitle;
 
+  /// No description provided for @topOfTheWeekendTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Top de la semana'**
+  String get topOfTheWeekendTitle;
+
+  /// No description provided for @homeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicio'**
+  String get homeTitle;
+
+  /// No description provided for @gamesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Juegos'**
+  String get gamesTitle;
+
+  /// No description provided for @socialTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Social'**
+  String get socialTitle;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil'**
+  String get profileTitle;
+
+  /// No description provided for @mostReviewedGamesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Los juegos más reseñados'**
+  String get mostReviewedGamesTitle;
+
+  /// No description provided for @retroRevivalGamesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Juegos clásicos'**
+  String get retroRevivalGamesTitle;
+
+  /// No description provided for @favoritesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Favoritos'**
+  String get favoritesTitle;
+
+  /// No description provided for @pendingsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get pendingsTitle;
+
+  /// No description provided for @mostReviewedGamesDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Echa un vistazo a los juegos más reseñados de cierto periodo'**
+  String get mostReviewedGamesDescription;
+
+  /// No description provided for @mostReviewedRetroRevivalGamesDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Vuelve a los clásicos viendo los juegos retro más reseñados'**
+  String get mostReviewedRetroRevivalGamesDescription;
+
   /// No description provided for @login.
   ///
   /// In es, this message translates to:
-  /// **'Iniciar sesiôn'**
+  /// **'Iniciar sesión'**
   String get login;
 
   /// No description provided for @createAccount.
@@ -442,12 +526,6 @@ abstract class AppLocalizations {
   /// **'Todos'**
   String get allReviews;
 
-  /// No description provided for @newFollowerNotification.
-  ///
-  /// In es, this message translates to:
-  /// **'¡{username} ha comenzado a seguirte!'**
-  String newFollowerNotification(String username);
-
   /// No description provided for @followers.
   ///
   /// In es, this message translates to:
@@ -520,6 +598,18 @@ abstract class AppLocalizations {
   /// **'Error del servidor'**
   String get serverError;
 
+  /// No description provided for @saveMultimediaError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al subir archivo'**
+  String get saveMultimediaError;
+
+  /// No description provided for @unexpectedValuesError.
+  ///
+  /// In es, this message translates to:
+  /// **'Se ingresaron valores inesperados'**
+  String get unexpectedValuesError;
+
   /// No description provided for @requiredField.
   ///
   /// In es, this message translates to:
@@ -574,6 +664,12 @@ abstract class AppLocalizations {
   /// **'La descripcion es invalida'**
   String get invalidDescription;
 
+  /// No description provided for @invalidPhoto.
+  ///
+  /// In es, this message translates to:
+  /// **'La foto es inválida'**
+  String get invalidPhoto;
+
   /// No description provided for @nameFormat.
   ///
   /// In es, this message translates to:
@@ -610,11 +706,23 @@ abstract class AppLocalizations {
   /// **'La descripcion ser entre 3-100 caracteres y solo debe contener letras'**
   String get descriptionFormat;
 
-  /// Mensaje de error genérico
+  /// No description provided for @visitTheMostReviewedGame.
   ///
   /// In es, this message translates to:
-  /// **'Ha ocurrido un error desconocido'**
-  String get unknownError;
+  /// **'Visita el juego más reseñado de la semana'**
+  String get visitTheMostReviewedGame;
+
+  /// No description provided for @profilePictureSaveSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Foto guardada correctamente'**
+  String get profilePictureSaveSuccess;
+
+  /// No description provided for @profilePictureSaveFail.
+  ///
+  /// In es, this message translates to:
+  /// **'No fue posible guardar la foto'**
+  String get profilePictureSaveFail;
 }
 
 class _AppLocalizationsDelegate

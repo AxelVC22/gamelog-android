@@ -1,7 +1,3 @@
-// data/repositories/socket_repository_impl.dart
-
-
-
 import 'package:gamelog/core/data/repositories/sockets/notifications/socket_repository.dart';
 
 import '../../../data_sources/notifications/socket_io_data_source.dart';
@@ -13,30 +9,30 @@ class SocketRepositoryImpl implements SocketRepository {
 
   @override
   void connect({
-    required String usuario,
-    required String contrasenia,
-    required String idJugador,
+    required String user,
+    required String password,
+    required String idPlayer,
   }) {
     dataSource.connect(
-      usuario: usuario,
-      contrasenia: contrasenia,
-      idJugador: idJugador,
+      user: user,
+      password: password,
+      idPlayer: idPlayer,
     );
   }
 
   @override
-  void suscribirResenasJuego(String idJuego) {
-    dataSource.suscribirResenasJuego(idJuego);
+  void subscribeGameReviews(String idGame) {
+    dataSource.subscribeGameReviews(idGame);
   }
 
   @override
-  void desuscribirResenasJuego(String idJuego) {
-    dataSource.desuscribirResenasJuego(idJuego);
+  void unsubscribeGameReviews(String idGame) {
+    dataSource.unsubscribeGameReviews(idGame);
   }
 
   @override
-  void suscribirBroadcast() {
-    dataSource.suscribirBroadcast();
+  void subscribeBroadcast() {
+    dataSource.subscribeBroadcast();
   }
 
   @override
@@ -48,17 +44,17 @@ class SocketRepositoryImpl implements SocketRepository {
   bool get isConnected => dataSource.isConnected;
 
   @override
-  void setOnNotificacionJugador(Function(String) callback) {
-    dataSource.onNotificacionJugador = callback;
+  void setOnPlayerNotification(Function(dynamic) callback) {
+    dataSource.onPlayerNotification = callback;
   }
 
   @override
-  void setOnActualizacionResenas(Function(String) callback) {
-    dataSource.onActualizacionResenas = callback;
+  void setOnReviewsUpdating(Function(dynamic) callback) {
+    dataSource.onReviewsUpdating = callback;
   }
 
   @override
-  void setOnMensajeBroadcast(Function(String) callback) {
-    dataSource.onMensajeBroadcast = callback;
+  void setOnBroadcastMessage(Function(dynamic) callback) {
+    dataSource.onBroadcastMessage = callback;
   }
 }

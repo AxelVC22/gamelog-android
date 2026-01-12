@@ -11,6 +11,7 @@ class LogoutUseCase {
   LogoutUseCase(this.repository);
 
   Future<Either<Failure, LogoutResponse>> call(String email) async {
+
     if (email.isEmpty || !email.contains("@") || email.length > 50) {
       return left(Failure(ErrorCodes.invalidEmail));
     }

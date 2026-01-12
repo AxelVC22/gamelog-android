@@ -18,17 +18,8 @@
   "search": "Buscar",
   "follow": "Seguir",
   "friends": "Amigos",
-
-  "welcomeMessage": "¡Bienvenido, {username}!",
-  "@welcomeMessage": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
-
-
+  "noResults": "Sin resultados",
+  "selectRange": "Seleccionar rango",
   "email": "Correo",
   "user": "Usuario",
   "password": "Contraseña",
@@ -36,13 +27,16 @@
   "fathersSurname": "Primer apellido",
   "mothersSurname": "Segundo apellido",
   "userName": "Nombre de usuario",
+  "readingToken" : "Leyendo token...",
+  "noRefreshToken": "Sin refresh token",
+  "refreshToken": "Refresh token:",
+  "changeProfilePicture": "Cambiar foto de perfil",
 
 
   "@@Titles": "=== TITULOS DE MODULOS ===",
   "recoverPasswordTitle": "Recuperación de contraseña",
   "createAccountTitle": "Creación de cuenta",
   "searchProfileTitle": "Buscar perfil",
-  "profileTitle": "Perfil de usuario",
   "editProfileTitle": "Editar perfil",
   "favoriteGames": "Videojuegos favoritos",
   "searchGameTitle": "Buscar juego",
@@ -52,8 +46,22 @@
   "gameTitle": "Juego",
   "myReviewTitle": "Mi reseña",
   "notificationsTitle": "Notificaciones",
-  "socialTitle": "Social",
   "statisticsTitle": "Estadísticas",
+  "topOfTheWeekendTitle" : "Top de la semana",
+  "homeTitle": "Inicio",
+  "gamesTitle": "Juegos",
+  "socialTitle": "Social",
+  "profileTitle": "Perfil",
+  "mostReviewedGamesTitle": "Los juegos más reseñados",
+  "retroRevivalGamesTitle": "Juegos clásicos",
+  "favoritesTitle": "Favoritos",
+  "pendingsTitle": "Pendientes",
+
+
+  "@@ModuleDescriptions": "=== DESCRIPCIONES DE MODULOS ===",
+  "mostReviewedGamesDescription": "Echa un vistazo a los juegos más reseñados de cierto periodo",
+  "mostReviewedRetroRevivalGamesDescription": "Vuelve a los clásicos viendo los juegos retro más reseñados",
+
 
 
 
@@ -61,7 +69,7 @@
 
   "@@Auth": "=== Autenticación ===",
 
-  "login": "Iniciar sesiôn",
+  "login": "Iniciar sesión",
   "createAccount": "Crear cuenta",
   "recoverPassword": "Recuperar contraseña",
   "verificationCode": "Código de verificación",
@@ -85,20 +93,15 @@
   "addToPendings": "Añadir a pendientes",
   "allReviews": "Todos",
 
-  "@@Notifications": "=== Notificaciones ===",
 
-  "newFollowerNotification": "¡{username} ha comenzado a seguirte!",
-  "@newFollowerNotification": {
-    "placeholders": {
-      "username": {
-        "type": "String"
-      }
-    }
-  },
+
+
   "@@Social": "=== Social ===",
 
   "followers": "Seguidores",
   "followedPlayers": "Seguidos",
+
+
 
   "@@Errors": "=== Errores ===",
 
@@ -115,6 +118,14 @@
   "badRequest": "La solicitud es inválida",
 
   "serverError": "Error del servidor",
+  "saveMultimediaError": "Error al subir archivo",
+  "unexpectedValuesError": "Se ingresaron valores inesperados",
+
+
+
+
+
+
 
   "@@ValidationMessages": "=== Mensajes de validacion UI===",
   "requiredField" : "El campo es obligatorio",
@@ -127,6 +138,11 @@
   "invalidPassword": "La contrasena no es segura: procura usar mas de 8 caracteres \n Menos de 50 letras simbolos etc",
   "invalidEmail": "El correo es invalido",
   "invalidDescription": "La descripcion es invalida",
+  "invalidPhoto": "La foto es inválida",
+
+
+
+
 
   "@@FormatFields": "=== Formato de campos ===",
 
@@ -142,9 +158,13 @@
 
   "@@Validation": "=== Validaciion de CU ===",
 
-  "unknownError": "Ha ocurrido un error desconocido",
-  "@unknownError": {
-    "description": "Mensaje de error genérico"
-  }
+
+  "@@Home": "== Home ===",
+  "visitTheMostReviewedGame": "Visita el juego más reseñado de la semana",
+
+
+  "@@Messages": "== Mensajes ===",
+  "profilePictureSaveSuccess": "Foto guardada correctamente",
+  "profilePictureSaveFail": "No fue posible guardar la foto"
 
 }

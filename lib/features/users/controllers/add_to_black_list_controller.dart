@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamelog/core/data/models/users/add_to_black_list_request.dart';
 import 'package:gamelog/core/data/models/users/add_to_black_list_response.dart';
-import 'package:gamelog/core/data/models/users/search_user_response.dart';
 import 'package:gamelog/core/data/providers/users/users_providers.dart';
 import 'package:gamelog/features/users/use_cases/add_to_black_list_use_case.dart';
 
