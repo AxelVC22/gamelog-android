@@ -4,6 +4,7 @@ import 'package:gamelog/core/helpers/field_validator.dart';
 import 'package:gamelog/l10n/app_localizations_extension.dart';
 import '../../../core/domain/entities/user.dart';
 import '../../../core/domain/failures/failure.dart';
+import '../../../core/helpers/password_helper.dart';
 import '../../../core/presentation/field_state.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_global_loader.dart';
@@ -64,9 +65,10 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   }
 
   Future<void> performCreateAccount() async {
+    String hashedPassword = PasswordHelper.hashPassword(_passwordController.text);
     final request = RegisterUserRequest(
       email: _emailController.text,
-      password: _passwordController.text,
+      password: hashedPassword,
       status: UserStatus.Desbaneado.name,
       name: _nameController.text,
       fathersSurname: _fathersSurnameController.text,
