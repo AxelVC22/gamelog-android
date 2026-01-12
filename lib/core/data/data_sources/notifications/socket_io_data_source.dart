@@ -1,108 +1,82 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-
-import '../../../services/notification_service.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class SocketIODataSource {
-  IO.Socket? _socket;
-  String? _idJugador;
+  io.Socket? _socket;
+  String? _idPlayer;
 
-  Function(String)? onNotificacionJugador;
-  Function(String)? onActualizacionResenas;
-  Function(String)? onMensajeBroadcast;
+  Function(dynamic)? onPlayerNotification;
+  Function(dynamic)? onReviewsUpdating;
+  Function(dynamic)? onBroadcastMessage;
 
   void connect({
-    required String usuario,
-    required String contrasenia,
-    required String idJugador,
+    required String user,
+    required String password,
+    required String idPlayer,
   }) {
-    _idJugador = idJugador;
+    _idPlayer = idPlayer;
 
-    _socket = IO.io(
-      'http://192.168.0.24:1236',
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .setQuery({
-        'usuario': usuario,
-        'contrasenia': contrasenia,
-      })
-          .build(),
+    _socket = io.io(
+      ApiConstants.webSocketsUrl,
+      io.OptionBuilder().setTransports(['websocket']).setQuery({
+        'usuario': user,
+        'contrasenia': password,
+      }).build(),
     );
 
     _socket!.on('connect', (_) {
-
-      print('Socket conectado');
-      _socket!.emit('suscribir_notificacion_jugador', idJugador);
+      _socket!.emit('suscribir_notificacion_jugador', idPlayer);
     });
 
     _socket!.on('notificacion_jugador', (data) {
-
-      if (data is List && data.isNotEmpty) {
-        final payload = data[0];
-
-        if (payload is Map) {
-          final accion = payload['accion'];
-          final mensaje = payload['mensaje'];
-
-          NotificationService().mostrarNotificacion(
-            titulo: _tituloPorAccion(accion.toString()),
-            mensaje: mensaje ?? 'Nueva notificación',
-          );
-        }
+      if (onPlayerNotification != null) {
+        onPlayerNotification!(data);
       }
     });
 
     _socket!.on('actualizacion_resenas', (data) {
-      print('Actualización de reseñas: $data');
-      if (onActualizacionResenas != null) {
-        onActualizacionResenas!(data.toString());
+      if (onReviewsUpdating != null) {
+        onReviewsUpdating!(data);
       }
     });
 
     _socket!.on('mensaje_broadcast', (data) {
-      print('Mensaje broadcast: $data');
-      if (onMensajeBroadcast != null) {
-        onMensajeBroadcast!(data.toString());
+      if (onBroadcastMessage != null) {
+        onBroadcastMessage!(data);
       }
     });
 
-    _socket!.on('disconnect', (_) {
-      print('Socket desconectado');
-    });
-
-    _socket!.on('connect_error', (error) {
-      print('Error de conexión: $error');
-    });
 
     _socket!.connect();
   }
 
-  void suscribirResenasJuego(String idJuego) {
+  void subscribeGameReviews(String idGame) {
     if (_socket != null && _socket!.connected) {
-      _socket!.emit('suscribir_interaccion_resenas', idJuego);
+      _socket!.emit('suscribir_interaccion_resenas', idGame);
     }
   }
 
-  void desuscribirResenasJuego(String idJuego) {
+  void unsubscribeGameReviews(String idGame) {
     if (_socket != null && _socket!.connected) {
-      _socket!.emit('desuscribir_interaccion_resenas', idJuego);
+      _socket!.emit('desuscribir_interaccion_resenas', idGame);
     }
   }
 
-  void suscribirBroadcast() {
+  void subscribeBroadcast() {
     if (_socket != null && _socket!.connected) {
       _socket!.emit('broadcast_mensajes_servidor');
     }
   }
 
-  void desuscribirNotificacionJugador() {
-    if (_socket != null && _socket!.connected && _idJugador != null) {
-      _socket!.emit('desuscribir_notificacion_jugador', _idJugador);
+  void unsubscribePlayerNotification() {
+    if (_socket != null && _socket!.connected && _idPlayer != null) {
+      _socket!.emit('desuscribir_notificacion_jugador', _idPlayer);
     }
   }
 
   void disconnect() {
     if (_socket != null && _socket!.connected) {
-      desuscribirNotificacionJugador();
+      unsubscribePlayerNotification();
       _socket!.disconnect();
       _socket!.dispose();
       _socket = null;
@@ -110,8 +84,4 @@ class SocketIODataSource {
   }
 
   bool get isConnected => _socket != null && _socket!.connected;
-
-  String _tituloPorAccion(String accion) {
-    return 'Titulo';
-  }
 }

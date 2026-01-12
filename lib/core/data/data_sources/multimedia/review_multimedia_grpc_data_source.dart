@@ -1,7 +1,7 @@
 
 import 'package:grpc/grpc.dart';
 import 'dart:typed_data';
-import '../../../grpc/Multimedia_De_Resenia.pbgrpc.dart';
+import '../../../../grpc/Multimedia_De_Resenia.pbgrpc.dart';
 
 class ReviewMultimediaGrpcDataSource {
   late ClientChannel _channel;
@@ -22,30 +22,27 @@ class ReviewMultimediaGrpcDataSource {
 
   Future<SubirFotoResponse> uploadPhoto({
     required String idReview,
-    required int indice,
+    required int index,
     required String extension,
     required Uint8List data,
   }) async {
     try {
       final request = SubirFotoRequest()
         ..idReview = idReview
-        ..indice = indice
+        ..indice = index
         ..extension_3 = extension
         ..datos = data;
 
       return await _stub.subirFoto(request);
     } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
+      throw Exception(e.message);
     }
   }
 
   Future<ObtenerFotosResponse> retrievePhotos(String idReview) async {
-    try {
       final request = ObtenerFotosRequest()..idReview = idReview;
       return await _stub.obtenerFotos(request);
-    } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
-    }
+
   }
 
 
@@ -82,7 +79,7 @@ class ReviewMultimediaGrpcDataSource {
 
       return await _stub.subirVideo(requestStream());
     } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
+      throw Exception(e.message);
     }
   }
 
@@ -90,7 +87,6 @@ class ReviewMultimediaGrpcDataSource {
       String idReview, {
         Function(double)? onProgress,
       }) async {
-    try {
       final request = ObtenerVideoRequest()..idReview = idReview;
       final stream = _stub.obtenerVideo(request);
 
@@ -122,19 +118,14 @@ class ReviewMultimediaGrpcDataSource {
       }
 
       return result;
-    } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
-    }
+
   }
 
 
   Future<MetadataResponse> retrieveMetadata(String idReview) async {
-    try {
       final request = ObtenerMetadataRequest()..idReview = idReview;
       return await _stub.obtenerMetadata(request);
-    } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
-    }
+
   }
 
   Future<EliminarArchivosResponse> deleteFiles(String idReview) async {
@@ -142,7 +133,7 @@ class ReviewMultimediaGrpcDataSource {
       final request = EliminarArchivosRequest()..idReview = idReview;
       return await _stub.eliminarArchivos(request);
     } on GrpcError catch (e) {
-      throw Exception('Error gRPC: ${e.message}');
+      throw Exception(e.message);
     }
   }
 

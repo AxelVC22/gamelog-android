@@ -86,8 +86,8 @@ class _AppGraphState extends State<AppGraph> {
                   child: Text(
                     widget.title,
                     style: const TextStyle(
-                      fontSize: 24,
-                      fontStyle: FontStyle.normal,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

@@ -11,6 +11,7 @@ class FollowUserUseCase {
   FollowUserUseCase(this.repository);
 
   Future<Either<Failure, FollowUserResponse>> call (FollowUserRequest request) async {
+
     final result = await repository.followUser(request);
     return result;
   }

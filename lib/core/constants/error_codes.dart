@@ -2,6 +2,7 @@
 class ErrorCodes {
 
   static const unexpectedError = 'unexpectedError';
+  static const unexpectedValuesError = 'unexpectedValuesError';
 
   static const invalidName = 'invalidName';
   static const invalidFathersSurname = 'invalidFathersSurname';
@@ -11,6 +12,7 @@ class ErrorCodes {
   static const invalidEmail = 'invalidEmail';
   static const invalidPassword = 'invalidPassword';
   static const invalidDescription = 'invalidDescription';
+  static const invalidPhoto = 'invalidPhoto';
 
 
   static const userNotFound = 'userNotFound';

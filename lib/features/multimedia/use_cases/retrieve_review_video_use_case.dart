@@ -3,10 +3,10 @@ import 'dart:typed_data';
 
 import '../../../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 
-class ObtenerVideoUseCase {
+class RetrieveVideoUseCase {
   final ReviewMultimediaRepository repository;
 
-  ObtenerVideoUseCase(this.repository);
+  RetrieveVideoUseCase(this.repository);
 
   Future<Uint8List?> call({
     required String idReview,

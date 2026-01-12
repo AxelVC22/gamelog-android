@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/data/models/auth/logout_response.dart';
 import 'package:gamelog/features/auth/controllers/logout_controller.dart';
 import 'package:gamelog/features/auth/views/login_screen.dart';
@@ -84,7 +85,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (user == null) return;
     if (user.email == null) return;
 
+    _disconnectSocket();
     await ref.read(logoutControllerProvider.notifier).logout(user.email!);
+  }
+
+  void _disconnectSocket() {
+    final socketController = ref.read(socketControllerProvider.notifier);
+    final currentUser = ref.read(currentUserProvider.notifier).state;
+    final socketState = ref.watch(socketControllerProvider);
+
+    if (currentUser == null) return;
+
+    if (!socketState.isConnected) {
+      socketController.disconnect(
+      );
+    }
   }
 
   @override
@@ -115,12 +130,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (!socketState.isConnected) {
       socketController.connect(
-        usuario: dotenv.env['USUARIO_NOTI']!,
-        contrasenia: dotenv.env['CONTRASENIA_NOTI']!,
-        idJugador: currentUser.idPlayer.toString(),
+        user: dotenv.env['USUARIO_NOTI']!,
+        password: dotenv.env['CONTRASENIA_NOTI']!,
+        idPlayer: currentUser.idPlayer.toString(),
       );
 
-      socketController.suscribirBroadcast();
+      socketController.subscribeBroadcast();
     }
   }
 
@@ -200,7 +215,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    final socketState = ref.watch(socketControllerProvider);
     final mergedGames = ref.watch(mergedGamesProvider);
 
     ref.listen<AsyncValue<LogoutResponse?>>(logoutControllerProvider, (
@@ -239,7 +253,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onPressed: () => performLogout(),
         ),
         actions: [
-          Icon(socketState.isConnected ? Icons.wifi : Icons.wifi_off),
+
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {
@@ -261,11 +275,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               AppModuleTitle(
-                title: 'Visita el juego mas resenado de la semana',
+                title: l10n.visitTheMostReviewedGame,
               ),
 
               if (notFoundTrendStatistics)
-                Text('no se eonctro el mas resenado')
+                Text(l10n.noResults)
               else if (mergedGames.isEmpty)
                 const AppSkeletonLoader(
                   height: 200,
@@ -276,7 +290,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   name: mergedGames.first.name,
                   imageUrl:
                       mergedGames.first.backgroundImage ??
-                      'https://picsum.photos/800/450',
+                      ApiConstants.defaultImageUrl,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -289,7 +303,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 8.0),
 
               if (notFoundTrendStatistics)
-                Text('noo se encontraron estadiscicas')
+                Text(l10n.noResults)
               else if (mergedGames.isEmpty)
                 const AppSkeletonLoader(
                   height: 297,
@@ -298,7 +312,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               else
                 AppGraph(
                   games: mergedGames,
-                  title: 'Top de la semanna',
+                  title: l10n.topOfTheWeekendTitle,
                   onTap: () {
                     Navigator.push(
                       context,

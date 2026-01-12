@@ -13,7 +13,6 @@ import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_password_field.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../core/data/models/auth/recover_password_response.dart';
-import '../../../core/data/providers/auth/auth_providers.dart';
 import 'package:gamelog/l10n/app_localizations.dart';
 
 import '../controllers/recover_password_controller.dart';

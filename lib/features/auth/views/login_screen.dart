@@ -4,8 +4,6 @@ import 'package:gamelog/core/domain/entities/user.dart';
 import 'package:gamelog/core/data/models/auth/login_request.dart';
 import 'package:gamelog/features/auth/views/create_account_screen.dart';
 import 'package:gamelog/features/auth/views/recover_password_screen.dart';
-import '../../../core/data/providers/sockets/notifications/socket_providers.dart';
-import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
 import '../../../core/presentation/field_state.dart';
 import '../../../core/helpers/field_validator.dart';

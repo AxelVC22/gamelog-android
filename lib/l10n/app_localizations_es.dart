@@ -63,9 +63,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get friends => 'Amigos';
 
   @override
-  String welcomeMessage(String username) {
-    return '¡Bienvenido, $username!';
-  }
+  String get noResults => 'Sin resultados';
+
+  @override
+  String get selectRange => 'Seleccionar rango';
 
   @override
   String get email => 'Correo';
@@ -89,6 +90,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get userName => 'Nombre de usuario';
 
   @override
+  String get readingToken => 'Leyendo token...';
+
+  @override
+  String get noRefreshToken => 'Sin refresh token';
+
+  @override
+  String get refreshToken => 'Refresh token:';
+
+  @override
+  String get changeProfilePicture => 'Cambiar foto de perfil';
+
+  @override
   String get recoverPasswordTitle => 'Recuperación de contraseña';
 
   @override
@@ -96,9 +109,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchProfileTitle => 'Buscar perfil';
-
-  @override
-  String get profileTitle => 'Perfil de usuario';
 
   @override
   String get editProfileTitle => 'Editar perfil';
@@ -128,13 +138,45 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notificationsTitle => 'Notificaciones';
 
   @override
-  String get socialTitle => 'Social';
-
-  @override
   String get statisticsTitle => 'Estadísticas';
 
   @override
-  String get login => 'Iniciar sesiôn';
+  String get topOfTheWeekendTitle => 'Top de la semana';
+
+  @override
+  String get homeTitle => 'Inicio';
+
+  @override
+  String get gamesTitle => 'Juegos';
+
+  @override
+  String get socialTitle => 'Social';
+
+  @override
+  String get profileTitle => 'Perfil';
+
+  @override
+  String get mostReviewedGamesTitle => 'Los juegos más reseñados';
+
+  @override
+  String get retroRevivalGamesTitle => 'Juegos clásicos';
+
+  @override
+  String get favoritesTitle => 'Favoritos';
+
+  @override
+  String get pendingsTitle => 'Pendientes';
+
+  @override
+  String get mostReviewedGamesDescription =>
+      'Echa un vistazo a los juegos más reseñados de cierto periodo';
+
+  @override
+  String get mostReviewedRetroRevivalGamesDescription =>
+      'Vuelve a los clásicos viendo los juegos retro más reseñados';
+
+  @override
+  String get login => 'Iniciar sesión';
 
   @override
   String get createAccount => 'Crear cuenta';
@@ -185,11 +227,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get allReviews => 'Todos';
 
   @override
-  String newFollowerNotification(String username) {
-    return '¡$username ha comenzado a seguirte!';
-  }
-
-  @override
   String get followers => 'Seguidores';
 
   @override
@@ -226,6 +263,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get serverError => 'Error del servidor';
 
   @override
+  String get saveMultimediaError => 'Error al subir archivo';
+
+  @override
+  String get unexpectedValuesError => 'Se ingresaron valores inesperados';
+
+  @override
   String get requiredField => 'El campo es obligatorio';
 
   @override
@@ -255,6 +298,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invalidDescription => 'La descripcion es invalida';
 
   @override
+  String get invalidPhoto => 'La foto es inválida';
+
+  @override
   String get nameFormat =>
       'El nombre debe ser entre 3-50 caracteres y solo debe contener letras';
 
@@ -279,5 +325,12 @@ class AppLocalizationsEs extends AppLocalizations {
       'La descripcion ser entre 3-100 caracteres y solo debe contener letras';
 
   @override
-  String get unknownError => 'Ha ocurrido un error desconocido';
+  String get visitTheMostReviewedGame =>
+      'Visita el juego más reseñado de la semana';
+
+  @override
+  String get profilePictureSaveSuccess => 'Foto guardada correctamente';
+
+  @override
+  String get profilePictureSaveFail => 'No fue posible guardar la foto';
 }

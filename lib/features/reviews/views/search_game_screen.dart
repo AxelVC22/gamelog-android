@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import 'package:gamelog/core/domain/entities/game.dart';
 import 'package:gamelog/features/reviews/controllers/search_game_controller.dart';
 
@@ -89,7 +90,7 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
               const SizedBox(height: 12),
 
               if (notFoundResults)
-                Text('Sin resultados')
+                Text(l10n.noResults)
               else if (results == null)
                 AppSkeletonLoader(height: 200)
               else
@@ -107,7 +108,7 @@ class _SearchGameScreenState extends ConsumerState<SearchGameScreen> {
                                 .read(searchResultProvider.notifier)
                                 .state!
                                 .backgroundImage ??
-                            'https://picsum.photos/800/450',
+                            ApiConstants.defaultImageUrl,
                         onTap: () {
                           Navigator.push(
                             context,

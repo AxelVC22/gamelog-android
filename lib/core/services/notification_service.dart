@@ -1,4 +1,3 @@
-// core/services/notification_service.dart
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 
@@ -9,10 +8,9 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  /// Inicialización (llamar una sola vez, ej. en main)
   Future<void> initialize() async {
     await AwesomeNotifications().initialize(
-      null, // usa el icono por defecto de la app
+      null,
       [
         NotificationChannel(
           channelKey: 'gamelog_channel',
@@ -25,7 +23,6 @@ class NotificationService {
       debug: true,
     );
 
-    // Permisos (Android 13+ y iOS)
     final isAllowed =
     await AwesomeNotifications().isNotificationAllowed();
 
@@ -35,17 +32,16 @@ class NotificationService {
     }
   }
 
-  /// Mostrar notificación simple
-  Future<void> mostrarNotificacion({
-    required String titulo,
-    required String mensaje,
+  Future<void> showNotification({
+    required String title,
+    required String message,
   }) async {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
         channelKey: 'gamelog_channel',
-        title: titulo,
-        body: mensaje,
+        title: title,
+        body: message,
         notificationLayout: NotificationLayout.Default,
       ),
     );

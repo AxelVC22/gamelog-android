@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,22 +10,21 @@ import 'package:gamelog/features/reviews/controllers/retrieve_player_reviews_con
 
 import 'package:gamelog/l10n/app_localizations.dart';
 import 'package:gamelog/widgets/app_skeleton_loader.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../core/data/providers/photos/photos_providers.dart';
 import '../../../core/data/providers/photos/reviews/reviews_multimedia_providers.dart';
-import '../../../core/data/repositories/photos/reviews/review_multimedia_repository.dart';
 import '../../../core/domain/entities/game.dart';
 import '../../../core/domain/entities/review.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/presentation/failure_handler.dart';
+import '../../../core/presentation/feed_ui_handler.dart';
 import '../../../widgets/app_filter_tab.dart';
 import '../../../widgets/app_global_loader.dart';
 import '../../../widgets/app_icon_button.dart';
 import '../../../widgets/app_module_title.dart';
-import '../../../widgets/app_photo.dart';
 import '../../../widgets/app_review_card.dart';
+import '../../multimedia/controllers/review_multimedia_controller.dart';
+import '../../photos/controllers/profile_photo_controller.dart';
 import '../controllers/like_review_controller.dart';
 import '../controllers/retrieve_followed_player_reviews_controller.dart';
 import '../controllers/unlike_review_controller.dart';
@@ -52,7 +48,6 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
   late final ProviderSubscription _retrieveReviewsSub;
   late final ProviderSubscription _retrieveFollowedReviewsSub;
   bool showingFollowed = false;
-
 
   @override
   void initState() {
@@ -90,11 +85,12 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
 
           ref.read(retrieveResultsProvider.notifier).state = response.reviews;
 
-          final List<String> userIds =
-          response.reviews.map((a) => a.idPlayer.toString()).toList();
+          final List<String> userIds = response.reviews
+              .map((a) => a.idPlayer.toString())
+              .toList();
 
-
-          await ref.read(profilePhotoControllerProvider.notifier)
+          await ref
+              .read(profilePhotoControllerProvider.notifier)
               .getMultiplePhotos(userIds);
         },
         error: (error, __) {
@@ -223,6 +219,22 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
     final results = ref.watch(retrieveResultsProvider);
     final photoState = ref.watch(profilePhotoControllerProvider);
 
+    ref.listen<UploadState>(reviewMultimediaControllerProvider, (
+      previous,
+      next,
+    ) {
+      if (next.error != null) {
+        handleFailure(context: context, error: next.error!);
+      }
+    });
+
+    ref.listen<PhotoState>(profilePhotoControllerProvider, (previous, next) {
+      if (next.error != null) {
+        handleFailure(context: context, error: next.error!);
+      } else if (next.successMessage != null) {
+        handleSnackBarMessage(context: context, code: next.successMessage!);
+      }
+    });
 
     ref.listen<AsyncValue<DeleteReviewResponse?>>(
       deleteReviewControllerProvider,
@@ -373,7 +385,7 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
               const SizedBox(height: 16.0),
 
               if (notFoundResults)
-                Text('Sin resultados')
+                Text(l10n.noResults)
               else if (results.isEmpty)
                 const AppSkeletonLoader.listTile()
               else
@@ -383,7 +395,10 @@ class _PlayerReviewsScreenState extends ConsumerState<PlayerReviewsScreen> {
                     itemBuilder: (_, i) {
                       return AppReviewCard(
                         review: results[i],
-                        imageData: photoState.multiplePhotos != null ? photoState.multiplePhotos![results[i].idPlayer.toString()] : null,
+                        imageData: photoState.multiplePhotos != null
+                            ? photoState.multiplePhotos![results[i].idPlayer
+                                  .toString()]
+                            : null,
                         isLoading: photoState.isLoading,
                         likes: results[i].likesTotal,
                         userType: ref

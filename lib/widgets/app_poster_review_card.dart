@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../core/domain/entities/review.dart';
+import 'app_review_card.dart';
 import 'app_start_rating.dart';
 
 class AppPosterReviewCard extends StatelessWidget {
@@ -10,6 +12,7 @@ class AppPosterReviewCard extends StatelessWidget {
   final DateTime date;
   final double rating;
   final String opinion;
+  final Review review;
 
   const AppPosterReviewCard({
     super.key,
@@ -19,10 +22,12 @@ class AppPosterReviewCard extends StatelessWidget {
     required this.date,
     required this.rating,
     required this.opinion,
+    required this.review
   });
 
   @override
   Widget build(BuildContext context) {
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -89,6 +94,8 @@ class AppPosterReviewCard extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                         ),
                       ),
+                      ReviewItem(review: review)
+
                     ],
                   ),
                 ),

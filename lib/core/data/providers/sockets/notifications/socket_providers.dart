@@ -1,6 +1,7 @@
 // core/providers/socket_providers.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/features/auth/state/auth_state.dart';
 
 import '../../../../../features/notifications/controllers/socket_controller.dart';
 import '../../../../services/notification_service.dart';
@@ -34,5 +35,6 @@ StateNotifierProvider<SocketController, SocketState>((ref) {
   return SocketController(
     repository: repository,
     notificationService: notificationService,
+    authNotifier: ref.read(authStateProvider.notifier)
   );
 });

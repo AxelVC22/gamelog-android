@@ -4,8 +4,8 @@ import '../../../../features/photos/controllers/profile_photo_controller.dart';
 import '../../../../features/photos/use_cases/get_multiple_photos_use_case.dart';
 import '../../../../features/photos/use_cases/get_photo_use_case.dart';
 import '../../../../features/photos/use_cases/upload_photo_use_case.dart';
-import '../../data_sources/photo_grpc_data_source.dart';
-import '../../repositories/photos/photo_repository_implementation.dart';
+import '../../data_sources/multimedia/photo_grpc_data_source.dart';
+import '../../repositories/photos/profile_picture/photo_repository_implementation.dart';
 final photoDataSourceProvider = Provider<PhotoGrpcDataSource>((ref) {
   return PhotoGrpcDataSource(
     host: ApiConstants.host,

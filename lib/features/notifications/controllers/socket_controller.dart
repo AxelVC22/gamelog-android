@@ -1,26 +1,30 @@
-// features/notifications/controllers/socket_controller.dart
-
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamelog/core/constants/api_constants.dart';
 import '../../../core/data/repositories/sockets/notifications/socket_repository.dart';
 import '../../../core/services/notification_service.dart';
+import '../../auth/state/auth_state.dart';
 
 class SocketState {
   final bool isConnected;
   final String? lastNotification;
+  final String? lastAction;
 
   SocketState({
     this.isConnected = false,
     this.lastNotification,
+    this.lastAction,
   });
 
   SocketState copyWith({
     bool? isConnected,
     String? lastNotification,
+    String? lastAction,
+    AuthNotifier? authNotifier,
   }) {
     return SocketState(
       isConnected: isConnected ?? this.isConnected,
       lastNotification: lastNotification ?? this.lastNotification,
+      lastAction: lastAction ?? this.lastAction,
     );
   }
 }
@@ -28,107 +32,113 @@ class SocketState {
 class SocketController extends StateNotifier<SocketState> {
   final SocketRepository repository;
   final NotificationService notificationService;
+  final AuthNotifier authNotifier;
 
   SocketController({
     required this.repository,
     required this.notificationService,
+    required this.authNotifier,
   }) : super(SocketState()) {
     _setupListeners();
   }
 
   void _setupListeners() {
-    // Listener de notificaciones
-    repository.setOnNotificacionJugador((data) {
-      _handleNotificacionJugador(data);
+    repository.setOnPlayerNotification((data) {
+      _handlePlayerNotification(data);
     });
 
-    // Listener de actualización de reseñas
-    repository.setOnActualizacionResenas((data) {
-      _handleActualizacionResenas(data);
+    repository.setOnReviewsUpdating((data) {
+      _handleReviewsUpdating(data);
     });
 
-    // Listener de broadcast
-    repository.setOnMensajeBroadcast((data) {
+    repository.setOnBroadcastMessage((data) {
       _handleMensajeBroadcast(data);
     });
   }
 
   void connect({
-    required String usuario,
-    required String contrasenia,
-    required String idJugador,
+    required String user,
+    required String password,
+    required String idPlayer,
   }) {
-    repository.connect(
-      usuario: usuario,
-      contrasenia: contrasenia,
-      idJugador: idJugador,
-    );
+    repository.connect(user: user, password: password, idPlayer: idPlayer);
 
     state = state.copyWith(isConnected: true);
   }
 
-  void _handleNotificacionJugador(String data) {
-    try {
-      final json = jsonDecode(data);
-      final mensaje = json['mensaje'] ?? '';
-      final accion = json['accion'] ?? '';
+  void _handlePlayerNotification(dynamic data) {
+    if (data is! List || data.isEmpty) return;
 
-      // Actualizar estado
-      state = state.copyWith(lastNotification: mensaje);
+    final payload = data.first;
 
-      // Mostrar notificación local (excepto si es eliminar seguidor)
-      if (accion != 'eliminar_seguidor') {
-        notificationService.mostrarNotificacion(
-          titulo: 'Notificación',
-          mensaje: mensaje,
-        );
-      }
+    final message = payload['mensaje'];
+    final action = payload['accion'];
 
-      // Manejar baneo
-      if (accion == 'banear_usuario') {
-        _handleBaneo();
-      }
-    } catch (e) {
-      print('Error parseando notificación: $e');
-    }
-  }
+    if (message is! String || action is! String) return;
 
-  void _handleActualizacionResenas(String data) {
-    print('Actualización de reseñas recibida: $data');
-    // Aquí puedes emitir un evento para refrescar la lista de reseñas
-    // O usar un RefreshNotifier, etc.
-  }
+    state = state.copyWith(lastNotification: message, lastAction: action);
 
-  void _handleMensajeBroadcast(String data) {
-    try {
-      final json = jsonDecode(data);
-      final mensaje = json['mensaje'] ?? '';
-
-      notificationService.mostrarNotificacion(
-        titulo: 'Mensaje del servidor',
-        mensaje: mensaje,
+    if (action != 'Eliminar_seguidor') {
+      notificationService.showNotification(
+        title: ApiConstants.appName,
+        message: message,
       );
-    } catch (e) {
-      print('Error parseando broadcast: $e');
+    }
+
+    if (action == 'Banear_usuario') {
+      _handleBan();
     }
   }
 
-  void _handleBaneo() {
-    // Aquí implementas la lógica de logout
+  void _handleReviewsUpdating(dynamic data) {
+    if (data is! List || data.isEmpty) return;
+
+    final payload = data.first;
+    if (payload is! Map) return;
+
+    final message = payload['mensaje'];
+    final action = payload['accion'];
+
+    if (message is! String || action is! String) return;
+
+    state = state.copyWith(lastNotification: message, lastAction: action);
+
+    notificationService.showNotification(
+      title: ApiConstants.appName,
+      message: message,
+    );
+  }
+
+  void _handleMensajeBroadcast(dynamic data) {
+    String mensaje = '';
+
+    if (data is Map) {
+      mensaje = data['mensaje'] ?? '';
+    } else if (data is String) {
+      mensaje = data;
+    }
+
+    notificationService.showNotification(
+      title: ApiConstants.appName,
+      message: mensaje,
+    );
+  }
+
+  void _handleBan() {
     disconnect();
-    // Navegar a login, limpiar shared prefs, etc.
+    authNotifier.expired();
   }
 
-  void suscribirResenasJuego(String idJuego) {
-    repository.suscribirResenasJuego(idJuego);
+  void subscribeGameReviews(String idGame) {
+    repository.subscribeGameReviews(idGame);
   }
 
-  void desuscribirResenasJuego(String idJuego) {
-    repository.desuscribirResenasJuego(idJuego);
+  void unsubscribeGameReviews(String idGame) {
+    repository.unsubscribeGameReviews(idGame);
   }
 
-  void suscribirBroadcast() {
-    repository.suscribirBroadcast();
+  void subscribeBroadcast() {
+    repository.subscribeBroadcast();
   }
 
   void disconnect() {
